@@ -595,7 +595,6 @@ data:not(:hover){
 .container2{
     display:flex;
     gap:40px;
-    padding-left:200px;
 }
 .card{
     width:250px;
