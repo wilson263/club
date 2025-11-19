@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=, initial-scale=1.0">
+    <title>faculty</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+        body{
+            background-image: url(images-1/profile.jpeg);
+            height:100%;
+            width:100%;
+            background-position: center;
+            background-attachment: fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+            padding:30px;
+        }
+        .container{
+             background-color: rgba(225,225,225,.1);
+             border:  2px rgba(225,225,225,.2);
+            backdrop-filter: blur(30px);
+            height:100%;
+            height: 800px;
+            width:100%;
+            border-radius: 30px;
+        }
+        
+    
+
+        /** nav bar **/
+.navbar{
+    width: 100%;
+    height:90px;
+    display: flex;
+    background-color: rgb(240, 244, 248);
+    position:sticky;
+    top:0;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+}
+
+.logo{
+    position: absolute;
+    left:4px;
+    background-color: whitesmoke;
+    background-image:url(images-1/logo.jpeg) ;
+    height:70px;
+    width:70px;
+    background-size: cover;  
+    border-radius: 300px;
+    margin-top:6px ;
+}
+.clgname{
+    margin-left: 10px;
+    position:absolute;
+    left:70px;
+}
+.name{
+    font-size: 40px;
+    font-weight: 900;
+    color: red;
+    font-weight: bolder;
+}
+.institute{
+    font-size: x-small;
+    font-weight: 900;
+    margin-top: 0px;
+    color:rgb(4, 4, 98);
+    margin-top:0px;
+}
+.ugc{
+  font-size: x-small; 
+  color: brown;
+  font-weight: 900;
+}
+.rec{
+    font-size: xx-small;
+    font-weight: 900;
+}
+.app{
+    font-size: xx-small;
+    font-weight: 900;
+}
+.sublogo-1{
+  background-image: url(images-1/sublogo-3.jpeg);  
+  height:50px;
+  width:50px;
+  background-size: cover;
+  position: absolute;
+  right:113px;  
+  top:10px;
+  border-radius:300px;
+}
+.sublogo-2{
+  background-image:url(images-1/sublogo-2.jpeg) ;  
+  height:50px;
+  width:50px;
+  background-size: cover;
+  position: absolute;
+  right:60px;  
+  top:10px;
+   border-radius:300px;
+}
+.sublogo-3{
+  background-image: url(images-1/sublogo-1.jpeg);  
+  height:50px;
+  width:50px;
+  background-size: cover;
+  position: absolute;
+  right:5px;  
+  top:10px;
+   border-radius:300px;
+}
+.sublogo-4{
+  background-image: url(images-1/clublogo.jpeg);  
+  height:55px;
+  width:55px;
+  background-size: cover;
+  position: absolute;
+  right:165px;  
+  top:8px;
+   border-radius:300px;
+}
+
+/** header **/
+header{
+    position:sticky;
+    background-color:  rgb(240, 244, 248);
+    top:90px;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    z-index:100;
+}
+
+.homebut{
+    font-size:15px;
+    color:black;
+    text-decoration: none;
+    background-color:white;
+    padding: 10px;
+    border-radius: 100px;
+
+} 
+.nav a{
+   font-size: 15px;
+   color:black;
+   background-color: white;
+   padding:10px;
+   border-radius: 100px;
+}
+
+/** table **/
+.faculty{
+    padding:50px;
+    margin-top: 20px;
+}
+h1{
+    margin-bottom: 20px;
+    font-size: 45px;
+    color:white;
+    font-size: x-large;
+    font-family: sans-serif;
+    font-weight: 900;
+}
+table{
+    width:100%;
+    border-collapse: collapse;
+    color:whitesmoke
+}
+th,
+td{
+    border:1px solid lightgrey;
+    padding: 6px;
+    text-align: center;
+}
+td{
+    font-size: 12px;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+      <div class="container">
+            <div class="navbar">
+            <div class="logo"></div>
+            <div class="clgname">
+            <p class="name">Sri Indu</p>
+            <p class="institute">Institute of Engineering & Technology</p>
+            <p class="ugc">UGC Autonomous Institution</p>
+            <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>   
+       </div>
+       <div class="sublogo-1"></div>
+       <div class="sublogo-2"></div>
+       <div class="sublogo-3"></div>
+       <div class="sublogo-4"></div>
+       
+
+    </div>
+
+
+    <header>
+        <a href="home-2.html" class="homebut"><i class="fa-solid fa-house"></i></a>
+        <nav class="nav">
+        <a href=""><i class="fa-solid fa-trophy"></i></a>
+        <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
+        <a href="faculty.html"><i class="fa-solid fa-graduation-cap"></i></a>
+        <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
+        <a href="#"><i class="fa-solid fa-comment"></i></a>
+      </nav>   
+    </header>
+
+
+<div class="faculty">
+    <h1>&middot;Faculty Member's</h1>
+       <table>
+        <tr>
+         <th>Name</th>
+         <th>Designtion</th>
+         <th>Qualification</th>
+        </tr>
+
+        <tr>
+          <td>Mrs.M.Karuna</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+
+        <tr>
+          <td>Mrs.N.Kalyani</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+
+        <tr>
+          <td>Mr.B.Sai Tharun</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+
+        <tr>
+          <td>Mr.T.Ravi Charan</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+
+        <tr>
+          <td>Ms.S.Divya</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+
+        <tr>
+          <td>Mr.D.G.R.Kumar</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+
+        <tr>
+          <td>something</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+
+        <tr>
+          <td>something</td>
+          <td>M.tech</td>
+          <td>Professor</td>
+        </tr>
+       </div>
+       </div>
+    </div>
+  
+</body>
+</html>
