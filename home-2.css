@@ -15,6 +15,14 @@ body{
                 padding:10px;
                 
 }
+
+
+.seo-title {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+}
+
  .container{
        position: relative;
        height:100%;
