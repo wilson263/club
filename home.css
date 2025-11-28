@@ -927,8 +927,12 @@ header{
 
 
 @media (max-width:599px) {
+      body{
+          margin:0;
+          padding:0;
+      }
        .navbar{
-       height:60px;
+      height:60px;
        }
        .logo{
         height: 50px;
