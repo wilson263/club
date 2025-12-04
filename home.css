@@ -21,7 +21,7 @@ body{
        height:100%;
        background-color: rgba(225,225,225,.1);
        border:  2px rgba(225,225,225,.2);
-       backdrop-filter: blur(30px);
+       backdrop-filter: blur(10px);
        background-size: cover;
        border-radius: 30px;
  }
