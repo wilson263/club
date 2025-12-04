@@ -25,6 +25,8 @@ body{
        backdrop-filter: blur(10px);
        background-size: cover;
        border-radius: 30px;
+     margin:0px;
+     padding:0px;
  }
 
  /** nav bar **/
