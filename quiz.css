@@ -190,7 +190,7 @@ header{
 
 /* Hero */
 .hero {
-  height: 650px;
+  height: 550px;
   background-image:url(images-1/club1.jpeg) ;
   background-size: cover;
   display: flex;
