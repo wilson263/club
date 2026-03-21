@@ -286,19 +286,52 @@ async function loadUpcomingEventsForRegistration(selectId) {
   const select = document.getElementById(id);
   if (!select || !db) return;
   try {
-    const snap = await db.collection("events").where("type", "==", "upcoming").orderBy("addedAt", "desc").get();
-    select.innerHTML = '<option value="">— Select an Event —</option>';
-    snap.forEach(doc => {
-      const opt = document.createElement("option");
-      opt.value = doc.id;
-      opt.dataset.title = doc.data().title || "";
-      opt.textContent = doc.data().title + (doc.data().date ? " (" + doc.data().date + ")" : "");
-      select.appendChild(opt);
-    });
-    if (snap.empty) {
-      select.innerHTML = '<option value="">No upcoming events at the moment</option>';
+    select.innerHTML = '<option value="">— Select an Event / Announcement —</option>';
+    let hasOptions = false;
+
+    // Load upcoming events
+    try {
+      const evSnap = await db.collection("events").where("type", "==", "upcoming").orderBy("addedAt", "desc").get();
+      if (!evSnap.empty) {
+        const grp = document.createElement("optgroup");
+        grp.label = "📅 Upcoming Events";
+        evSnap.forEach(doc => {
+          const d = doc.data();
+          const opt = document.createElement("option");
+          opt.value = doc.id;
+          opt.dataset.title = d.title || "";
+          opt.textContent = (d.title || "Untitled Event") + (d.date ? " (" + d.date + ")" : "");
+          grp.appendChild(opt);
+        });
+        select.appendChild(grp);
+        hasOptions = true;
+      }
+    } catch(e) { console.warn("Events load error:", e); }
+
+    // Load announcements
+    try {
+      const annSnap = await db.collection("announcements").orderBy("addedAt", "desc").get();
+      if (!annSnap.empty) {
+        const grp = document.createElement("optgroup");
+        grp.label = "📢 Announcements";
+        annSnap.forEach(doc => {
+          const d = doc.data();
+          const text = d.title || d.text || "Untitled Announcement";
+          const opt = document.createElement("option");
+          opt.value = "ann_" + doc.id;
+          opt.dataset.title = text;
+          opt.textContent = text.length > 60 ? text.substring(0, 60) + "…" : text;
+          grp.appendChild(opt);
+        });
+        select.appendChild(grp);
+        hasOptions = true;
+      }
+    } catch(e) { console.warn("Announcements load error:", e); }
+
+    if (!hasOptions) {
+      select.innerHTML = '<option value="">No events or announcements available</option>';
     }
-  } catch(e) { console.warn("Error loading events:", e); }
+  } catch(e) { console.warn("Error loading registration options:", e); }
 }
 
 async function submitRegistration(event) {
