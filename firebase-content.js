@@ -158,10 +158,12 @@ async function loadHomePageImages() {
 
   try {
     const snap = await db.collection("home_images").orderBy("uploadedAt", "desc").get();
+    container.innerHTML = ""; // clear any existing content first
     if (snap.empty) return;
 
     snap.forEach(doc => {
       const { url } = doc.data();
+      if (!url) return;
       const box = document.createElement("div");
       box.className = "box";
       const imgDiv = document.createElement("div");

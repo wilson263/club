@@ -660,29 +660,8 @@
       </span>
     </div>
 
-    <!-- ══ SCROLL GALLERY ══ -->
-    <div class="scroll-container" id="dynamic-home-images">
-      <div class="box">
-        <a href="gallery.html" style="text-decoration:none;display:block;height:100%">
-          <div class="boximg" style="background-image:url(images-1/1.jpeg)"></div>
-        </a>
-      </div>
-      <div class="box">
-        <a href="gallery.html" style="text-decoration:none;display:block;height:100%">
-          <div class="boximg" style="background-image:url(images-1/event2.jpeg)"></div>
-        </a>
-      </div>
-      <div class="box">
-        <a href="gallery.html" style="text-decoration:none;display:block;height:100%">
-          <div class="boximg" style="background-image:url(images-1/quiz1.jpeg)"></div>
-        </a>
-      </div>
-      <div class="box">
-        <a href="gallery.html" style="text-decoration:none;display:block;height:100%">
-          <div class="boximg" style="background-image:url(images-1/club1.jpeg)"></div>
-        </a>
-      </div>
-    </div>
+    <!-- ══ SCROLL GALLERY — populated by admin uploads only ══ -->
+    <div class="scroll-container" id="dynamic-home-images"></div>
 
     <!-- ══ SOCIAL BAR ══ -->
     <div class="social">
@@ -1323,7 +1302,7 @@
       }
     })();
   </script>
-  <script src="firebase-content.js?v=2"></script>
+  <script src="firebase-content.js?v=3"></script>
   <script>
     window.addEventListener("load", () => {
       loadHomePageImages();
