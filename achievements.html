@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Achievements — Neural Nexus Club | SIIET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="gallery.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { font-family: 'Inter', Arial, sans-serif; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body { background: #080810 !important; background-image: none !important; margin: 0; padding: 0; }
+    .container { background: transparent !important; border: none !important; backdrop-filter: none !important; border-radius: 0 !important; }
+
+    /* NAVBAR */
+    .navbar {
+      background: rgba(8,8,16,0.97) !important;
+      backdrop-filter: blur(20px) !important;
+      border-bottom: 1px solid rgba(230,57,70,0.2) !important;
+      height: 72px !important;
+      border-radius: 0 !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 999 !important;
+      display: flex;
+      align-items: center;
+    }
+    .logo {
+      background-image: url(images-1/logo.jpeg);
+      border: 2px solid #e63946;
+      box-shadow: 0 0 16px rgba(230,57,70,0.35);
+      margin-top: 0 !important;
+    }
+    .name { color: #e63946 !important; font-size: 28px !important; }
+    .institute, .ugc, .rec { color: #ccc !important; }
+
+    .sublogo-group {
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      position: absolute !important;
+      right: 10px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+    }
+    .sublogo-1, .sublogo-2, .sublogo-3, .sublogo-4 {
+      position: static !important; right: auto !important; top: auto !important;
+      width: 42px !important; height: 42px !important;
+      border-radius: 50% !important;
+      border: 2px solid rgba(230,57,70,0.4) !important;
+      flex-shrink: 0 !important;
+    }
+    @media (max-width: 480px) {
+      .sublogo-1, .sublogo-2, .sublogo-3, .sublogo-4 { width: 30px !important; height: 30px !important; }
+      .sublogo-group { gap: 4px !important; right: 6px !important; }
+      .name { font-size: 20px !important; }
+      .clgname { max-width: calc(100% - 145px) !important; }
+    }
+
+    /* HEADER NAV */
+    header {
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0808 100%) !important;
+      border-bottom: 1px solid rgba(230,57,70,0.15) !important;
+      position: sticky !important;
+      top: 72px !important;
+      z-index: 998 !important;
+    }
+    .nav a { color: #ccc !important; border-radius: 8px !important; transition: all 0.2s !important; }
+    .nav a:hover { background: #e63946 !important; color: white !important; transform: translateY(-2px) !important; }
+    .homebut { background: rgba(230,57,70,0.15) !important; color: #e63946 !important; border-radius: 8px !important; }
+    .nav a.active-page { background: #e63946 !important; color: white !important; }
+
+    /* HERO */
+    .achieve-hero {
+      background: linear-gradient(135deg, #0a0a14 0%, #1a0a0f 50%, #0a0e1a 100%);
+      padding: 56px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(230,57,70,0.15);
+    }
+    .achieve-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(230,57,70,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(230,57,70,0.15);
+      border: 1px solid rgba(230,57,70,0.35);
+      color: #e63946;
+      padding: 6px 18px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .achieve-hero h1 {
+      font-size: clamp(32px, 7vw, 60px);
+      font-weight: 900;
+      color: white;
+      margin: 0 0 12px;
+      line-height: 1.1;
+    }
+    .achieve-hero h1 span { color: #e63946; }
+    .achieve-hero p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.55);
+      max-width: 500px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* STATS BAR */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0;
+      background: #0d0d1e;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .stat-item {
+      flex: 1;
+      min-width: 100px;
+      max-width: 180px;
+      text-align: center;
+      padding: 24px 16px;
+      border-right: 1px solid rgba(255,255,255,0.06);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-size: 32px;
+      font-weight: 900;
+      color: #e63946;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* MAIN CONTENT */
+    .achievements-page {
+      background: #080810;
+      padding: 48px 20px;
+    }
+
+    /* SECTION HEADER */
+    .section-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #e63946;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: white;
+      margin: 0;
+    }
+
+    /* ACHIEVEMENT CARDS GRID */
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto 60px;
+    }
+
+    .achievement-card {
+      background: linear-gradient(135deg, #0d0d1e 0%, #12121f 100%);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 28px 24px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+    }
+    .achievement-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #e63946, #ff6b6b);
+      border-radius: 20px 20px 0 0;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .achievement-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(230,57,70,0.2);
+      border-color: rgba(230,57,70,0.25);
+    }
+    .achievement-card:hover::before { opacity: 1; }
+
+    .card-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      margin-bottom: 18px;
+    }
+    .card-icon.gold { background: rgba(255,193,7,0.15); }
+    .card-icon.silver { background: rgba(176,190,197,0.15); }
+    .card-icon.bronze { background: rgba(188,143,143,0.12); }
+    .card-icon.blue { background: rgba(41,128,185,0.15); }
+    .card-icon.green { background: rgba(39,174,96,0.15); }
+    .card-icon.purple { background: rgba(142,68,173,0.15); }
+
+    .card-category {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #e63946;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 10px;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.7;
+      margin-bottom: 18px;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .card-date {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+    }
+    .card-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+    .badge-gold { background: rgba(255,193,7,0.15); color: #ffc107; }
+    .badge-silver { background: rgba(176,190,197,0.12); color: #b0bec5; }
+    .badge-winner { background: rgba(39,174,96,0.15); color: #27ae60; }
+    .badge-participant { background: rgba(41,128,185,0.12); color: #5dade2; }
+
+    /* TIMELINE SECTION */
+    .timeline-section {
+      max-width: 700px;
+      margin: 0 auto 60px;
+    }
+    .timeline {
+      position: relative;
+      padding-left: 36px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, #e63946, rgba(230,57,70,0.1));
+    }
+    .timeline-item {
+      position: relative;
+      margin-bottom: 32px;
+      background: linear-gradient(135deg, #0d0d1e, #12121f);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 20px 22px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .timeline-item:hover {
+      border-color: rgba(230,57,70,0.2);
+      transform: translateX(4px);
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -30px;
+      top: 22px;
+      width: 16px; height: 16px;
+      background: #e63946;
+      border-radius: 50%;
+      border: 3px solid #080810;
+      box-shadow: 0 0 12px rgba(230,57,70,0.5);
+    }
+    .timeline-date {
+      font-size: 11px;
+      color: #e63946;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .timeline-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 6px;
+    }
+    .timeline-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      background: linear-gradient(135deg, #0d0d1e, #1a0a0f);
+      border: 1px solid rgba(230,57,70,0.15);
+      border-radius: 20px;
+      padding: 48px 24px;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    .cta-section h2 {
+      font-size: 24px;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 12px;
+    }
+    .cta-section p {
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #e63946, #b52733);
+      color: white;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 100px;
+      font-weight: 800;
+      font-size: 14px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(230,57,70,0.4);
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(230,57,70,0.5); }
+
+    /* FOOTER */
+    .footer {
+      background: #040408;
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Admin FAB */
+    .admin-fab {
+      position: fixed; bottom: 24px; right: 24px;
+      background: linear-gradient(135deg, #e63946, #b52733);
+      color: white; border-radius: 50px; padding: 12px 20px;
+      font-size: 13px; font-weight: 800; text-decoration: none;
+      box-shadow: 0 4px 20px rgba(230,57,70,0.4); z-index: 1000;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .admin-fab:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(230,57,70,0.5); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname">
+      <p class="name">Sri Indu</p>
+      <p class="institute">Institute of Engineering &amp; Technology</p>
+      <p class="ugc">UGC Autonomous Institution</p>
+      <p class="rec">Recognized under 2(f) of UGC Act 1956</p>
+    </div>
+    <div class="sublogo-group">
+      <div class="sublogo-4"></div>
+      <div class="sublogo-1"></div>
+      <div class="sublogo-2"></div>
+      <div class="sublogo-3"></div>
+    </div>
+  </div>
+
+  <!-- HEADER NAV -->
+  <header>
+    <a href="home.html" class="homebut" title="Home">⌂</a>
+    <nav class="nav">
+      <a href="achievements.html" title="Achievements" class="active-page">🏆</a>
+      <a href="clubmembers.html" title="Members">👤</a>
+      <a href="faculty.html" title="Faculty">🎓</a>
+      <a href="gallery.html" title="Events &amp; Gallery">📅</a>
+      <a href="contact.html" title="Contact">💬</a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <div class="achieve-hero">
+    <div class="hero-badge">✦ Neural Nexus Club</div>
+    <h1>Our <span>Achievements</span></h1>
+    <p>Celebrating the milestones, victories, and proud moments of the Neural Nexus AI &amp; Data Science Club at SIIET.</p>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">10+</div>
+      <div class="stat-label">Events Conducted</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">5+</div>
+      <div class="stat-label">Awards Won</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">200+</div>
+      <div class="stat-label">Members</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3+</div>
+      <div class="stat-label">Years Active</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="achievements-page">
+
+    <!-- ACHIEVEMENT CARDS -->
+    <div class="section-header">
+      <div class="section-label">Highlights</div>
+      <h2 class="section-title">Key Achievements</h2>
+    </div>
+
+    <div class="achievements-grid">
+
+      <div class="achievement-card">
+        <div class="card-icon gold">🏆</div>
+        <div class="card-category">Quiz Competition</div>
+        <div class="card-title">Inter-College AI Quiz Championship</div>
+        <div class="card-desc">Our team secured 1st place in the inter-college AI &amp; Data Science quiz competition, showcasing deep knowledge in machine learning and AI concepts.</div>
+        <div class="card-footer">
+          <span class="card-date">📅 2024</span>
+          <span class="card-badge badge-gold">🥇 1st Place</span>
+        </div>
+      </div>
+
+      <div class="achievement-card">
+        <div class="card-icon blue">💻</div>
+        <div class="card-category">Hackathon</div>
+        <div class="card-title">Smart India Hackathon Participation</div>
+        <div class="card-desc">Neural Nexus members participated in Smart India Hackathon, presenting innovative AI-based solutions for real-world problems.</div>
+        <div class="card-footer">
+          <span class="card-date">📅 2024</span>
+          <span class="card-badge badge-participant">🔵 Participant</span>
+        </div>
+      </div>
+
+      <div class="achievement-card">
+        <div class="card-icon green">🎓</div>
+        <div class="card-category">Workshop</div>
+        <div class="card-title">100+ Students Trained in Python &amp; ML</div>
+        <div class="card-desc">Conducted a series of hands-on workshops training over 100 students in Python programming, machine learning fundamentals, and data analysis.</div>
+        <div class="card-footer">
+          <span class="card-date">📅 2023–2024</span>
+          <span class="card-badge badge-winner">✅ Completed</span>
+        </div>
+      </div>
+
+      <div class="achievement-card">
+        <div class="card-icon purple">🤖</div>
+        <div class="card-category">Project Expo</div>
+        <div class="card-title">Best AI Project Award — College Expo</div>
+        <div class="card-desc">Club members won the Best Project award at the annual college technical exposition for their AI-based project solving an industry problem.</div>
+        <div class="card-footer">
+          <span class="card-date">📅 2023</span>
+          <span class="card-badge badge-gold">🥇 Best Project</span>
+        </div>
+      </div>
+
+      <div class="achievement-card">
+        <div class="card-icon silver">📊</div>
+        <div class="card-category">Data Science</div>
+        <div class="card-title">Data Science Case Study Runner-Up</div>
+        <div class="card-desc">Secured 2nd place in a state-level data science case study competition, demonstrating strong analytical and visualization skills.</div>
+        <div class="card-footer">
+          <span class="card-date">📅 2023</span>
+          <span class="card-badge badge-silver">🥈 2nd Place</span>
+        </div>
+      </div>
+
+      <div class="achievement-card">
+        <div class="card-icon gold">🌟</div>
+        <div class="card-category">Club Recognition</div>
+        <div class="card-title">Best Technical Club — SIIET</div>
+        <div class="card-desc">Neural Nexus was recognized as the Best Technical Club of the year by Sri Indu Institute of Engineering &amp; Technology for outstanding performance and community impact.</div>
+        <div class="card-footer">
+          <span class="card-date">📅 2023</span>
+          <span class="card-badge badge-winner">🏅 Recognized</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="section-header">
+      <div class="section-label">Our Journey</div>
+      <h2 class="section-title">Club Milestones</h2>
+    </div>
+
+    <div class="timeline-section">
+      <div class="timeline">
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2024</div>
+          <div class="timeline-title">🏆 1st Place — AI Quiz Championship</div>
+          <div class="timeline-desc">Dominated the inter-college AI quiz and brought home the gold.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2024</div>
+          <div class="timeline-title">💻 Smart India Hackathon</div>
+          <div class="timeline-desc">Represented the college with AI-driven solutions at the national hackathon.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2023–2024</div>
+          <div class="timeline-title">🎓 100+ Students Trained</div>
+          <div class="timeline-desc">Ran multiple Python, ML, and AI workshops empowering students across departments.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2023</div>
+          <div class="timeline-title">🤖 Best AI Project — College Expo</div>
+          <div class="timeline-desc">Innovative AI project wins top award at the annual technical exposition.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2023</div>
+          <div class="timeline-title">🌟 Best Technical Club Award</div>
+          <div class="timeline-desc">Officially recognized as the Best Technical Club of SIIET for the academic year.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-date">2022</div>
+          <div class="timeline-title">🚀 Neural Nexus Club Founded</div>
+          <div class="timeline-desc">The AI &amp; Data Science Club was established at Sri Indu Institute of Engineering &amp; Technology.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <h2>Want to Be Part of Our Story?</h2>
+      <p>Join Neural Nexus and contribute to our growing list of achievements. Every member makes a difference.</p>
+      <a href="clubmembers.html" class="cta-btn">Meet Our Members →</a>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    © 2025 Neural Nexus Group — AI &amp; DS Club, SIIET. All rights reserved.
+  </div>
+
+</div>
+
+<a href="admin.html" class="admin-fab">🔐 Admin</a>
+
+</body>
+</html>
