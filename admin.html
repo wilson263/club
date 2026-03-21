@@ -639,27 +639,96 @@
             <div id="newsletter-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div>
           </div>
         </div>
-
-        <!-- ── LIVE QUIZ ── -->
+        <!-- LIVE QUIZ -->
         <div class="panel" id="panel-live-quiz">
-          <div class="card">
-            <div class="card-title"><span class="ct-icon">⚡</span> Live Quiz — Host Control</div>
-            <p class="hint-text">Start a live question. Students on <a href="live-quiz.html" target="_blank" style="color:#e63946">live-quiz.html</a> will see it instantly. Only one active session at a time.</p>
-            <div class="f-group"><label class="f-label">Question *</label><textarea class="f-input" id="qz-question" rows="3" placeholder="e.g. Which algorithm is used for classification?"></textarea></div>
-            <div class="f-group"><label class="f-label">Options (one per line, max 4) *</label><textarea class="f-input" id="qz-options" rows="4" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"></textarea></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="f-group"><label class="f-label">Correct Option # (1-4) *</label><input class="f-input" type="number" id="qz-correct" min="1" max="4" placeholder="e.g. 2"></div>
-              <div class="f-group"><label class="f-label">Timer (seconds)</label><input class="f-input" type="number" id="qz-timer" value="30" min="10" max="120"></div>
+
+          <!-- SESSION SETUP -->
+          <div class="card" id="qz-setup-card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">&#9889;</span> Live Quiz — Host Control</div>
+              <div id="qz-session-badge" style="display:none;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);border-radius:50px;padding:5px 14px;font-size:12px;font-weight:700;color:#e63946">&#9679; SESSION LIVE</div>
             </div>
-            <div style="display:flex;gap:10px">
-              <button class="btn btn-primary" onclick="startQuizSession()">⚡ Go Live!</button>
-              <button class="btn btn-danger" onclick="stopQuizSession()">⏹ End Session</button>
+            <p class="hint-text">Create a quiz session, add as many questions as you want, then launch them one by one. Participants join at <a href="live-quiz.html" target="_blank" style="color:#e63946">live-quiz.html</a>.</p>
+
+            <div id="qz-create-section">
+              <div class="f-group"><label class="f-label">Quiz Title *</label><input class="f-input" id="qz-title" placeholder="e.g. AI &amp; Data Science Quiz — Round 1"></div>
+              <button class="btn btn-primary" onclick="createQuizSession()">&#9889; Create Quiz Session</button>
             </div>
-            <div id="quiz-status" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+
+            <div id="qz-active-section" style="display:none">
+              <div style="background:rgba(39,174,96,0.08);border:1px solid rgba(39,174,96,0.2);border-radius:12px;padding:14px 18px;margin-bottom:16px;font-size:14px;color:#27ae60;font-weight:600">
+                &#9989; Session active: <span id="qz-session-title" style="color:#fff"></span>
+              </div>
+
+              <!-- Add Question -->
+              <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:20px;margin-bottom:16px">
+                <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:14px">&#10133; Add Question</div>
+                <div class="f-group"><label class="f-label">Question *</label><textarea class="f-input" id="qz-question" rows="2" placeholder="e.g. Which algorithm is best for image classification?"></textarea></div>
+                <div class="f-group"><label class="f-label">Option A *</label><input class="f-input" id="qz-opt-a" placeholder="Option A"></div>
+                <div class="f-group"><label class="f-label">Option B *</label><input class="f-input" id="qz-opt-b" placeholder="Option B"></div>
+                <div class="f-group"><label class="f-label">Option C</label><input class="f-input" id="qz-opt-c" placeholder="Option C (optional)"></div>
+                <div class="f-group"><label class="f-label">Option D</label><input class="f-input" id="qz-opt-d" placeholder="Option D (optional)"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div class="f-group">
+                    <label class="f-label">Correct Answer *</label>
+                    <select class="f-input" id="qz-correct">
+                      <option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option>
+                    </select>
+                  </div>
+                  <div class="f-group"><label class="f-label">Timer (seconds)</label><input class="f-input" type="number" id="qz-timer" value="30" min="10" max="120"></div>
+                </div>
+                <button class="btn btn-secondary" onclick="addQuizQuestion()">&#10133; Add to Queue</button>
+              </div>
+
+              <!-- Questions Queue -->
+              <div style="margin-bottom:16px">
+                <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:10px">&#128203; Question Queue (<span id="qz-q-count">0</span> questions)</div>
+                <div id="qz-question-list" style="display:flex;flex-direction:column;gap:8px"></div>
+              </div>
+
+              <!-- Host Controls -->
+              <div style="background:rgba(230,57,70,0.06);border:1px solid rgba(230,57,70,0.2);border-radius:14px;padding:16px;margin-bottom:16px">
+                <div style="font-size:13px;font-weight:700;color:#e63946;margin-bottom:12px">&#127916; Host Controls</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <button class="btn btn-primary" onclick="launchNextQuestion()" id="qz-next-btn">&#9889; Launch Next Question</button>
+                  <button class="btn btn-secondary" onclick="endCurrentQuestion()" id="qz-end-q-btn">&#9209; End Current Question</button>
+                  <button class="btn btn-danger" onclick="endQuizSession()">&#9940; End Entire Quiz</button>
+                </div>
+                <div id="qz-current-status" style="margin-top:10px;font-size:13px;color:var(--muted)">No question active yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- LIVE PARTICIPANTS -->
+          <div class="card" style="margin-top:16px" id="qz-participants-card" style="display:none">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">&#128100;</span> Live Participants (<span id="qz-p-count">0</span>)</div>
+              <button class="btn btn-secondary" style="font-size:12px" onclick="refreshQuizParticipants()">&#128260; Refresh</button>
+            </div>
+            <div id="qz-participants-list"><div style="text-align:center;padding:24px;color:var(--muted)">No participants yet.</div></div>
+          </div>
+
+          <!-- MISBEHAVIOR FLAGS -->
+          <div class="card" style="margin-top:16px">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">&#9888;</span> Misbehavior Flags (<span id="qz-flag-count">0</span> unseen)</div>
+              <button class="btn btn-secondary" style="font-size:12px" onclick="refreshQuizFlags()">&#128260; Refresh</button>
+            </div>
+            <p class="hint-text">Real-time alerts: tab switches, window blur, DevTools detection, page close.</p>
+            <div id="qz-flags-list"><div style="text-align:center;padding:24px;color:var(--muted)">No flags yet.</div></div>
+          </div>
+
+          <!-- RESPONSES SUMMARY -->
+          <div class="card" style="margin-top:16px">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">&#128202;</span> Live Responses</div>
+              <button class="btn btn-secondary" style="font-size:12px" onclick="refreshQuizResponses()">&#128260; Refresh</button>
+            </div>
+            <div id="qz-responses-list"><div style="text-align:center;padding:24px;color:var(--muted)">No responses yet.</div></div>
           </div>
         </div>
 
-        <!-- ── FEEDBACK INBOX ── -->
+        <!-- __ FEEDBACK INBOX ── -->
         <div class="panel" id="panel-feedback-inbox">
           <div class="card">
             <div class="card-title"><span class="ct-icon">⭐</span> Event Feedback Inbox</div>
