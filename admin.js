@@ -1426,10 +1426,12 @@ async function saveAlumni() {
   const name = document.getElementById("al-name").value.trim();
   const batch = document.getElementById("al-batch").value.trim();
   if (!name || !batch) { showToast("Name and batch year are required","error"); return; }
-  await db.collection("alumni").add({ name, batch, company: document.getElementById("al-company").value.trim(), role: document.getElementById("al-role").value.trim(), linkedin: document.getElementById("al-linkedin").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Alumni added!","success");
-  ["al-name","al-batch","al-company","al-role","al-linkedin"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminAlumni();
+  try {
+    await db.collection("alumni").add({ name, batch, company: document.getElementById("al-company").value.trim(), role: document.getElementById("al-role").value.trim(), linkedin: document.getElementById("al-linkedin").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Alumni added!","success");
+    ["al-name","al-batch","al-company","al-role","al-linkedin"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminAlumni();
+  } catch(e) { showToast("Error saving alumni: " + e.message, "error"); console.error("saveAlumni error:", e); }
 }
 
 // ── LEADERBOARD ─────────────────────────────────────────
@@ -1455,10 +1457,12 @@ async function saveLeaderboard() {
   const pts = parseInt(document.getElementById("lb-points").value)||0;
   if (!name) { showToast("Name is required","error"); return; }
   const badges = (document.getElementById("lb-badges").value||"").split(",").map(b=>b.trim()).filter(Boolean);
-  await db.collection("leaderboard").add({ name, dept: document.getElementById("lb-dept").value.trim(), points: pts, badges, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Entry added!","success");
-  ["lb-name","lb-dept","lb-points","lb-badges"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminLeaderboard();
+  try {
+    await db.collection("leaderboard").add({ name, dept: document.getElementById("lb-dept").value.trim(), points: pts, badges, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Entry added!","success");
+    ["lb-name","lb-dept","lb-points","lb-badges"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminLeaderboard();
+  } catch(e) { showToast("Error saving entry: " + e.message, "error"); console.error("saveLeaderboard error:", e); }
 }
 
 // ── PLACEMENTS ──────────────────────────────────────────
@@ -1482,10 +1486,12 @@ async function savePlacement() {
   const name = document.getElementById("pl-name").value.trim();
   const company = document.getElementById("pl-company").value.trim();
   if (!name || !company) { showToast("Name and company are required","error"); return; }
-  await db.collection("placements").add({ name, company, role: document.getElementById("pl-role").value.trim(), year: document.getElementById("pl-year").value.trim(), package: document.getElementById("pl-package").value.trim(), companyEmoji: document.getElementById("pl-emoji").value.trim()||"🏢", addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Placement added!","success");
-  ["pl-name","pl-company","pl-role","pl-year","pl-package","pl-emoji"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminPlacements();
+  try {
+    await db.collection("placements").add({ name, company, role: document.getElementById("pl-role").value.trim(), year: document.getElementById("pl-year").value.trim(), package: document.getElementById("pl-package").value.trim(), companyEmoji: document.getElementById("pl-emoji").value.trim()||"🏢", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Placement added!","success");
+    ["pl-name","pl-company","pl-role","pl-year","pl-package","pl-emoji"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminPlacements();
+  } catch(e) { showToast("Error saving placement: " + e.message, "error"); console.error("savePlacement error:", e); }
 }
 
 // ── BLOG ────────────────────────────────────────────────
@@ -1508,10 +1514,12 @@ async function loadAdminBlog() {
 async function saveBlog() {
   const title = document.getElementById("bl-title").value.trim();
   if (!title) { showToast("Title is required","error"); return; }
-  await db.collection("blog").add({ title, author: document.getElementById("bl-author").value.trim(), category: document.getElementById("bl-cat").value.trim(), date: document.getElementById("bl-date").value, url: document.getElementById("bl-url").value.trim(), coverImage: document.getElementById("bl-cover").value.trim(), excerpt: document.getElementById("bl-excerpt").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Article published!","success");
-  ["bl-title","bl-author","bl-cat","bl-url","bl-cover","bl-excerpt","bl-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminBlog();
+  try {
+    await db.collection("blog").add({ title, author: document.getElementById("bl-author").value.trim(), category: document.getElementById("bl-cat").value.trim(), date: document.getElementById("bl-date").value, url: document.getElementById("bl-url").value.trim(), coverImage: document.getElementById("bl-cover").value.trim(), excerpt: document.getElementById("bl-excerpt").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Article published!","success");
+    ["bl-title","bl-author","bl-cat","bl-url","bl-cover","bl-excerpt","bl-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminBlog();
+  } catch(e) { showToast("Error publishing article: " + e.message, "error"); console.error("saveBlog error:", e); }
 }
 
 // ── NEWSLETTER ──────────────────────────────────────────
@@ -1534,9 +1542,11 @@ async function loadAdminNewsletter() {
 async function checkQuizStatus() {
   const el = document.getElementById("quiz-status");
   if (!el) return;
-  const snap = await db.collection("quiz_sessions").where("active","==",true).get();
-  el.textContent = snap.empty ? "No active quiz session." : "⚡ LIVE: "+snap.docs[0].data().question;
-  el.style.color = snap.empty ? "var(--muted)" : "#e63946";
+  try {
+    const snap = await db.collection("quiz_sessions").where("active","==",true).get();
+    el.textContent = snap.empty ? "No active quiz session." : "⚡ LIVE: "+snap.docs[0].data().question;
+    el.style.color = snap.empty ? "var(--muted)" : "#e63946";
+  } catch(e) { el.textContent = "Error checking quiz status."; console.error("checkQuizStatus error:", e); }
 }
 async function startQuizSession() {
   const q = document.getElementById("qz-question").value.trim();
@@ -1544,14 +1554,18 @@ async function startQuizSession() {
   const correct = parseInt(document.getElementById("qz-correct").value)-1;
   const timer = parseInt(document.getElementById("qz-timer").value)||30;
   if (!q || opts.length < 2) { showToast("Question and at least 2 options required","error"); return; }
-  await db.collection("quiz_sessions").where("active","==",true).get().then(snap=>Promise.all(snap.docs.map(d=>d.ref.update({active:false}))));
-  await db.collection("quiz_sessions").add({ question: q, options: opts, correctIndex: correct, timer, active: true, questionNumber: Date.now(), startedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Quiz is now LIVE!","success"); checkQuizStatus();
+  try {
+    await db.collection("quiz_sessions").where("active","==",true).get().then(snap=>Promise.all(snap.docs.map(d=>d.ref.update({active:false}))));
+    await db.collection("quiz_sessions").add({ question: q, options: opts, correctIndex: correct, timer, active: true, questionNumber: Date.now(), startedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Quiz is now LIVE!","success"); checkQuizStatus();
+  } catch(e) { showToast("Error starting quiz: " + e.message, "error"); console.error("startQuizSession error:", e); }
 }
 async function stopQuizSession() {
-  const snap = await db.collection("quiz_sessions").where("active","==",true).get();
-  await Promise.all(snap.docs.map(d=>d.ref.update({active:false})));
-  showToast("Quiz ended","info"); checkQuizStatus();
+  try {
+    const snap = await db.collection("quiz_sessions").where("active","==",true).get();
+    await Promise.all(snap.docs.map(d=>d.ref.update({active:false})));
+    showToast("Quiz ended","info"); checkQuizStatus();
+  } catch(e) { showToast("Error stopping quiz: " + e.message, "error"); console.error("stopQuizSession error:", e); }
 }
 
 // ── FEEDBACK ────────────────────────────────────────────
@@ -1605,18 +1619,22 @@ async function loadAdminAttendance() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function toggleAttSession(id, active, cb) {
-  await db.collection("attendance_sessions").doc(id).update({ active });
-  showToast(active?"Session re-opened":"Session closed","info"); if(cb) cb();
+  try {
+    await db.collection("attendance_sessions").doc(id).update({ active });
+    showToast(active?"Session re-opened":"Session closed","info"); if(cb) cb();
+  } catch(e) { showToast("Error updating session: " + e.message, "error"); console.error("toggleAttSession error:", e); }
 }
 async function createAttendanceSession() {
   const title = document.getElementById("att-title").value.trim();
   const code = document.getElementById("att-code-inp").value.trim().toUpperCase();
   const date = document.getElementById("att-date").value;
   if (!title || !code) { showToast("Title and code are required","error"); return; }
-  await db.collection("attendance_sessions").add({ title, code, date, active: true, createdBy: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Session created! Show code: "+code,"success");
-  ["att-title","att-code-inp","att-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminAttendance();
+  try {
+    await db.collection("attendance_sessions").add({ title, code, date, active: true, createdBy: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Session created! Show code: "+code,"success");
+    ["att-title","att-code-inp","att-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminAttendance();
+  } catch(e) { showToast("Error creating session: " + e.message, "error"); console.error("createAttendanceSession error:", e); }
 }
 
 // ── CERTIFICATES ─────────────────────────────────────────
@@ -1640,10 +1658,12 @@ async function issueCertificate() {
   if (!issuedTo || !event) { showToast("Name and event are required","error"); return; }
   const customCode = document.getElementById("cert-code-inp").value.trim().toUpperCase();
   const code = customCode || "NN-"+(new Date().getFullYear())+"-"+Math.random().toString(36).substr(2,4).toUpperCase();
-  await db.collection("certificates").add({ code, issuedTo, event, date, issuedBy: currentUser.email, issuedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Certificate issued! Code: "+code,"success");
-  ["cert-to","cert-event","cert-date","cert-code-inp"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminCertificates();
+  try {
+    await db.collection("certificates").add({ code, issuedTo, event, date, issuedBy: currentUser.email, issuedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Certificate issued! Code: "+code,"success");
+    ["cert-to","cert-event","cert-date","cert-code-inp"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminCertificates();
+  } catch(e) { showToast("Error issuing certificate: " + e.message, "error"); console.error("issueCertificate error:", e); }
 }
 
 // ── PRESS ────────────────────────────────────────────────
@@ -1667,10 +1687,12 @@ async function loadAdminPress() {
 async function savePress() {
   const title = document.getElementById("pr-title").value.trim();
   if (!title) { showToast("Headline is required","error"); return; }
-  await db.collection("press").add({ title, source: document.getElementById("pr-source").value.trim(), date: document.getElementById("pr-date").value, url: document.getElementById("pr-url").value.trim(), icon: document.getElementById("pr-icon").value.trim()||"📰", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Coverage added!","success");
-  ["pr-title","pr-source","pr-date","pr-url","pr-icon"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminPress();
+  try {
+    await db.collection("press").add({ title, source: document.getElementById("pr-source").value.trim(), date: document.getElementById("pr-date").value, url: document.getElementById("pr-url").value.trim(), icon: document.getElementById("pr-icon").value.trim()||"📰", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Coverage added!","success");
+    ["pr-title","pr-source","pr-date","pr-url","pr-icon"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminPress();
+  } catch(e) { showToast("Error saving coverage: " + e.message, "error"); console.error("savePress error:", e); }
 }
 
 // ── OPEN SOURCE ──────────────────────────────────────────
@@ -1693,10 +1715,12 @@ async function loadAdminOSS() {
 async function saveOSS() {
   const title = document.getElementById("oss-title").value.trim();
   if (!title) { showToast("Repo name is required","error"); return; }
-  await db.collection("opensource").add({ title, description: document.getElementById("oss-desc").value.trim(), language: document.getElementById("oss-lang").value.trim(), stars: parseInt(document.getElementById("oss-stars").value)||0, link: document.getElementById("oss-link").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Repository added!","success");
-  ["oss-title","oss-desc","oss-lang","oss-stars","oss-link"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminOSS();
+  try {
+    await db.collection("opensource").add({ title, description: document.getElementById("oss-desc").value.trim(), language: document.getElementById("oss-lang").value.trim(), stars: parseInt(document.getElementById("oss-stars").value)||0, link: document.getElementById("oss-link").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Repository added!","success");
+    ["oss-title","oss-desc","oss-lang","oss-stars","oss-link"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminOSS();
+  } catch(e) { showToast("Error saving repository: " + e.message, "error"); console.error("saveOSS error:", e); }
 }
 
 // ── MINUTES ──────────────────────────────────────────────
@@ -1725,10 +1749,12 @@ async function saveMinutes() {
   const fileUrl = document.getElementById("mn-url").value.trim();
   const date = document.getElementById("mn-date").value;
   if (!title || !fileUrl) { showToast("Title and file URL are required","error"); return; }
-  await db.collection("minutes").add({ title, date, meetingType: document.getElementById("mn-type").value.trim(), fileUrl, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Minutes uploaded!","success");
-  ["mn-title","mn-date","mn-type","mn-url"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminMinutes();
+  try {
+    await db.collection("minutes").add({ title, date, meetingType: document.getElementById("mn-type").value.trim(), fileUrl, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Minutes uploaded!","success");
+    ["mn-title","mn-date","mn-type","mn-url"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminMinutes();
+  } catch(e) { showToast("Error uploading minutes: " + e.message, "error"); console.error("saveMinutes error:", e); }
 }
 
 // ── SPONSORS ─────────────────────────────────────────────
@@ -1754,10 +1780,12 @@ async function loadAdminSponsors() {
 async function saveSponsor() {
   const name = document.getElementById("sp-name").value.trim();
   if (!name) { showToast("Company name is required","error"); return; }
-  await db.collection("sponsors").add({ name, tier: document.getElementById("sp-tier").value, website: document.getElementById("sp-website").value.trim(), logo: document.getElementById("sp-logo").value.trim()||"🏢", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast("Sponsor added!","success");
-  ["sp-name","sp-website","sp-logo"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-  loadAdminSponsors();
+  try {
+    await db.collection("sponsors").add({ name, tier: document.getElementById("sp-tier").value, website: document.getElementById("sp-website").value.trim(), logo: document.getElementById("sp-logo").value.trim()||"🏢", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Sponsor added!","success");
+    ["sp-name","sp-website","sp-logo"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+    loadAdminSponsors();
+  } catch(e) { showToast("Error saving sponsor: " + e.message, "error"); console.error("saveSponsor error:", e); }
 }
 
 // ── SHARED DELETE HELPER ──────────────────────────────────
