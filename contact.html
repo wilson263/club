@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact Neural Nexus — AI &amp; Data Science Club, Sri Indu Institute of Engineering &amp; Technology.">
+  <title>Contact Us — Neural Nexus | SIIET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: #080810; color: white; min-height: 100vh; }
+
+    /* NAVBAR */
+    .navbar {
+      width: 100%; height: 72px; display: flex; align-items: center;
+      background: #080810;
+      border-bottom: 1px solid rgba(230,57,70,0.2);
+      position: sticky; top: 0; z-index: 999;
+    }
+    .logo { position: absolute; left: 8px; top: 8px; background-image: url(images-1/logo.jpeg); height: 56px; width: 56px; background-size: cover; border-radius: 50%; border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35); }
+    .clgname { margin-left: 76px; }
+    .name { font-size: clamp(16px,4vw,28px); font-weight: 900; color: #e63946; line-height: 1.1; }
+    .institute { font-size: 11px; font-weight: 700; color: #ccc; }
+    .ugc { font-size: 10px; color: rgba(230,57,70,0.8); font-weight: 700; }
+    .rec { font-size: 9px; color: #888; }
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 46px; width: 46px; background-size: cover; border-radius: 50%; position: absolute; border: 2px solid rgba(255,255,255,0.15); }
+    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); right: 156px; top: 13px; }
+    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); right: 107px; top: 13px; }
+    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); right: 58px; top: 13px; }
+    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); right: 9px; top: 13px; }
+    @media(max-width:600px) {
+      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 36px; width: 36px; }
+      .sublogo-4 { right: 118px; top: 18px; } .sublogo-1 { right: 80px; top: 18px; }
+      .sublogo-2 { right: 42px; top: 18px; } .sublogo-3 { right: 4px; top: 18px; }
+    }
+
+    /* HEADER NAV */
+    header {
+      position: sticky; top: 72px; z-index: 998;
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0808 100%);
+      border-bottom: 1px solid rgba(230,57,70,0.15);
+      display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;
+    }
+    .homebut { font-size: 15px; color: #e63946; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; background: rgba(230,57,70,0.15); }
+    .nav { display: flex; gap: 4px; }
+    .nav a { font-size: 15px; color: #ccc; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; }
+    .homebut:hover,.nav a:hover { background: #e63946; color: white; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(230,57,70,0.4); }
+    .nav a.active { background: rgba(230,57,70,0.2); color: #e63946; }
+
+    /* HERO */
+    .page-hero {
+      background: linear-gradient(135deg, #0a0a14 0%, #1a0a0f 50%, #0a0e1a 100%);
+      padding: 60px 24px 48px; text-align: center; position: relative; overflow: hidden;
+    }
+    .page-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(230,57,70,0.14) 0%, transparent 70%);
+    }
+    .page-hero::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent);
+    }
+    .page-icon {
+      width: 90px; height: 90px; border-radius: 50%; background: rgba(230,57,70,0.1);
+      border: 2px solid rgba(230,57,70,0.4); margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px; position: relative; z-index: 1;
+      box-shadow: 0 0 40px rgba(230,57,70,0.2);
+    }
+    .page-hero h1 {
+      font-size: clamp(28px, 6vw, 56px); font-weight: 900; letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff 0%, #e63946 60%, #ff6b7a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      position: relative; z-index: 1; margin-bottom: 10px;
+    }
+    .page-hero p { color: rgba(255,255,255,0.4); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; position: relative; z-index: 1; }
+
+    /* PAGE CONTENT */
+    .page-content { max-width: 900px; margin: 0 auto; padding: 48px 24px 64px; }
+
+    /* ABOUT CLUB */
+    .about-strip {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px; padding: 32px; margin-bottom: 40px;
+      display: flex; gap: 28px; align-items: center; flex-wrap: wrap;
+      position: relative; overflow: hidden;
+    }
+    .about-strip::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #e63946, transparent);
+    }
+    .about-logo {
+      width: 90px; height: 90px; border-radius: 50%; flex-shrink: 0;
+      background-image: url(images-1/clublogo.jpeg); background-size: cover; background-position: center;
+      border: 3px solid #e63946; box-shadow: 0 0 30px rgba(230,57,70,0.25);
+    }
+    .about-text h2 { font-size: 20px; font-weight: 900; color: white; margin-bottom: 10px; }
+    .about-text p { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.9; }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 11px; font-weight: 800; color: rgba(230,57,70,0.7); letter-spacing: 3px;
+      text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* CONTACT GRID */
+    .contact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin-bottom: 48px; }
+    .contact-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 28px 24px; transition: all 0.25s; position: relative;
+      overflow: hidden; text-decoration: none; display: block;
+    }
+    .contact-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+      transition: height 0.3s;
+    }
+    .contact-card.instagram::before { background: linear-gradient(180deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+    .contact-card.whatsapp::before { background: #25d366; }
+    .contact-card.email::before { background: #e63946; }
+    .contact-card.phone::before { background: #457b9d; }
+    .contact-card:hover { border-color: rgba(230,57,70,0.35); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    .contact-card .c-icon {
+      width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center;
+      justify-content: center; font-size: 22px; margin-bottom: 16px;
+    }
+    .contact-card.instagram .c-icon { background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#bc1888); }
+    .contact-card.whatsapp .c-icon { background: rgba(37,211,102,0.15); color: #25d366; border: 1px solid rgba(37,211,102,0.3); }
+    .contact-card.email .c-icon { background: rgba(230,57,70,0.15); color: #e63946; border: 1px solid rgba(230,57,70,0.3); }
+    .contact-card.phone .c-icon { background: rgba(69,123,157,0.15); color: #7aadcd; border: 1px solid rgba(69,123,157,0.3); }
+    .contact-card .c-title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 4px; }
+    .contact-card .c-handle { font-size: 13px; color: rgba(255,255,255,0.45); margin-bottom: 14px; word-break: break-all; }
+    .contact-card .c-action {
+      display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700;
+      color: #e63946; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .contact-card .c-action i { font-size: 10px; }
+
+    /* EVENTS SECTION */
+    .events-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
+    .event-chip {
+      background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.25);
+      border-radius: 50px; padding: 10px 20px; display: flex; align-items: center; gap: 10px;
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7);
+    }
+    .event-chip .chip-dot { width: 7px; height: 7px; border-radius: 50%; background: #e63946; }
+
+    /* MAP / LOCATION CARD */
+    .location-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 28px 24px; position: relative; overflow: hidden;
+      display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;
+    }
+    .location-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent);
+    }
+    .loc-icon { width: 56px; height: 56px; border-radius: 14px; background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.25); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .loc-details h3 { font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px; }
+    .loc-details p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.8; margin-bottom: 4px; }
+    .loc-details a { color: #e63946; text-decoration: none; font-size: 13px; font-weight: 600; }
+    .loc-details a:hover { text-decoration: underline; }
+
+    /* FOOTER */
+    footer { background: #04040a; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 24px 0; }
+    .footer-inner { display: flex; flex-wrap: wrap; gap: 24px; max-width: 1100px; margin: 0 auto; padding-bottom: 32px; }
+    .footer-col { flex: 1 1 180px; min-width: 0; }
+    .footer-col .logo-f { width: 50px; height: 50px; border-radius: 50%; background-image: url(images-1/logo.jpeg); background-size: cover; border: 2px solid #e63946; margin-bottom: 12px; }
+    .footer-col .name-f { font-size: 18px; font-weight: 900; color: #e63946; }
+    .footer-col .inst-f { font-size: 11px; color: #999; margin-top: 2px; }
+    .footer-heading { font-size: 12px; font-weight: 800; color: #e63946; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+    .footer-col p, .footer-col a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; display: block; margin-bottom: 7px; line-height: 1.6; }
+    .footer-col a:hover { color: #e63946; }
+    .footer-social { display: flex; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+    .footer-social a { font-size: 20px !important; color: rgba(255,255,255,0.35) !important; transition: color 0.2s; margin: 0 !important; display: inline !important; }
+    .footer-social a:hover { color: #e63946 !important; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); text-align: center; padding: 16px; color: rgba(255,255,255,0.25); font-size: 12px; }
+    .admin-fab { position: fixed; bottom: 28px; right: 28px; background: linear-gradient(135deg,#c0392b,#96281b); color: white; border-radius: 50px; padding: 13px 22px; font-size: 14px; font-weight: 700; box-shadow: 0 6px 24px rgba(192,57,43,0.45); display: flex; align-items: center; gap: 8px; z-index: 999; text-decoration: none; transition: transform 0.2s; }
+    .admin-fab:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname">
+      <p class="name">Sri Indu</p>
+      <p class="institute">Institute of Engineering &amp; Technology</p>
+      <p class="ugc">UGC Autonomous Institution</p>
+      <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
+    </div>
+    <div class="sublogo-4"></div>
+    <div class="sublogo-1"></div>
+    <div class="sublogo-2"></div>
+    <div class="sublogo-3"></div>
+  </div>
+
+  <header>
+    <a href="home.html" class="homebut"><i class="fa-solid fa-house"></i></a>
+    <nav class="nav">
+      <a href="quiz.html"><i class="fa-solid fa-trophy"></i></a>
+      <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
+      <a href="faculty.html"><i class="fa-solid fa-graduation-cap"></i></a>
+      <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
+      <a href="contact.html" class="active"><i class="fa-solid fa-comment"></i></a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <div class="page-hero">
+    <div class="page-icon"><i class="fa-solid fa-paper-plane" style="color:#e63946;"></i></div>
+    <h1>Contact Us</h1>
+    <p>✦ Reach out to Neural Nexus ✦</p>
+  </div>
+
+  <div class="page-content">
+
+    <!-- ABOUT CLUB -->
+    <div class="about-strip">
+      <div class="about-logo"></div>
+      <div class="about-text">
+        <h2>Neural Nexus — AI &amp; DS Club</h2>
+        <p>We are the Artificial Intelligence &amp; Data Science Club of Sri Indu Institute of Engineering &amp; Technology. Founded on a culture of learning, creating, and developing together, we run workshops, debates, quizzes, and competitions to help students explore AI and Data Science through hands-on experience.</p>
+      </div>
+    </div>
+
+    <!-- REACH US -->
+    <div class="section-label">📬 Reach Us On</div>
+    <div class="contact-grid">
+
+      <a class="contact-card instagram" href="https://www.instagram.com/siiet_ai_ds_club" target="_blank">
+        <div class="c-icon"><i class="fa-brands fa-instagram" style="color:white;"></i></div>
+        <div class="c-title">Instagram</div>
+        <div class="c-handle">@siiet_ai_ds_club</div>
+        <div class="c-action">Follow Us <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+      <a class="contact-card whatsapp" href="https://chat.whatsapp.com" target="_blank">
+        <div class="c-icon"><i class="fa-brands fa-whatsapp"></i></div>
+        <div class="c-title">WhatsApp Group</div>
+        <div class="c-handle">Neural Nexus Community</div>
+        <div class="c-action">Join Group <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+      <a class="contact-card email" href="mailto:neuralnexus.siiet@gmail.com">
+        <div class="c-icon"><i class="fa-solid fa-envelope"></i></div>
+        <div class="c-title">Email</div>
+        <div class="c-handle">neuralnexus.siiet@gmail.com</div>
+        <div class="c-action">Send Mail <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+      <a class="contact-card phone" href="tel:+919014196561">
+        <div class="c-icon"><i class="fa-solid fa-phone"></i></div>
+        <div class="c-title">Phone</div>
+        <div class="c-handle">+91 9014196561</div>
+        <div class="c-action">Call Us <i class="fa-solid fa-arrow-right"></i></div>
+      </a>
+
+    </div>
+
+    <!-- EVENTS -->
+    <div class="section-label">📅 Our Activities</div>
+    <div class="events-row">
+      <div class="event-chip"><div class="chip-dot"></div>Quiz Competitions</div>
+      <div class="event-chip"><div class="chip-dot"></div>AI Workshops</div>
+      <div class="event-chip"><div class="chip-dot"></div>Expert Lectures</div>
+      <div class="event-chip"><div class="chip-dot"></div>Hackathons</div>
+      <div class="event-chip"><div class="chip-dot"></div>Debates</div>
+      <div class="event-chip"><div class="chip-dot"></div>Project Showcases</div>
+      <div class="event-chip"><div class="chip-dot"></div>Technical Competitions</div>
+    </div>
+
+    <!-- LOCATION -->
+    <div class="section-label">📍 Find Us</div>
+    <div class="location-card">
+      <div class="loc-icon"><i class="fa-solid fa-location-dot" style="color:#e63946;"></i></div>
+      <div class="loc-details">
+        <h3>Sri Indu Institute of Engineering &amp; Technology</h3>
+        <p>Sheriguda, Ibrahimpatnam,</p>
+        <p>Rangareddy District, Telangana — 501 510</p>
+        <p style="margin-top:12px;">📞 College: 93947187999, 8096951507</p>
+        <p>✉️ College: acct.siiet@gmail.com</p>
+        <a href="https://sriindu.ac.in/" target="_blank" style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;">
+          <i class="fa-solid fa-globe"></i> sriindu.ac.in
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="logo-f"></div>
+        <div class="name-f">Sri Indu</div>
+        <div class="inst-f">Institute of Engineering &amp; Technology<br>UGC Autonomous Institution</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">College Contact</div>
+        <p>Sheriguda, Rangareddy, Telangana</p>
+        <p>PIN: 501510</p>
+        <p>📞 93947187999, 8096951507</p>
+        <p>✉️ acct.siiet@gmail.com</p>
+        <a href="https://sriindu.ac.in/" target="_blank">🌐 sriindu.ac.in</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Neural Nexus</div>
+        <p>📱 9014196561</p>
+        <p>✉️ neuralnexus.siiet@gmail.com</p>
+        <p style="margin-top:8px;color:rgba(255,255,255,0.3);font-size:11px;letter-spacing:1px;">FOLLOW US</p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"><i class="fa-brands fa-telegram"></i></a>
+          <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">Copyright &copy; 2025 Neural Nexus Group | All rights reserved.</div>
+  </footer>
+
+  <a href="admin.html" class="admin-fab"><i class="fa-solid fa-lock"></i> Admin</a>
+
+</body>
+</html>
