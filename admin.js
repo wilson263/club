@@ -31,7 +31,7 @@ if (isConfigured) {
   storage = firebase.storage();
 
   // Persist session across page navigation
-  try { auth.setPersistence("local"); } catch(e) {}
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {
@@ -80,13 +80,7 @@ async function doLogin() {
   hideLoginError();
 
   try {
-    const __cred = await auth.signInWithEmailAndPassword(email, password);
-      // SUCCESS: directly show dashboard, don't rely on onAuthStateChanged
-      currentUser = __cred.user;
-      isPermanentAdmin = __cred.user.email === PERMANENT_ADMIN_EMAIL;
-      if (isPermanentAdmin) localStorage.setItem("nn_role_" + __cred.user.uid, "true");
-      showDashboard(); // show first so any errors below don't block access
-      try { updateSidebarForRole(__cred.user); } catch(e) {}
+    await auth.signInWithEmailAndPassword(email, password);
   } catch (err) {
     if ((err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") &&
         email === PERMANENT_ADMIN_EMAIL && password === PERMANENT_ADMIN_PASSWORD) {
@@ -100,7 +94,6 @@ async function doLogin() {
       }
     }
     let msg = "Invalid email or password.";
-    if (err.code === "auth/unauthorized-domain") msg = "Sign-in is blocked for this domain. Please add this domain to Firebase Auth settings.";
     if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") msg = "No admin account found with this email.";
     if (err.code === "auth/wrong-password")   msg = "Incorrect password.";
     if (err.code === "auth/too-many-requests") msg = "Too many attempts. Try again later.";
@@ -1812,8 +1805,8 @@ function renderWaitingList(participants) {
   el.innerHTML = participants.map(p=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">'
     +'<div style="font-size:18px">&#128100;</div>'
     +'<div style="flex:1;font-size:13px;font-weight:600;color:#fff">'+p.name+'</div>'
-    +'<button onclick="admitParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:12px;padding:6px 12px;background:rgba(39,174,96,0.15);border:1px solid rgba(39,174,96,0.3);border-radius:8px;color:#27ae60;cursor:pointer;font-family:inherit">&#9989; Admit</button>'
-    +'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:12px;padding:6px 12px;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.25);border-radius:8px;color:#e63946;cursor:pointer;font-family:inherit">&#10060; Deny</button>'
+    +'<button onclick="admitParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'\')" style="font-size:12px;padding:6px 12px;background:rgba(39,174,96,0.15);border:1px solid rgba(39,174,96,0.3);border-radius:8px;color:#27ae60;cursor:pointer;font-family:inherit">&#9989; Admit</button>'
+    +'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'\')" style="font-size:12px;padding:6px 12px;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.25);border-radius:8px;color:#e63946;cursor:pointer;font-family:inherit">&#10060; Deny</button>'
     +'</div>'
   ).join('');
 }
@@ -1826,8 +1819,8 @@ function renderAdmittedList(participants) {
     +'<div style="flex:1;font-size:13px;font-weight:600;color:#fff">'+p.name+'</div>'
     +'<div style="font-size:11px;color:#27ae60;font-weight:700">Score: '+(p.score||0)+'</div>'
     +'<div style="font-size:11px;color:'+(( p.tabSwitches||0)>0?'#e63946':'var(--muted)')+';font-weight:700">Tabs: '+(p.tabSwitches||0)+'</div>'
-    +'<button onclick="warnParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer;font-family:inherit">&#9888;</button>'
-    +'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer;font-family:inherit">&#128683;</button>'
+    +'<button onclick="warnParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'\')" style="font-size:11px;padding:4px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer;font-family:inherit">&#9888;</button>'
+    +'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'\')" style="font-size:11px;padding:4px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer;font-family:inherit">&#128683;</button>'
     +'</div>'
   ).join('');
 }
@@ -1999,8 +1992,8 @@ async function loadLiveScores() {
           +'<td style="padding:8px 12px;text-align:center;color:'+tc+';font-weight:700">'+(p.tabSwitches||0)+'</td>'
           +'<td style="padding:8px 12px;text-align:center"><span style="color:'+sc+';font-size:11px;font-weight:700;text-transform:uppercase">'+(p.status||'active')+'</span></td>'
           +'<td style="padding:8px 12px;text-align:center;display:flex;gap:5px;justify-content:center">'
-          +(p.status!=='warned'&&p.status!=='banned'?'<button onclick="warnParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer">&#9888;</button>':'')
-          +(p.status!=='banned'?'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer">&#128683;</button>':'<span style="font-size:11px;color:var(--muted)">Removed</span>')
+          +(p.status!=='warned'&&p.status!=='banned'?'<button onclick="warnParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'\')" style="font-size:11px;padding:4px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer">&#9888;</button>':'')
+          +(p.status!=='banned'?'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'\')" style="font-size:11px;padding:4px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer">&#128683;</button>':'<span style="font-size:11px;color:var(--muted)">Removed</span>')
           +'</td></tr>';
       }).join('')+'</tbody></table></div>';
   } catch(e) { console.error('loadLiveScores',e); }
@@ -2028,8 +2021,8 @@ function startFlagListener() {
           +'<div style="flex:1"><div style="font-size:13px;color:#fff">'+(d.message||'Flag')+'</div>'
           +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+time+' &middot; <span style="color:'+(colors[d.type]||'#f5c842')+';font-weight:700;text-transform:uppercase">'+(d.type||'')+'</span></div></div>'
           +'<div style="display:flex;gap:5px;flex-shrink:0">'
-          +'<button onclick="warnParticipant(\''+d.participantId+'\',\''+d.participantName.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:3px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:6px;color:#f5c842;cursor:pointer">Warn</button>'
-          +'<button onclick="banParticipant(\''+d.participantId+'\',\''+d.participantName.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:3px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);border-radius:6px;color:#e63946;cursor:pointer">Remove</button>'
+          +'<button onclick="warnParticipant(\''+d.participantId+'\',\''+d.participantName.replace(/\'/g,"\\'")+'\')" style="font-size:11px;padding:3px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:6px;color:#f5c842;cursor:pointer">Warn</button>'
+          +'<button onclick="banParticipant(\''+d.participantId+'\',\''+d.participantName.replace(/\'/g,"\\'")+'\')" style="font-size:11px;padding:3px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);border-radius:6px;color:#e63946;cursor:pointer">Remove</button>'
           +(d.seen?'':'<button onclick="markFlagSeen(\''+doc.id+'\',this)" style="font-size:11px;padding:3px 7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--muted);cursor:pointer">&#10003;</button>')
           +'</div></div>';
       }).join('');
