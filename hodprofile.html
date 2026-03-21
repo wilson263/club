@@ -1,735 +1,248 @@
 <!DOCTYPE html>
-<html>
-    <head>
-    <meta charset="UTF-8">
-        <title>HOD — Neural Nexus</title>
-        <meta http-equiv="X-UA-Compatible" content="IE-edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
-        <style>
-            *{
-                margin:0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: Arial, Helvetica, sans-serif;
-            }
-   body{
-    background-image: url(images-1/profile.jpeg);
-                height:100%;
-                width:100%;
-                background-size: cover;
-                background-repeat: no-repeat;
-                align-items: center;
-                background-attachment: fixed;
-                padding:10px;
-                
-}
- .container{
-       position: relative;
-       height:100%;
-       background-color: rgba(225,225,225,.1);
-       border:  2px rgba(225,225,225,.2);
-       backdrop-filter: blur(30px);
-       background-size: cover;
-       border-radius: 30px;
-       
- }         
-.wilson{
-    width: 100%;
-    height:90px;
-    display: flex;
-    background-color: rgb(240, 244, 248);
-    position:sticky;
-    top:0;
-    border-top-right-radius:30px;
-    border-top-left-radius:30px;
-    z-index: 1;
-}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HOD Profile — Dr. S. Venkata Pavan Kumar, Neural Nexus AI &amp; Data Science Club, SIIET.">
+  <title>HOD Profile — Neural Nexus | SIIET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: #080810; color: white; min-height: 100vh; }
 
-.clgname{
-    margin-left: 10px;
-    position:absolute;
-    left:50px;
-}
-.name{
-    font-size: 40px;
-    margin-bottom: 0;
-    font-weight: 900;
-    color: red;
-    font-weight: bolder;
-    margin-top: 0;
-}
-.institute{
-    font-size: x-small;
-    font-weight: 900;
-    margin-top: 0px;
-    color:rgb(4, 4, 98);
-    margin-bottom:0px;
-}
-.ugc{
-  font-size: x-small; 
-  color: brown;
-  font-weight: 900;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-.rec{
-    font-size: xx-small;
-    font-weight: 900;
-    margin-top: 0;
-    color:rgb(4, 4, 98);
-}
-.app{
-    font-size: xx-small;
-    font-weight: 900;
-}
+    .navbar {
+      width: 100%; height: 72px; display: flex; align-items: center;
+      background: rgba(8,8,16,0.97); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(230,57,70,0.2);
+      position: sticky; top: 0; z-index: 999;
+    }
+    .logo { position: absolute; left: 8px; top: 8px; background-image: url(images-1/logo.jpeg); height: 56px; width: 56px; background-size: cover; border-radius: 50%; border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35); }
+    .clgname { margin-left: 76px; }
+    .name { font-size: clamp(16px,4vw,28px); font-weight: 900; color: #e63946; line-height: 1.1; }
+    .institute { font-size: 11px; font-weight: 700; color: #ccc; }
+    .ugc { font-size: 10px; color: rgba(230,57,70,0.8); font-weight: 700; }
+    .rec { font-size: 9px; color: #888; }
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 46px; width: 46px; background-size: cover; border-radius: 50%; position: absolute; border: 2px solid rgba(255,255,255,0.15); }
+    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); right: 156px; top: 13px; }
+    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); right: 107px; top: 13px; }
+    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); right: 58px; top: 13px; }
+    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); right: 9px; top: 13px; }
+    @media(max-width:600px) {
+      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 36px; width: 36px; }
+      .sublogo-4 { right: 118px; top: 18px; } .sublogo-1 { right: 80px; top: 18px; }
+      .sublogo-2 { right: 42px; top: 18px; } .sublogo-3 { right: 4px; top: 18px; }
+    }
 
-.logo{
-    position: absolute;
-    left:4px;
-    background-color: whitesmoke;
-    background-image:url(images-1/logo.jpeg) ;
-    height:70px;
-    width:70px;
-    background-size: cover;  
-    border-radius: 300px;
-    margin-top:6px ;
-}
-.clgname{
-    margin-left: 10px;
-    position:absolute;
-    left:70px;
-}
-.name{
-    font-size: 40px;
-    font-weight: 900;
-    color: red;
-    font-weight: bolder;
-}
-.institute{
-    font-size: x-small;
-    font-weight: 900;
-    margin-top: 0px;
-    color:rgb(4, 4, 98);
-    margin-top:0px;
-}
-.ugc{
-  font-size: x-small; 
-  color: brown;
-  font-weight: 900;
-}
-.rec{
-    font-size: xx-small;
-    font-weight: 900;
-}
-.app{
-    font-size: xx-small;
-    font-weight: 900;
-}
+    header {
+      position: sticky; top: 72px; z-index: 998;
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0808 100%);
+      border-bottom: 1px solid rgba(230,57,70,0.15);
+      display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;
+    }
+    .homebut { font-size: 15px; color: #e63946; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; background: rgba(230,57,70,0.15); }
+    .nav { display: flex; gap: 4px; }
+    .nav a { font-size: 15px; color: #ccc; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; }
+    .homebut:hover,.nav a:hover { background: #e63946; color: white; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(230,57,70,0.4); }
+    .nav a.active { background: rgba(230,57,70,0.2); color: #e63946; }
 
-.sublogo-1{
-  background-image: url(images-1/sublogo-3.jpeg);  
-  height:70px;
-  width:70px;
-  background-size: cover;
-  position: absolute;
-  right:160px;  
-  top:8px;
-  border-radius:300px;
-}
-.sublogo-2{
-  background-image:url(images-1/sublogo-2.jpeg) ;  
-  height:70px;
-  width:70px;
-  background-size: cover;
-  position: absolute;
-  right:85px;  
-  top:8px;
-   border-radius:300px;
-}
-.sublogo-3{
-  background-image: url(images-1/sublogo-1.jpeg);  
-  height:70px;
-  width:70px;
-  background-size: cover;
-  position: absolute;
-  right:10px;  
-  top:8px;
-   border-radius:300px;
-}
-            header{
-               position:sticky;
-               top:90px;
-               left: 0;
-               width:100%;
-               padding:10px;
-               background-color:rgb(230, 228, 228);
-               display: flex;
-               justify-content: space-between;
-               align-items: center;
-               z-index: 100; 
-            }
-            
-            .logo-1{
-                font-size: 20px;
-                color:black;
-                text-decoration: none;
-                font-weight: 600;
-            }
-            .homebut{
-               font-size:15px;
-               color:black;
-                text-decoration: none;
-               background-color:white;
-               padding: 10px;
-               border-radius: 100px;
+    /* HERO BANNER */
+    .profile-hero {
+      background: linear-gradient(135deg, #0a0a14 0%, #1a0a0f 50%, #0a0e1a 100%);
+      padding: 60px 24px;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .profile-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(230,57,70,0.12) 0%, transparent 70%);
+    }
+    .profile-hero::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent);
+    }
+    .hod-avatar {
+      width: 160px; height: 200px; border-radius: 20px; object-fit: cover; object-position: top;
+      border: 3px solid #e63946; box-shadow: 0 0 0 8px rgba(230,57,70,0.1), 0 20px 60px rgba(230,57,70,0.2);
+      margin-bottom: 28px; position: relative; z-index: 1;
+      background-image: url(images-1/hod.jpeg); background-size: cover; background-position: center top;
+    }
+    .profile-hero .badge {
+      display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+      padding: 5px 16px; border-radius: 50px; background: rgba(230,57,70,0.15); color: #e63946;
+      border: 1px solid rgba(230,57,70,0.3); margin-bottom: 16px; position: relative; z-index: 1;
+    }
+    .profile-hero h1 {
+      font-size: clamp(26px, 5vw, 48px); font-weight: 900; letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff 0%, #e63946 60%, #ff6b7a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      position: relative; z-index: 1; margin-bottom: 8px;
+    }
+    .profile-hero .subtitle { font-size: 14px; color: rgba(255,255,255,0.4); position: relative; z-index: 1; }
 
-} 
-.nav a{
-   font-size: 15px;
-   color:black;
-   background-color: white;
-   padding:10px;
-   border-radius: 100px;
-}
-.hodimg{
-       position:relative;
-       height:180px;
-       width:180px;
-       margin-left: 60px;
-       margin-top: 10px;
-       border:2px solid #fff;
-       box-shadow: 0 0 20px #fff;
-       border-radius: 300px;
-       background-image: url(images-1/hod.jpeg);
-       background-size: cover;
-                
-        }
-h1{
-    font-size: 20px;
-    color:white;
-    font-weight: 600;
-    margin-top: 10px;
-    line-height: 2;
-}
-h2{
-    font-size:20px ;
-    color:white;
-    font-weight: 900;
-}
-.h2::before{
-    content:"wilson";
-}
- p{
-     font-size: 12px;
-     font-weight: 600;
-     color:white;
-     margin:10px;
- }
-.side{
-     font-size: medium;
-     color:rgb(190, 188, 188);
-     font-weight: 900;
-}
-.achiv{
-font-size: 13px;
-margin-bottom: 10px;
-}           
-ul{
-    color:white;
-    font-size: 12px;
-    margin:10px;
-    font-weight: 600;
-    line-height: 1;
-}
+    /* CONTENT */
+    .profile-content { max-width: 900px; margin: 0 auto; padding: 48px 24px 64px; }
+    .info-block {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 28px 28px 24px; margin-bottom: 24px;
+      position: relative; overflow: hidden;
+    }
+    .info-block::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+      background: linear-gradient(180deg, #e63946, transparent);
+    }
+    .info-block h2 {
+      font-size: 13px; font-weight: 800; color: #e63946; text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
+    }
+    .info-block p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.9; }
+    .info-block ul { list-style: none; padding: 0; }
+    .info-block ul li {
+      font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.8; padding-left: 16px; position: relative;
+      margin-bottom: 6px;
+    }
+    .info-block ul li::before { content: '·'; position: absolute; left: 0; color: #e63946; font-size: 18px; line-height: 1.4; }
+    .pub-type {
+      display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+      padding: 2px 10px; border-radius: 50px; background: rgba(230,57,70,0.1); color: #e63946;
+      border: 1px solid rgba(230,57,70,0.25); margin-bottom: 10px; margin-top: 16px;
+    }
 
-/**footer**/
-.last{
-    margin-top: 200px;
-    max-height: fit-content;
-    width:100%;
-    background: lightgray;
-    padding:40px;
-    border-bottom-left-radius: 30px;
-    border-bottom-right-radius: 30px;
-}
-.last-1{
-    width:100%;
-    height:100%;
-}
+    /* FOOTER */
+    footer { background: #04040a; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 24px 0; }
+    .footer-inner { display: flex; flex-wrap: wrap; gap: 32px; max-width: 1100px; margin: 0 auto; padding-bottom: 32px; }
+    .footer-col { flex: 1; min-width: 200px; }
+    .footer-col .logo-f { width: 50px; height: 50px; border-radius: 50%; background-image: url(images-1/logo.jpeg); background-size: cover; border: 2px solid #e63946; margin-bottom: 12px; }
+    .footer-col .name-f { font-size: 18px; font-weight: 900; color: #e63946; }
+    .footer-col .inst-f { font-size: 11px; color: #999; margin-top: 2px; }
+    .footer-heading { font-size: 12px; font-weight: 800; color: #e63946; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+    .footer-col p, .footer-col a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; display: block; margin-bottom: 7px; line-height: 1.6; }
+    .footer-col a:hover { color: #e63946; }
+    .footer-social { display: flex; gap: 14px; margin-top: 12px; }
+    .footer-social a { font-size: 20px !important; color: rgba(255,255,255,0.35) !important; transition: color 0.2s; margin: 0 !important; display: inline !important; }
+    .footer-social a:hover { color: #e63946 !important; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); text-align: center; padding: 16px; color: rgba(255,255,255,0.25); font-size: 12px; }
+    .admin-fab { position: fixed; bottom: 28px; right: 28px; background: linear-gradient(135deg,#c0392b,#96281b); color: white; border-radius: 50px; padding: 13px 22px; font-size: 14px; font-weight: 700; box-shadow: 0 6px 24px rgba(192,57,43,0.45); display: flex; align-items: center; gap: 8px; z-index: 999; text-decoration: none; transition: transform 0.2s; }
+    .admin-fab:hover { transform: translateY(-2px); }
+  </style>
+</head>
+<body>
 
-.logo-1{
-    position: absolute;
-    left:4px;
-    background-color: whitesmoke;
-    background-image:url(images-1/logo.jpeg) ;
-    height:70px;
-    width:70px;
-    background-size: cover;  
-    border-radius: 300px;
-    margin-left: 40px;
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname">
+      <p class="name">Sri Indu</p>
+      <p class="institute">Institute of Engineering &amp; Technology</p>
+      <p class="ugc">UGC Autonomous Institution</p>
+      <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
+    </div>
+    <div class="sublogo-4"></div>
+    <div class="sublogo-1"></div>
+    <div class="sublogo-2"></div>
+    <div class="sublogo-3"></div>
+  </div>
 
-}
-.clgname-1{
-    margin-left: 10px;
-    position:absolute;
-    left:70px;
-    position: relative;
-    
-}
-.name-1{
-    font-size: 30px;
-    font-weight: 900;
-    color: red;
-    margin:0;
-    font-weight: bolder;
-}
-.institute-1{
-    font-size: x-small;
-    font-weight: 900;
-    margin:0;
-    color:rgb(4, 4, 98);
-    margin-top:0px;
-}
-.ugc-1{
-  font-size: x-small; 
-  color: brown;
-  font-weight: 900;
-  margin:0;
-}
-.rec-1{
-    font-size: xx-small;
-    font-weight: 900;
-    margin:0;
-    color:black;
-}
-.app-1{
-    font-size: xx-small;
-    font-weight: 900;
-}
+  <header>
+    <a href="home.html" class="homebut"><i class="fa-solid fa-house"></i></a>
+    <nav class="nav">
+      <a href="quiz.html"><i class="fa-solid fa-trophy"></i></a>
+      <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
+      <a href="faculty.html" class="active"><i class="fa-solid fa-graduation-cap"></i></a>
+      <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
+      <a href="#contact"><i class="fa-solid fa-comment"></i></a>
+    </nav>
+  </header>
 
-.info{
-    font-size: 13px;
-    margin-top: 15px;
-    margin-left: 15px;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color:black;
-}
-.address{
-    font-size: 11px;
-    margin-left:20px ;
-    font-weight: 400;
-    margin-top: 1px;
-    color:black;
-    margin:0;
-    margin-left: 30px;
-}
-.details{
-    width:300px;
-    height:120px;
-    color:rgb(65, 64, 64);
-    font-size: 11px;
-    font-weight: 400;
-    margin-top: 20px;
-    margin-left: 20px;
-}
-.details-1{
-    margin-top: 18px;
-    border-bottom: 2px solid rgb(65, 64, 64);
-    color:rgb(65, 64, 64);
-    margin:10px;
-    font-weight: 400;
+  <!-- PROFILE HERO -->
+  <div class="profile-hero">
+    <div class="hod-avatar"></div>
+    <div class="badge">Head of Department · AI &amp; Data Science</div>
+    <h1>Dr. S. Venkata Pavan Kumar</h1>
+    <div class="subtitle">M.Tech &nbsp;·&nbsp; Ph.D &nbsp;·&nbsp; 15+ Years Experience</div>
+  </div>
 
-}
-.social-5{
-   position: absolute;
-   right: 30px;
-   bottom:10px;
-   padding:5px;
-    display:flex;
-    align-items: center;
-    font-size: 13px;
-    margin-top: 5px;
-    background: rgba(225,225,225,.6);
-    width: fit-content;
-}
-.social-6{
-    font-size: 11px;
-    color:rgb(168, 62, 62);
-}
-.social-7{
-    font-size: 11px;
-    margin-left: 5px;
-    color:green;
-}
-.icon{
-   font-size: 11px;
-}
+  <div class="profile-content">
 
+    <div class="info-block">
+      <h2><i class="fa-solid fa-user"></i> About</h2>
+      <p>As an experienced academic leader, Dr. S. Venkata Pavan Kumar brings over 15 years of excellence to the field of engineering education. He has successfully headed departments including HOD CSE (Data Science) and HOD CSE (AI&amp;ML), demonstrating a strong and enduring commitment to the direction of the AI and Data Science fields.</p>
+    </div>
 
+    <div class="info-block">
+      <h2><i class="fa-solid fa-briefcase"></i> Working Experience</h2>
+      <ul>
+        <li>HOD CSE (Data Science) — Siddhartha Institute of Engineering &amp; Technology, J.N.T.U Hyderabad (Jan 2023 – Aug 2024)</li>
+        <li>HOD CSE (AI&amp;ML) — Siddhartha Institute of Engineering &amp; Technology, J.N.T.U Hyderabad (Jan 2022 – Dec 2022)</li>
+        <li>HOD CSE &amp; Officer In-Charge of Training &amp; Placement Cell &amp; Vice Principal — Indira Institute of Technology &amp; Sciences, J.N.T.U Kakinada (Dec 2017 – Jul 2019)</li>
+        <li>HOD CSE &amp; Officer In-Charge of JNTU Works, AICTE Works — Priyadarshini Institute of Science &amp; Technology, J.N.T.U Hyderabad (Dec 2013 – Nov 2017)</li>
+        <li>Senior Instructor — AANM &amp; VVRSR Polytechnic, SBTET AP (Jul 2008 – Jun 2009)</li>
+      </ul>
+    </div>
 
+    <div class="info-block">
+      <h2><i class="fa-solid fa-book-open"></i> Publications</h2>
 
-  @media (min-width:900px){
+      <div class="pub-type">International Journal</div>
+      <ul>
+        <li>"Security Analysis Of A Single Sign On Mechanism For Distributed Computer Network" — International Journal of Computational Mathematical Ideas (November 2014)</li>
+      </ul>
 
+      <div class="pub-type">ICDMRI-2024</div>
+      <ul>
+        <li>"Epidemic Outbreak Prediction According To Social Media Data"</li>
+        <li>"A Machine Learning Framework for Biometric Authentication Using Electrocardiogram"</li>
+      </ul>
 
-        /** clglogo **/
-.wilson{
-    width: 100%;
-    height:120px;
-    display: flex;
-    background-color:#fff;
-    border:2px rgba(225,225,225,.2);
-    backdrop-filter: blur(30px);
-    border-top-right-radius: 30px;
-    border-top-left-radius: 30px;
-    position:sticky;
-    top:0;
-    z-index: 1;
-}
-.logo{
-    position: absolute;
-    left:4px;
-    background-color: whitesmoke;
-    background-image:url(images-1/logo.jpeg) ;
-    height:100px;
-    width:100px;
-    background-size: cover;  
-    border-radius: 300px;
-    margin-top:10px ;
-}
-.clgname{
-    margin-left: 40px;
-    position:absolute;
-    left:70px;
-    top:30px;
-    line-height: 10px;
-}
-.clgwil{
-    margin-top:20px;
-}
-.name{
-    font-size: 60px;
-    font-weight: 900;
-    color: red;
-   
-}
-.institute{
-    font-size: 15px;
-    font-weight: 600;
-    margin-top: 80px;
-     color:rgb(4, 4, 98);
-    margin-top:0px;
-    margin-bottom: 0px;
-}
-.ugc{
-  font-size: small; 
-  color: brown;
-  font-weight: 600;
-  margin-top:8px;  
-  margin-bottom: 0px;
-}
-.rec{
-    font-size: small;
-    font-weight: 600;
-    margin-top: 8px;
-     color:rgb(4, 4, 98);
-}
-.app{
-    font-size: xx-small;
-    font-weight: 900;
-}
+      <div class="pub-type">Books Published</div>
+      <ul>
+        <li>Computer Organization &amp; Architecture (ISBN No: 978-93-5625-101-4)</li>
+        <li>Proceedings of the International Conference on Multi Disciplinary Research and Innovations (ISBN No: 978-81-973346-1-0)</li>
+        <li>Hand Book on Soft Skills (ISBN No: 2095|ISBN|2018|A)</li>
+      </ul>
+    </div>
 
-.sublogo-1{
-    height:110px;
-    width:110px;
-    right:270px;
-}
-.sublogo-2{
-    height:110px;
-    width:110px;
-    right:140px;
-}
-.sublogo-3{
-    height:110px;
-    width:110px;
-    right:10px;
-}
+    <div class="info-block">
+      <h2><i class="fa-solid fa-trophy"></i> Professional Achievements</h2>
+      <p>Recognised for outstanding contributions to technical education, department leadership, and research in Artificial Intelligence &amp; Machine Learning. Committed to bridging academic learning with industry relevance.</p>
+    </div>
 
+  </div>
 
-            body{
-                background-image: url(images-1/profile.jpeg);
-                height:100%;
-                width:100%;
-                background-repeat: no-repeat;
-                background-size: cover;
-                align-items: center;
-                padding:50px;
-                
-            }
-            .container{
-                position: relative;
-                height:100%;
-                background-color: rgba(225,225,225,.1);
-                border:  2px rgba(225,225,225,.2);
-                backdrop-filter: blur(30px);
-                transform: scale(0); 
-                animation: zoom-in 1s ease forwards;
-               border-radius: 30px;
-                
-            }
-            @keyframes zoom-in{
-              100%{
-                transform: scale(1);
-              }
-            }
-
-
-            header{
-               position:sticky;
-               top:120px;
-               left: 0;
-               width:100%;
-               padding:20px 5%;
-               background-color:rgb(230, 228, 228);
-               display: flex;
-               justify-content: space-between;
-               align-items: center;
-               z-index: 100;   
-            }
-            
-            .logo-1{
-                font-size: 20px;
-                color:black;
-                text-decoration: none;
-                font-weight: 600;
-            }
-            .navbar a{
-                font-size: 15px;
-                color:black;
-                text-decoration: none;
-                font-weight: 500;
-                margin-left: 35px;
-                border-bottom: 2px solid transparent;
-                transition: .5s;
-            }
-            .navbar a:hover,
-                .navbar a.active{
-                border-color: #fff;
-               
-            }
-            
-            .home{
-                display:flex;
-                align-items: center;
-                height:100%;
-                gap:50px;
-                padding:50px 5% 0;
-                color:#fff;
-            }
-            h1{
-                font-size: 55px;
-                line-height: 1;
-            }
-            h2{
-                font-size: 20px;
-                margin-top: 20px;
-
-            }
-            p{
-                font-size: 15px;
-                font-weight: 600;
-            }
-            .side{
-                font-size: medium;
-                color:rgb(190, 188, 188);
-                font-weight: 900;
-            }
-            .achiv{
-                font-size: 13px;
-                margin-bottom: 10px;
-            }
-            .hodimg{
-                position:relative;
-                height:240px;
-                width:240px;
-                margin-left: 60px;
-                margin-top: 10px;
-                border:2px solid #fff;
-                box-shadow: 0 0 20px #fff;
-                border-radius: 300px;
-                background-image: url(images-1/hod.jpeg);
-                background-size: cover;
-                
-            }
-            
-            @keyframes slide-in{
-                100%{
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
-        }
-
-           
-        </style>
-    </head>
-    <body>
-        <div class="container">
-             <div class="wilson">
-          <div class="logo"></div>
-          <div class="clgname">
-            <p class="name">Sri Indu</p>
-            <div class="clgwil">
-                <p class="institute">Institute of Engineering & Technology</p>
-                <p class="ugc">UGC Autonomous Institution</p>
-                <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>   
-            </div>
-
-       </div>
-         <div class="sublogo-1"></div>
-            <div class="sublogo-2"></div>
-            <div class="sublogo-3"></div>
-       </div>
-            <header>
-                <a href="home.html" class="homebut"><i class="fa-solid fa-house"></i></a>
-        <nav class="nav">
-        <a href=""><i class="fa-solid fa-trophy"></i></a>
-        <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
-        <a href="faculty.html"><i class="fa-solid fa-graduation-cap"></i></a>
-        <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
-        <a href="#"><i class="fa-solid fa-comment"></i></a>
-           </nav>
-            </header>
-            <div class="hodimg"></div> 
-            <section class="home animated">
-                <div class="home-detail">
-                    <h1>DR.S.Venkata Pavan Kumar</h1>
-                    <h2>M.tech , Ph.D</h2>
-                    <p>As an experienced academic leader, I bring over 15 years
-                     of dedicated experience in engineering education, with a 
-                     significant focus on Computer Science and emerging technologies.
-                      I have successfully headed departments, including roles as HOD
-                       CSE (Data Science) and HOD CSE (Al&ML), demonstrating a commitment 
-                    to advanced curricula development and academic accreditation. My background 
-                    includes a Ph.D. with a thesis on "A MACHINE LEARNING PROGRAM OF EXAMINATION
-                    SYSTEM FOR STUDENTS ONLINE MODELING SYSTEMS", aligning perfectly with the innovative 
-                    direction of the Al and Data Science fields.</p>
-
-                    <br>
-
-                    <h2>Degree</h2>
-                    <P><ul>&middot;Ph.D. from SJJTU Rajasthan, awarded on May 7, 2024, with a thesis titled:"A MACHINE LEARNING PROGRAM OF EXAMINATION SYSTEM FOR STUDENTS ONLINE MODELING SYSTEMS".</ul>  
-                       <ul>&middot; M.Tech from NRIIT, Visadala, affiliated to JNTUK in 2015. </ul> 
-                     <ul>&middot; B.Tech from T.R.R. College of Engineering and Technology, Inole, affiliated to JNTUH in 2012.</ul></P>
-                    <h2>Working Experience</h2>  
-                    <p>The candidate has 15+ Years of experience, including:
-                        <ul>&middot;Head Of The Department of Artificial Intelligence & Data Science of (Sri Indu Institute of Engg & tech..)</ul>  
-                        <ul>&middot;Principal in PRIYADARSHINI INSTITUTE OF TECHNOLOGY AND SCIENCE (J.N.T.U, Kakinada) from September 2024 to March 2025.</ul> 
-                        <ul>&middot;HOD CSE (Data Science) in SIDDHARTHA INSTITUTE OF ENGINEERING AND TECHNOLOGY (J.N.T.U, Hyderabad) from January 2023 to August 2024.</ul>  
-                        <ul>&middot;HOD CSE (AI&ML) in SIDDHARTHA INSTITUTE OF ENGINEERING AND TECHNOLOGY (J.N.T.U, Hyderabad) from January 2022 to December 2022. </ul> 
-                        <ul>&middot;Associate Professor in Department of CSE KRISHNA CHAITHANYA INSTITUTE OF TECHNOLOGY AND SCIENCES (J.N.T.U, Kakinada) from August 2020 to December 2021.</ul>  
-                        <ul>&middot;Associate Professor in Department of CSE A1 Global Institute of Engineering and Technology (J.N.T.U, Kakinada) from August 2019 to July 2020. </ul> 
-                        <ul>&middot;HOD CSE & OFFICER IN-CHARGE OF Training & Placement Cell & Vice Principal in Indira Institute of technology and sciences (J.N.T.U, Kakinada) from December 2017 to July 2019.</ul>  
-                        <ul>&middot;HOD CSE & OFFICER IN-CHARGE OF JNTU WORKS, AICTE WORKS in Priyadarshini Institute of Science and Technology (J.N.T.U, Hyderabad) from December 2013 to November 2017.</ul>  
-                        <ul>&middot;Assistant Professor in T.R.R College of Engineering (J.N.T.U, Hyderabad) from August 2012 to November 2013.</ul>  
-                        <ul>&middot;SENIOR INSTRUCTOR in T.R.R College of Engineering (J.N.T.U, Hyderabad) from August 2009 to November 2012.</ul> 
-                        <ul>&middot;SENIOR INSTRUCTOR in AANM & VVRSR POLYTECHNIC (SBTET, AP) from July 2008 to June 2009.</ul> </p>
-                    </P>
-
-                    <br>
-
-                    <h2>Publications</h2>
-                    
-                        <p class="side"><strong>International Journals Published</strong></p>
-                        <ul>"Evaluating Process to Assess Student in Online Learning" in International Journal of Computer Science and Mechatronics (2020). </ul> 
-                        <ul>&middot;"EVALUATING STUDENTS LEARNING PERFORMANCE USING AI" in International Journal of Computer Engineering and Applications (January 2019). </ul> 
-                        <ul>&middot;"Distributed Anomaly Feature Detection Over Financial frauds" in International Journal For Recent Development In Science And Technology (January 2020).  </ul>
-                        <ul>&middot;"Secure and Dependable Storage Services In Cloud Computing" in International Journal of Computational Science, Mathematics and Engineering (January 2016).</ul>  
-                        <ul>&middot;"Extracting Spread-Spectrum Hidden Data from Picture Representation" in International Journal of Computational Science, Mathematics and Engineering (January 2016).</ul>  
-                        <ul>&middot;"A Secure and Dynamic Multi Keyword Ranked Search Scheme Over Encrypted" in International Journal of Computational Science, Mathematics and Engineering (January 2016).</ul>  
-                        <ul>&middot;"Deduplicating Data and Secure Auditing in Cloud" in International Journal of Computational Science, Mathematics and Engineering (January 2016).</ul>  
-                        <ul>&middot;"Security Analysis Of A Single Sign On Mechanism For Distributed Computer Network" in International Journal of Computational Mathematical Ideas (November 2014). </ul> </p>
-
-                        <p class="side"><strong>ICDMRI-2024 Publications</strong></p>
-                        <p>"Epidemic Outbreak Prediction According To Social Media Data".  
-                        <ul>&middot;"A Solution for Heart Disease-Related Death Event Prediction Using Multi-Machine Learning Binary Classification, Feature Selection and Comparison Technique". </ul> 
-                        <ul>&middot;"CAPTCHA RECOGNITION USING CNN".</ul>  
-                        <ul>&middot;"Detecting Fake Images On Social Media Using Machine Learning". </ul> 
-                        <ul>&middot;"Detecting web attacks with end-to-end deep learning".  </ul>
-                        <ul>&middot;"OBJECT DETECTION AND TRACKING USING DEEP LEARNING".</ul>  
-                        <ul>&middot;"A Machine Learning Framework for Biometric Authentication Using Electrocardiogram".</ul> </p>
-
-                        <p class="side"><strong>Books Published</strong></p>
-                        <p><ul>&middot;COMPUTER ORGANIZATION & ARCHITECTURE (ISBN No: 978-93-5625-101-4). </ul> 
-                        <ul>&middot;PROCEEDINGS OF THE INTERNATIONAL CONFERENCE ON MULTI DISCIPLINARY RESEARCH AND INNOVATIONS (ISBN No: 978-81-973346-1-0).</ul></p>  
-                        <p><ul>&middot;<strong>HAND BOOK ON SOFT SKILLS (ISBN No: 2095|ISBN|2018|A).</strong></ul></p> 
-
-                    </P>
-                    <h2>Professional Achivements</h2>
-                       <ul class="achiv">&middot;RATIFIED by JNTUH in 2015. </ul>  
-                        <ul class="achiv">&middot;RATIFIED by JNTUK in 2025.</ul>  
-                        <ul class="achiv">&middot;Awarded INDIAN IDOL BEST PROFESSOR OF THE YEAR 2024.  </ul>
-                        <ul class="achiv" >&middot;Received the INDIAN GLOWRY AWARD FOR CONTRIBUTION TO STUDENT DEVELOPMENT 2024.  </ul>
-                        <ul class="achiv">&middot;Has an ARTICLE PUBLISHED IN FAME INDIA ABOUT ME 2024.</ul>    
-                
-                </div>
-            </section>
-  <!-- Admin FAB -->
-  <a href="admin.html" style="position:fixed;bottom:28px;right:28px;background:linear-gradient(135deg,#c0392b,#96281b);color:white;border:none;border-radius:50px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(192,57,43,0.45);display:flex;align-items:center;gap:8px;z-index:999;text-decoration:none;">
-    <i class="fa-solid fa-lock"></i> Admin
-  </a>
-
-            <footer>
-                <div class="last">
-      <div class="last-1">
-        <div class="all">
-
-          <div class="logo-1"></div>
-           <div class="clgname-1">
-               <p class="name-1">Sri Indu</p>
-               <p class="institute-1">Institute of Engineering & Technology</p>
-               <p class="ugc-1">UGC Autonomous Institution</p>
-               <p class="rec-1">Institution, Recognized under 2(f) of UGC Act 1956.</p>   
-          </div>
- 
-          <div class="list">
-           <p class="info">College Contact info</p>
-           <ul class="address">Sheriguda, Rangareddy, Telangana</ul>
-           <ul class="address">PIN:501510</ul>
-           <ul class="address">Mobile:93947187999, 8096951507</ul>
-           <ul class="address">Email: acct.siiet@gmail.com</ul>
-           <ul class="address"><a href="https://sriindu.ac.in/" style="text-decoration: none; color:black">web: siiet.ac.in</a></ul>
-          </div>
+  <footer id="contact">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="logo-f"></div>
+        <div class="name-f">Sri Indu</div>
+        <div class="inst-f">Institute of Engineering &amp; Technology<br>UGC Autonomous Institution</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">College Contact</div>
+        <p>Sheriguda, Rangareddy, Telangana</p>
+        <p>PIN: 501510</p>
+        <p>📞 93947187999, 8096951507</p>
+        <p>✉️ acct.siiet@gmail.com</p>
+        <a href="https://sriindu.ac.in/" target="_blank">🌐 sriindu.ac.in</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Neural Nexus</div>
+        <p>📱 9014196561</p>
+        <p>✉️ neuralnexus.siiet@gmail.com</p>
+        <p style="margin-top:8px;color:rgba(255,255,255,0.3);font-size:11px;letter-spacing:1px;">FOLLOW US</p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"><i class="fa-brands fa-telegram"></i></a>
+          <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
         </div>
-        
-        <div class="all-2"></div>
-         <div class="details">
-          <p class="details-1">Contact us &middot; 9014196561</p>
-          <p class="details-1">CLub Mail &middot;neuralnexus.siiet@gmail.com</p>
-          <p class="details-1">Social Media Handlings</p>
-          <p class="details-1">Faculty Member's</p>
-    
-         </div>
+      </div>
+    </div>
+    <div class="footer-bottom">Copyright &copy; 2025 Neural Nexus Group | All rights reserved.</div>
+  </footer>
 
+  <a href="admin.html" class="admin-fab"><i class="fa-solid fa-lock"></i> Admin</a>
 
-        </div>
-         <div class="social-5">
-         <p class="social-6" >Let's talk social </p>
-         <p class="social-7">#SIIET</p>
-         <div class="icon">
-          <a href="https://www.instagram.com/siiet_ai_ds_club?igsh=MTJydTl2b3A4ZnAzdg==" style="text-decoration: none; color:black"><i class="fa-brands fa-instagram"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-whatsapp"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-telegram"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-x-twitter"></i></a>
-         </div>
-        </div>
-            </footer>
-
-        </div>
-        
-    </body>
+</body>
 </html>
