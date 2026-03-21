@@ -11,27 +11,8 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════ AUTH LOADING SPLASH -->
-<div id="auth-loading" style="position:fixed;inset:0;background:#0a0a12;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:20px">
-  <img src="images-1/clublogo.jpeg" alt="Neural Nexus" style="width:72px;height:72px;border-radius:50%;border:2px solid rgba(230,57,70,0.5)" onerror="this.style.display='none'">
-  <div style="font-family:'Inter',sans-serif;color:#e63946;font-size:15px;letter-spacing:1px">Restoring session…</div>
-  <div style="width:40px;height:3px;background:rgba(230,57,70,0.2);border-radius:2px;overflow:hidden">
-    <div style="height:100%;background:#e63946;border-radius:2px;animation:authbar 1.2s ease-in-out infinite"></div>
-  </div>
-  <style>@keyframes authbar{0%{width:0%;margin-left:0}50%{width:100%;margin-left:0}100%{width:0%;margin-left:100%}}</style>
-</div>
-<!-- Standalone fallback — no Firebase needed. If scripts take >5s to load, show login form -->
-<script>
-window._nn_authFallback = setTimeout(function() {
-  var L = document.getElementById('auth-loading');
-  var S = document.getElementById('login-screen');
-  if (L) L.style.display = 'none';
-  if (S) S.style.display = 'flex';
-}, 5000);
-</script>
-
 <!-- ═══════════════════════════ LOGIN -->
-<div id="login-screen" style="display:none">
+<div id="login-screen">
   <div class="login-wrap">
     <div id="config-banner">
       ⚠️ <span>Firebase not configured. Open <code>admin.js</code> and paste your Firebase config to enable login. → <a href="https://console.firebase.google.com" target="_blank" style="color:inherit">console.firebase.google.com</a></span>
