@@ -50,8 +50,37 @@
     .name   { color: #e63946 !important; font-family: 'Inter', sans-serif !important; font-size: 34px !important; }
     .institute, .ugc, .rec { color: #ccc !important; }
 
+    .sublogo-group {
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      position: absolute !important;
+      right: 10px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      flex-shrink: 0 !important;
+    }
+
     .sublogo-1, .sublogo-2, .sublogo-3, .sublogo-4 {
       filter: brightness(1.2) !important;
+      position: static !important;
+      right: auto !important;
+      top: auto !important;
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: 50% !important;
+      border: 2px solid rgba(230,57,70,0.4) !important;
+      flex-shrink: 0 !important;
+    }
+
+    @media (max-width: 480px) {
+      .sublogo-1, .sublogo-2, .sublogo-3, .sublogo-4 {
+        width: 32px !important;
+        height: 32px !important;
+      }
+      .sublogo-group { gap: 4px !important; right: 6px !important; }
+      .name { font-size: 22px !important; }
+      .clgname { max-width: calc(100% - 160px) !important; }
     }
 
     /* ── HEADER NAV ── */
@@ -534,17 +563,19 @@
         <p class="ugc">UGC Autonomous Institution</p>
         <p class="rec">Recognized under 2(f) of UGC Act 1956</p>
       </div>
-      <div class="sublogo-1"></div>
-      <div class="sublogo-2"></div>
-      <div class="sublogo-3"></div>
-      <div class="sublogo-4"></div>
+      <div class="sublogo-group">
+        <div class="sublogo-4"></div>
+        <div class="sublogo-1"></div>
+        <div class="sublogo-2"></div>
+        <div class="sublogo-3"></div>
+      </div>
     </div>
 
     <!-- ══ HEADER NAV ══ -->
     <header>
       <a href="home.html" class="homebut" title="Home">⌂</a>
       <nav class="nav">
-        <a href="quiz.html" title="Achievements">🏆</a>
+        <a href="achievements.html" title="Achievements">🏆</a>
         <a href="clubmembers.html" title="Members">👤</a>
         <a href="faculty.html" title="Faculty">🎓</a>
         <a href="gallery.html" title="Events">📅</a>
