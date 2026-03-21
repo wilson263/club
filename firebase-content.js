@@ -164,7 +164,10 @@ async function loadHomePageImages() {
       const { url } = doc.data();
       const box = document.createElement("div");
       box.className = "box";
-      box.innerHTML = `<div class="boximg" style="background-image:url('${url}')"></div>`;
+      const imgDiv = document.createElement("div");
+      imgDiv.className = "boximg";
+      imgDiv.style.backgroundImage = "url(" + url + ")";
+      box.appendChild(imgDiv);
       container.appendChild(box);
     });
   } catch(e) {
