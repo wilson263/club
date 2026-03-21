@@ -337,28 +337,30 @@ async function loadStats() {
 function loadDashboardData() { loadStats(); }
 
 // ─── STORAGE UPLOAD HELPER ────────────────────────────────────────────────────
-// ─── STORAGE UPLOAD — uses Firebase Storage REST API directly via XHR
-// This bypasses the compat SDK bucket connectivity issues entirely and works
-// with both firebasestorage.app and appspot.com bucket formats.
+// ─── STORAGE UPLOAD — uses Firebase Storage REST API via XHR (no SDK)
+// Bypasses compat SDK bucket issues. Works with firebasestorage.app buckets.
 async function uploadFileToStorage(file, storagePath, onProgress) {
-  if (!auth.currentUser) throw new Error("Not authenticated");
+  if (!auth.currentUser) throw new Error("Not authenticated — please log in again");
 
+  // Use cached token first (faster), no forced refresh
   let token;
   try {
-    token = await auth.currentUser.getIdToken(true);
+    token = await auth.currentUser.getIdToken(false);
   } catch (e) {
-    throw new Error("Failed to get auth token: " + e.message);
+    throw new Error("Auth token error: " + e.message);
   }
 
   const bucket  = firebaseConfig.storageBucket;
   const encoded = encodeURIComponent(storagePath);
-  const url     = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o?uploadType=media&name=${encoded}`;
+  const apiUrl  = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o?uploadType=media&name=${encoded}`;
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
+    xhr.open("POST", apiUrl, true);
+    xhr.timeout = 60000; // 60-second hard timeout
     xhr.setRequestHeader("Authorization", "Firebase " + token);
     xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    xhr.setRequestHeader("X-Firebase-Storage-Version", "webjs/10.12.2");
 
     xhr.upload.addEventListener("progress", e => {
       if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total * 0.95);
@@ -368,22 +370,25 @@ async function uploadFileToStorage(file, storagePath, onProgress) {
       if (xhr.status >= 200 && xhr.status < 300) {
         try {
           const data  = JSON.parse(xhr.responseText);
-          const token = data.downloadTokens;
-          const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encoded}?alt=media&token=${token}`;
+          const dlToken = data.downloadTokens;
+          const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encoded}?alt=media&token=${dlToken}`;
           if (onProgress) onProgress(1);
           resolve(downloadUrl);
         } catch (e) {
-          reject(new Error("Failed to parse upload response: " + e.message));
+          reject(new Error("Upload response parse error: " + e.message));
         }
+      } else if (xhr.status === 401 || xhr.status === 403) {
+        reject(new Error("Upload permission denied (" + xhr.status + ") — check Firebase Storage rules"));
       } else {
-        let msg = `Upload failed (${xhr.status})`;
-        try { const d = JSON.parse(xhr.responseText); if (d.error) msg = d.error.message || msg; } catch (_) {}
+        let msg = "Upload failed (HTTP " + xhr.status + ")";
+        try { const d = JSON.parse(xhr.responseText); if (d.error) msg = (d.error.message || msg); } catch (_) {}
         reject(new Error(msg));
       }
     });
 
-    xhr.addEventListener("error",  () => reject(new Error("Network error during upload — check your connection")));
-    xhr.addEventListener("abort",  () => reject(new Error("Upload was aborted")));
+    xhr.addEventListener("timeout", () => reject(new Error("Upload timed out — please check your connection and try again")));
+    xhr.addEventListener("error",   () => reject(new Error("Upload network error — check your internet connection")));
+    xhr.addEventListener("abort",   () => reject(new Error("Upload was cancelled")));
     xhr.send(file);
   });
 }
