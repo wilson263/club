@@ -109,30 +109,38 @@ async function loadHomePageImages() {
 
 // ── Load events for gallery page ──
 async function loadFirebaseEvents() {
-  if (!db) return;
+  const condList = document.getElementById("conducted-events-list");
+  const upList   = document.getElementById("upcoming-events-list");
+
+  const noEventsMsg = '<p style="color:rgba(255,255,255,0.4);text-align:center;padding:40px 0;font-size:14px">No events posted yet.</p>';
+
+  if (!db) {
+    if (condList) condList.innerHTML = noEventsMsg;
+    if (upList)   upList.innerHTML   = noEventsMsg;
+    return;
+  }
 
   try {
     const snap = await db.collection("events").orderBy("addedAt", "desc").get();
-    if (snap.empty) return;
 
     const conducted = snap.docs.filter(d => d.data().type === "conducted").map(d => d.data());
     const upcoming  = snap.docs.filter(d => d.data().type === "upcoming").map(d => d.data());
 
-    const condList = document.getElementById("conducted-events-list");
-    if (condList && conducted.length) {
-      conducted.forEach(ev => {
-        condList.insertAdjacentHTML("beforeend", makeEventCard(ev));
-      });
+    if (condList) {
+      condList.innerHTML = conducted.length
+        ? conducted.map(ev => makeEventCard(ev)).join("")
+        : noEventsMsg;
     }
 
-    const upList = document.getElementById("upcoming-events-list");
-    if (upList && upcoming.length) {
-      upcoming.forEach(ev => {
-        upList.insertAdjacentHTML("beforeend", makeEventCard(ev));
-      });
+    if (upList) {
+      upList.innerHTML = upcoming.length
+        ? upcoming.map(ev => makeEventCard(ev)).join("")
+        : noEventsMsg;
     }
   } catch(e) {
     console.warn("Could not load events:", e);
+    if (condList) condList.innerHTML = noEventsMsg;
+    if (upList)   upList.innerHTML   = noEventsMsg;
   }
 }
 
