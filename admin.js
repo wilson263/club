@@ -30,8 +30,9 @@ if (isConfigured) {
   db      = firebase.firestore();
   storage = firebase.storage();
 
-  // Persist session across page navigation
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+  // Persist session across page navigation — use string "local" to avoid
+  // firebase.auth.Auth.Persistence potentially being undefined in some SDK versions
+  try { auth.setPersistence("local"); } catch(e) {}
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {
