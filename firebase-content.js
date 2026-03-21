@@ -1,6 +1,5 @@
 // firebase-content.js
 // Loads dynamic content from Firebase for public pages.
-// Replace firebaseConfig below with your actual Firebase config.
 
 const firebaseConfig = {
   apiKey: "AIzaSyAkYeTlfnicPo1JczB4rZZj61UnHFbvqVE",
@@ -25,7 +24,51 @@ if (isConfigured && typeof firebase !== "undefined") {
   }
 }
 
-// Load home page gallery images
+// ── Animate a counter from 0 to target ──
+function animateCounter(el, target) {
+  const duration = 1200;
+  const start = performance.now();
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(eased * target) + "+";
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ── Load dynamic stats for home page ──
+async function loadHomeStats() {
+  if (!db) return;
+
+  try {
+    const [membersSnap, eventsSnap] = await Promise.all([
+      db.collection("club_members").get(),
+      db.collection("events").get()
+    ]);
+
+    const memberCount = membersSnap.size;
+    const eventCount  = eventsSnap.size;
+    const workshopCount = eventsSnap.docs.filter(d => {
+      const title = (d.data().title || "").toLowerCase();
+      const desc  = (d.data().desc  || "").toLowerCase();
+      return title.includes("workshop") || desc.includes("workshop");
+    }).length;
+
+    const elMembers   = document.getElementById("stat-members-count");
+    const elEvents    = document.getElementById("stat-events-count");
+    const elWorkshops = document.getElementById("stat-workshops-count");
+
+    if (elMembers)   animateCounter(elMembers,   memberCount   || 0);
+    if (elEvents)    animateCounter(elEvents,     eventCount    || 0);
+    if (elWorkshops) animateCounter(elWorkshops,  workshopCount || 0);
+  } catch(e) {
+    console.warn("Could not load stats:", e);
+  }
+}
+
+// ── Load home page gallery images ──
 async function loadHomePageImages() {
   const container = document.getElementById("dynamic-home-images");
   if (!container || !db) return;
@@ -46,7 +89,7 @@ async function loadHomePageImages() {
   }
 }
 
-// Load events for gallery page
+// ── Load events for gallery page ──
 async function loadFirebaseEvents() {
   if (!db) return;
 
@@ -57,7 +100,6 @@ async function loadFirebaseEvents() {
     const conducted = snap.docs.filter(d => d.data().type === "conducted").map(d => d.data());
     const upcoming  = snap.docs.filter(d => d.data().type === "upcoming").map(d => d.data());
 
-    // Append to conducted events list
     const condList = document.getElementById("conducted-events-list");
     if (condList && conducted.length) {
       conducted.forEach(ev => {
@@ -65,7 +107,6 @@ async function loadFirebaseEvents() {
       });
     }
 
-    // Append to upcoming events list
     const upList = document.getElementById("upcoming-events-list");
     if (upList && upcoming.length) {
       upcoming.forEach(ev => {
@@ -77,7 +118,7 @@ async function loadFirebaseEvents() {
   }
 }
 
-// Load gallery images
+// ── Load gallery images ──
 async function loadFirebaseGalleryImages() {
   const grid = document.getElementById("dynamic-gallery-grid");
   if (!grid || !db) return;
@@ -110,7 +151,7 @@ function makeEventCard(ev) {
         ${dateObj ? `<div class="date-badge"><p>${month}</p><p>${day}</p></div>` : ""}
         <div class="event-details-dynamic">
           <h3>${ev.title}</h3>
-          ${ev.venue ? `<p><i class="fa-solid fa-location-dot"></i> ${ev.venue}</p>` : ""}
+          ${ev.venue ? `<p>📍 ${ev.venue}</p>` : ""}
           ${ev.desc  ? `<p>${ev.desc}</p>` : ""}
         </div>
       </div>
