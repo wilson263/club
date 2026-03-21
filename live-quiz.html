@@ -7,8 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="home.css" rel="stylesheet">
   <style>
-    *{font-family:'Inter',Arial,sans-serif}html{scroll-behavior:smooth}
-    body{background:#080810!important;background-image:none!important}
+    *{font-family:'Inter',Arial,sans-serif;box-sizing:border-box}html{scroll-behavior:smooth}
+    body{background:#080810!important;background-image:none!important;margin:0}
     .container{background:transparent!important;border:none!important;backdrop-filter:none!important;border-radius:0!important}
     .navbar{background:#080810!important;border-bottom:1px solid rgba(230,57,70,0.2)!important;height:72px!important;border-radius:0!important;position:sticky!important;top:0!important;z-index:999!important}
     .logo{background-image:url(images-1/logo.jpeg);border:2px solid #e63946;box-shadow:0 0 16px rgba(230,57,70,0.35);margin-top:10px!important}
@@ -16,24 +16,50 @@
     .sublogo-group{display:flex!important;align-items:center!important;gap:6px!important;position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important}
     .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4{filter:brightness(1.2)!important;position:static!important;width:42px!important;height:42px!important;border-radius:50%!important;border:2px solid rgba(230,57,70,0.4)!important;flex-shrink:0!important}
     header{background:linear-gradient(135deg,#0d0d1a 0%,#1a0808 100%)!important}
-    .page-hero{padding:60px 24px 40px;text-align:center;background:linear-gradient(135deg,#0a0a1a,#1a0810);border-bottom:1px solid rgba(230,57,70,0.15)}
-    .page-hero h1{font-size:42px;font-weight:900;color:#fff;margin:0 0 12px}.page-hero h1 span{color:#e63946}
-    .page-hero p{font-size:16px;color:rgba(255,255,255,0.5);max-width:600px;margin:0 auto}
-    .quiz-wrap{max-width:660px;margin:0 auto;padding:60px 24px}
-    .waiting-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:48px;text-align:center}
-    .pulse{animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-    .q-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;display:none}
-    .q-num{font-size:12px;font-weight:700;color:#e63946;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
-    .q-text{font-size:20px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:24px}
-    .options{display:grid;gap:10px}
-    .opt{padding:14px 18px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:all 0.2s;font-family:'Inter',sans-serif}
-    .opt:hover{border-color:#e63946;background:rgba(230,57,70,0.1)}
-    .opt.correct{border-color:#27ae60;background:rgba(39,174,96,0.15);color:#27ae60}
-    .opt.wrong{border-color:#e63946;background:rgba(230,57,70,0.15);color:#e63946}
-    .opt:disabled{cursor:default}
-    .timer{font-size:42px;font-weight:900;color:#e63946;margin-bottom:8px}
-    .page-footer{background:#040408;color:rgba(255,255,255,0.4);text-align:center;padding:16px;font-size:12px;border-top:1px solid rgba(255,255,255,0.05)}
+    :root{--red:#e63946;--green:#27ae60;--bg:#080810;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.1);--text:#fff;--muted:rgba(255,255,255,0.5)}
+    .qouter{max-width:700px;margin:0 auto;padding:28px 20px 80px}
+    .screen{display:none}.screen.active{display:block}
+    .join-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
+    .join-card h2{font-size:28px;font-weight:900;color:#fff;margin:0 0 8px}
+    .join-card p{color:var(--muted);font-size:14px;margin:0 0 28px}
+    .join-input{width:100%;padding:16px 20px;background:rgba(255,255,255,0.07);border:2px solid var(--border);border-radius:14px;color:#fff;font-size:18px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;margin-bottom:14px}
+    .join-input:focus{border-color:var(--red)}
+    .join-btn{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;transition:opacity .2s}
+    .join-btn:hover{opacity:.85}
+    .rules-box{background:rgba(230,57,70,0.07);border:1px solid rgba(230,57,70,0.2);border-radius:14px;padding:20px;margin-top:22px;text-align:left}
+    .rules-box h4{color:var(--red);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px}
+    .rules-box li{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5}
+    .wait-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:60px 36px;text-align:center;margin-top:28px}
+    .live-badge2{display:inline-flex;align-items:center;gap:7px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:50px;padding:7px 16px;font-size:12px;font-weight:700;color:var(--red);margin-bottom:20px}
+    .ldot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:blink 1.2s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:50px;padding:5px 14px;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:18px}
+    .pill .pdot{width:7px;height:7px;background:var(--green);border-radius:50%}
+    .prog-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:4px;margin-bottom:22px}
+    .prog-fill{height:100%;background:var(--red);border-radius:4px;transition:width .6s ease}
+    .qheader{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .qnum-label{font-size:12px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:1px}
+    .tbig{font-size:40px;font-weight:900;color:var(--red);line-height:1}
+    .tlbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+    .tbig.urgent{color:#ff3333;animation:blink .5s infinite}
+    .qcard{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:30px;margin-bottom:14px}
+    .qtext{font-size:20px;font-weight:800;color:#fff;line-height:1.5;margin-bottom:26px}
+    .opts{display:grid;gap:11px}
+    .opt{padding:15px 18px;background:rgba(255,255,255,0.05);border:2px solid var(--border);border-radius:13px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;text-align:left;transition:all .2s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:12px;width:100%}
+    .oletter{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+    .opt:not(:disabled):hover{border-color:var(--red);background:rgba(230,57,70,0.1)}
+    .opt.correct{border-color:var(--green);background:rgba(39,174,96,0.15)}.opt.correct .oletter{background:var(--green);color:#fff}
+    .opt.wrong{border-color:var(--red);background:rgba(230,57,70,0.15)}.opt.wrong .oletter{background:var(--red);color:#fff}
+    .opt:disabled{cursor:default;opacity:.9}
+    .feedback{padding:15px 20px;border-radius:13px;font-size:15px;font-weight:700;display:none;text-align:center;margin-top:14px}
+    .locknotice{text-align:center;font-size:13px;color:var(--muted);padding:10px;display:none}
+    .wait-next{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:22px;text-align:center;display:none}
+    .result-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
+    .big-score{font-size:72px;font-weight:900;color:var(--red);line-height:1}
+    .banned-card{background:rgba(230,57,70,0.08);border:2px solid rgba(230,57,70,0.4);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
+    .warned-card{background:rgba(245,200,66,0.07);border:2px solid rgba(245,200,66,0.3);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
+    .page-footer{background:#040408;color:rgba(255,255,255,.4);text-align:center;padding:16px;font-size:12px;border-top:1px solid rgba(255,255,255,.05)}
+    .fs-btn{position:fixed;bottom:20px;right:20px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:var(--muted);padding:9px 13px;font-size:12px;cursor:pointer;z-index:100;font-family:'Inter',sans-serif}
   </style>
 </head>
 <body>
@@ -44,83 +70,324 @@
     <div class="sublogo-group"><div class="sublogo-4"></div><div class="sublogo-1"></div><div class="sublogo-2"></div><div class="sublogo-3"></div></div>
   </div>
   <header>
-    <a href="home.html" class="homebut">⌂</a>
-    <nav class="nav"><a href="dashboard.html">🧭</a><a href="register.html">📝</a><a href="contact.html">💬</a></nav>
+    <a href="home.html" class="homebut" title="Home">&#8962;</a>
+    <nav class="nav"><a href="achievements.html">&#127942;</a><a href="clubmembers.html">&#128100;</a><a href="faculty.html">&#127891;</a><a href="gallery.html">&#128197;</a><a href="contact.html">&#128172;</a></nav>
   </header>
-  <div class="page-hero">
-    <h1>⚡ Live <span>Quiz</span></h1>
-    <p>Participate in live event quizzes and polls hosted by Neural Nexus. Questions appear when the host activates them.</p>
-  </div>
-  <div class="quiz-wrap">
-    <div class="waiting-card" id="waiting-state">
-      <div style="font-size:64px;margin-bottom:20px" class="pulse">⏳</div>
-      <h2 style="color:#fff;font-size:22px;margin:0 0 12px">Waiting for host...</h2>
-      <p style="color:rgba(255,255,255,0.5);font-size:14px;margin:0 0 20px">No active quiz right now. When the host starts a question it will appear here automatically.</p>
-      <div id="live-dot" style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(255,255,255,0.05);border-radius:20px">
-        <span style="width:8px;height:8px;border-radius:50%;background:#e63946;display:inline-block" class="pulse"></span>
-        <span style="font-size:13px;color:rgba(255,255,255,0.5)">Listening for questions...</span>
+
+  <div class="qouter">
+    <!-- JOIN -->
+    <div class="screen active" id="screen-join">
+      <div class="join-card">
+        <div style="font-size:52px;margin-bottom:16px">&#9889;</div>
+        <h2>Join Live Quiz</h2>
+        <p>Enter your full name. Your answers, timing, and behavior are fully monitored by the admin.</p>
+        <input class="join-input" id="pname" type="text" placeholder="Your Full Name" maxlength="50" autocomplete="off">
+        <div id="join-err" style="color:var(--red);font-size:13px;margin-bottom:12px;display:none"></div>
+        <button class="join-btn" onclick="joinQuiz()">&#9889; Join Quiz</button>
+        <div class="rules-box">
+          <h4>&#9888;&#65039; Strict Quiz Rules</h4>
+          <ul style="margin:0;padding-left:18px">
+            <li>Once you select an answer it is <strong style="color:#fff">permanently locked</strong>.</li>
+            <li><strong style="color:#fff">Do NOT switch tabs</strong> or minimize — flagged instantly.</li>
+            <li><strong style="color:#fff">Do NOT open DevTools</strong> or inspect source code.</li>
+            <li><strong style="color:#fff">Right-click is disabled</strong> during the quiz.</li>
+            <li>Closing or refreshing the page is tracked and reported.</li>
+            <li>The admin can warn or remove you at any time.</li>
+            <li>Unanswered questions (timer expired) score zero.</li>
+          </ul>
+        </div>
       </div>
     </div>
-    <div class="q-card" id="q-card">
-      <div class="q-num" id="q-num">Question 1</div>
-      <div class="timer" id="q-timer">30</div>
-      <div class="q-text" id="q-text"></div>
-      <div class="options" id="q-options"></div>
-      <div id="q-feedback" style="display:none;margin-top:16px;padding:14px;border-radius:12px;font-size:14px;font-weight:700;text-align:center"></div>
+
+    <!-- WAITING -->
+    <div class="screen" id="screen-waiting">
+      <div class="wait-card">
+        <div style="font-size:52px;margin-bottom:18px">&#128336;</div>
+        <div class="live-badge2"><span class="ldot"></span> LIVE SESSION</div>
+        <h3 style="color:#fff;font-size:22px;margin:0 0 10px">Waiting for quiz to begin...</h3>
+        <p style="color:var(--muted);font-size:14px;margin:0 0 28px">Keep this tab open and visible at all times. The admin will start shortly.</p>
+        <p style="color:rgba(255,255,255,.4);font-size:13px">Joined as <strong id="joined-as" style="color:#fff"></strong></p>
+        <div class="pill" style="margin-top:16px"><span class="pdot"></span><span id="wait-count">0</span>&nbsp;participants joined</div>
+      </div>
+    </div>
+
+    <!-- QUESTION -->
+    <div class="screen" id="screen-question">
+      <div style="text-align:center"><span class="pill"><span class="pdot"></span><span id="q-pcount">0</span>&nbsp;participants live</span></div>
+      <div class="prog-wrap"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="qheader">
+        <div class="qnum-label" id="q-label">Question 1</div>
+        <div style="text-align:center"><div class="tbig" id="q-timer">30</div><div class="tlbl">seconds</div></div>
+      </div>
+      <div class="qcard">
+        <div class="qtext" id="q-text"></div>
+        <div class="opts" id="q-opts"></div>
+        <div class="feedback" id="q-feedback"></div>
+        <div class="locknotice" id="locknotice">&#128274; Answer locked — waiting for next question...</div>
+      </div>
+      <div class="wait-next" id="wait-next">
+        <div style="font-size:26px;margin-bottom:8px">&#9989;</div>
+        <div style="color:#fff;font-weight:700">Answer submitted!</div>
+        <div style="color:var(--muted);font-size:13px;margin-top:6px">Waiting for the next question...</div>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div class="screen" id="screen-result">
+      <div class="result-card">
+        <div style="font-size:52px;margin-bottom:16px">&#127937;</div>
+        <h2 style="color:#fff;font-size:26px;margin:0 0 10px">Quiz Complete!</h2>
+        <div class="big-score" id="final-score">0</div>
+        <div style="color:var(--muted);font-size:14px;margin-top:8px">correct answers</div>
+        <div id="result-detail" style="color:rgba(255,255,255,.5);font-size:14px;margin-top:18px"></div>
+        <a href="home.html" style="display:inline-block;margin-top:28px;padding:14px 32px;background:var(--red);color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Back to Home</a>
+      </div>
+    </div>
+
+    <!-- BANNED -->
+    <div class="screen" id="screen-banned">
+      <div class="banned-card">
+        <div style="font-size:52px;margin-bottom:16px">&#128683;</div>
+        <h2 style="color:var(--red);font-size:24px;margin:0 0 12px">Removed from Quiz</h2>
+        <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:400px;margin:0 auto 24px">The admin has removed you for misbehavior. Your responses have been recorded.</p>
+        <a href="home.html" style="display:inline-block;padding:14px 32px;background:var(--red);color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Back to Home</a>
+      </div>
+    </div>
+
+    <!-- WARNED -->
+    <div class="screen" id="screen-warned">
+      <div class="warned-card">
+        <div style="font-size:52px;margin-bottom:16px">&#9888;&#65039;</div>
+        <h2 style="color:#f5c842;font-size:24px;margin:0 0 12px">Warning Issued!</h2>
+        <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:400px;margin:0 auto 24px">The admin has issued you a warning. Do NOT misbehave again or you will be permanently removed from this quiz.</p>
+        <button class="join-btn" style="max-width:280px;margin:0 auto;display:block" onclick="dismissWarning()">I Understand — Continue Quiz</button>
+      </div>
     </div>
   </div>
-  <div class="page-footer">© 2025 Neural Nexus Group — AI &amp; DS Club, SIIET. All rights reserved.</div>
+
+  <div class="page-footer">Neural Nexus — AI &amp; Data Science Club &middot; SIIET</div>
 </div>
-<a href="dashboard.html" class="admin-fab" style="background:linear-gradient(135deg,#1a1a3e,#2d1b69)">🧭 Dashboard</a>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<button class="fs-btn" onclick="toggleFS()">&#x26F6; Fullscreen</button>
+
 <script src="firebase-content.js"></script>
 <script>
-let timerInterval = null;
-let answered = false;
-function startQuizListener() {
-  if(!db) return;
-  db.collection("quiz_sessions").where("active","==",true).onSnapshot(snap=>{
-    if(snap.empty){
-      document.getElementById("waiting-state").style.display="block";
-      document.getElementById("q-card").style.display="none";
-      clearInterval(timerInterval); answered=false;
-    } else {
-      const d = snap.docs[0].data();
-      document.getElementById("waiting-state").style.display="none";
-      document.getElementById("q-card").style.display="block";
-      document.getElementById("q-num").textContent = "Question "+( d.questionNumber||1);
-      document.getElementById("q-text").textContent = d.question||"";
-      document.getElementById("q-feedback").style.display="none";
-      answered=false;
-      const opts = document.getElementById("q-options");
-      opts.innerHTML="";
-      (d.options||[]).forEach((o,i)=>{
-        const btn=document.createElement("button");
-        btn.className="opt"; btn.textContent=o;
-        btn.onclick=()=>{
-          if(answered) return; answered=true;
-          document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
-          const correct = d.correctIndex;
-          document.querySelectorAll(".opt").forEach((b,idx)=>b.classList.add(idx===correct?"correct":idx===i&&i!==correct?"wrong":""));
-          const fb=document.getElementById("q-feedback");
-          fb.style.display="block";
-          if(i===correct){fb.style.background="rgba(39,174,96,0.15)";fb.style.color="#27ae60";fb.textContent="✅ Correct! Well done.";}
-          else{fb.style.background="rgba(230,57,70,0.15)";fb.style.color="#e63946";fb.textContent="❌ Wrong! The correct answer: "+(d.options[correct]||"");}
-        };
-        opts.appendChild(btn);
+const LETTERS = ['A','B','C','D'];
+let pid=null, pname='', sid=null, curQid=null, qStart=null;
+let answered=false, myScore=0, totalQ=0;
+let timerInt=null, unsubSess=null, unsubQ=null;
+let tabCount=0;
+
+function getDevId(){
+  let id=localStorage.getItem('nn_qdev');
+  if(!id){id='dv_'+Date.now()+'_'+Math.random().toString(36).substr(2,8);localStorage.setItem('nn_qdev',id);}
+  return id;
+}
+function showScreen(s){
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('screen-'+s);
+  if(el) el.classList.add('active');
+}
+async function joinQuiz(){
+  if(!db) return alert('Connection error. Refresh.');
+  const name=document.getElementById('pname').value.trim();
+  const err=document.getElementById('join-err');
+  err.style.display='none';
+  if(!name||name.length<2){err.textContent='Enter your full name (min 2 chars).';err.style.display='block';return;}
+  try{
+    const snap=await db.collection('quiz_sessions').where('status','in',['setup','active']).limit(1).get();
+    if(snap.empty){err.textContent='No active quiz session. Wait for the admin.';err.style.display='block';return;}
+    sid=snap.docs[0].id; pname=name;
+    pid=getDevId()+'_'+name.replace(/s+/g,'_').toLowerCase().substr(0,20);
+    await db.collection('quiz_participants').doc(pid).set({
+      sessionId:sid,name,deviceId:getDevId(),
+      joinedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      lastSeen:firebase.firestore.FieldValue.serverTimestamp(),
+      score:0,tabSwitches:0,status:'active'
+    },{merge:true});
+    document.getElementById('joined-as').textContent=name;
+    showScreen('waiting');
+    startListening(); startHeartbeat(); initAntiCheat();
+  }catch(e){err.textContent='Error joining. Refresh and try again.';err.style.display='block';}
+}
+function startHeartbeat(){
+  setInterval(async()=>{
+    if(!pid)return;
+    try{await db.collection('quiz_participants').doc(pid).update({lastSeen:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){}
+  },8000);
+}
+function initAntiCheat(){
+  document.addEventListener('visibilitychange',async()=>{
+    if(!document.hidden||!pid)return;
+    tabCount++;
+    try{
+      await db.collection('quiz_participants').doc(pid).update({tabSwitches:firebase.firestore.FieldValue.increment(1)});
+      await db.collection('quiz_flags').add({
+        sessionId:sid,participantId:pid,participantName:pname,type:'tab_switch',
+        count:tabCount,questionId:curQid,seen:false,
+        flaggedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        message:pname+' switched tab/minimized (total: '+tabCount+')'
       });
-      clearInterval(timerInterval);
-      let t=d.timer||30;
-      document.getElementById("q-timer").textContent=t;
-      timerInterval=setInterval(()=>{
-        t--;document.getElementById("q-timer").textContent=t;
-        if(t<=0){clearInterval(timerInterval);document.querySelectorAll(".opt").forEach(b=>b.disabled=true);}
-      },1000);
+    }catch(e){}
+  });
+  window.addEventListener('blur',async()=>{
+    if(!pid)return;
+    try{
+      await db.collection('quiz_flags').add({
+        sessionId:sid,participantId:pid,participantName:pname,type:'window_blur',
+        questionId:curQid,seen:false,
+        flaggedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        message:pname+' left the quiz window'
+      });
+    }catch(e){}
+  });
+  setInterval(async()=>{
+    if(!pid)return;
+    if((window.outerWidth-window.innerWidth>160)||(window.outerHeight-window.innerHeight>160)){
+      try{
+        await db.collection('quiz_flags').add({
+          sessionId:sid,participantId:pid,participantName:pname,type:'devtools',
+          questionId:curQid,seen:false,
+          flaggedAt:firebase.firestore.FieldValue.serverTimestamp(),
+          message:pname+' possibly opened DevTools'
+        });
+      }catch(e){}
     }
+  },3000);
+  document.addEventListener('contextmenu',e=>e.preventDefault());
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&['u','s','a','c','i','j'].includes(e.key.toLowerCase()))e.preventDefault();
   });
 }
-window.addEventListener("load",startQuizListener);
+function startListening(){
+  unsubSess=db.collection('quiz_sessions').doc(sid).onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const d=snap.data();
+    if(d.status==='ended'){clearInterval(timerInt);if(unsubQ)unsubQ();showResultScreen();return;}
+    updateCount();
+  });
+  unsubQ=db.collection('quiz_questions').where('sessionId','==',sid).where('status','==','active').limit(1)
+    .onSnapshot(snap=>{
+      if(snap.empty){
+        const cur=document.querySelector('.screen.active');
+        if(cur&&!['screen-result','screen-banned','screen-warned'].includes(cur.id))showScreen('waiting');
+        clearInterval(timerInt);return;
+      }
+      const doc=snap.docs[0];
+      if(doc.id===curQid)return;
+      curQid=doc.id;
+      checkStatus(doc.data(),doc.id);
+    });
+}
+async function checkStatus(qdata,qid){
+  if(!pid)return showQuestion(qdata,qid);
+  try{
+    const p=await db.collection('quiz_participants').doc(pid).get();
+    if(p.exists){
+      const st=p.data().status;
+      if(st==='banned'){showScreen('banned');return;}
+      if(st==='warned'){showScreen('warned');return;}
+    }
+  }catch(e){}
+  showQuestion(qdata,qid);
+}
+function dismissWarning(){
+  if(pid) db.collection('quiz_participants').doc(pid).update({status:'active'}).catch(()=>{});
+  const cur=document.querySelector('.screen.active');
+  if(cur&&cur.id!=='screen-question') showScreen('question');
+}
+async function updateCount(){
+  try{
+    const s=await db.collection('quiz_participants').where('sessionId','==',sid).where('status','!=','banned').get();
+    document.getElementById('wait-count').textContent=s.size;
+    document.getElementById('q-pcount').textContent=s.size;
+  }catch(e){}
+}
+function showQuestion(q,qid){
+  clearInterval(timerInt);
+  answered=false; qStart=Date.now(); totalQ=q.totalQuestions||1;
+  document.getElementById('q-label').textContent='Question '+(q.order||1)+' of '+totalQ;
+  document.getElementById('prog-fill').style.width=((((q.order||1)-1)/totalQ)*100)+'%';
+  document.getElementById('q-text').textContent=q.question||'';
+  const optsEl=document.getElementById('q-opts');
+  optsEl.innerHTML='';
+  (q.options||[]).forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';
+    btn.innerHTML='<span class="oletter">'+LETTERS[i]+'</span><span>'+opt+'</span>';
+    btn.onclick=()=>pickAnswer(i,q,qid);
+    optsEl.appendChild(btn);
+  });
+  document.getElementById('q-feedback').style.display='none';
+  document.getElementById('locknotice').style.display='none';
+  document.getElementById('wait-next').style.display='none';
+  let t=q.timer||30;
+  const tel=document.getElementById('q-timer');
+  tel.textContent=t; tel.classList.remove('urgent');
+  timerInt=setInterval(()=>{
+    t--; tel.textContent=t;
+    if(t<=5) tel.classList.add('urgent');
+    if(t<=0){
+      clearInterval(timerInt); disableOpts();
+      if(!answered){answered=true;submitResp(-1,q,qid,q.timer||30);showFB(false,-1,q.correctIndex,q.options);}
+    }
+  },1000);
+  showScreen('question');
+}
+async function pickAnswer(idx,q,qid){
+  if(answered)return;
+  answered=true; clearInterval(timerInt);
+  const taken=Math.round((Date.now()-qStart)/1000);
+  disableOpts();
+  const ok=idx===q.correctIndex;
+  if(ok) myScore++;
+  const opts=document.querySelectorAll('.opt');
+  opts[idx].classList.add(ok?'correct':'wrong');
+  if(!ok&&q.correctIndex>=0&&opts[q.correctIndex]) opts[q.correctIndex].classList.add('correct');
+  showFB(ok,idx,q.correctIndex,q.options);
+  document.getElementById('locknotice').style.display='block';
+  document.getElementById('wait-next').style.display='block';
+  await submitResp(idx,q,qid,taken);
+}
+async function submitResp(idx,q,qid,taken){
+  if(!pid||!db)return;
+  try{
+    const ok=idx>=0&&idx===q.correctIndex;
+    await db.collection('quiz_responses').add({
+      sessionId:sid,questionId:qid,questionOrder:q.order,
+      participantId:pid,participantName:pname,
+      selectedIndex:idx,correctIndex:q.correctIndex,
+      isCorrect:ok,noAnswer:idx<0,
+      timeTaken:taken,answeredAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    if(ok) await db.collection('quiz_participants').doc(pid).update({score:firebase.firestore.FieldValue.increment(1)});
+  }catch(e){}
+}
+function disableOpts(){document.querySelectorAll('.opt').forEach(b=>b.disabled=true);}
+function showFB(ok,sel,correct,opts){
+  const fb=document.getElementById('q-feedback');
+  fb.style.display='block';
+  if(sel<0){fb.style.background='rgba(245,200,66,0.12)';fb.style.color='#f5c842';fb.textContent="Time's up! Correct: "+(opts[correct]||'');}
+  else if(ok){fb.style.background='rgba(39,174,96,0.12)';fb.style.color='#27ae60';fb.textContent='Correct! Well done.';}
+  else{fb.style.background='rgba(230,57,70,0.12)';fb.style.color='#e63946';fb.textContent='Wrong! Correct answer: '+(opts[correct]||'');}
+}
+async function showResultScreen(){
+  let score=myScore,total=totalQ;
+  if(pid){
+    try{
+      const p=await db.collection('quiz_participants').doc(pid).get();
+      if(p.exists) score=p.data().score||myScore;
+      const r=await db.collection('quiz_responses').where('participantId','==',pid).where('sessionId','==',sid).get();
+      total=r.size||totalQ;
+    }catch(e){}
+  }
+  document.getElementById('final-score').textContent=score;
+  document.getElementById('result-detail').textContent=score+' correct out of '+total+' questions.';
+  showScreen('result');
+}
+function toggleFS(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
 </script>
 </body>
 </html>
