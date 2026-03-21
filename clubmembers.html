@@ -1,807 +1,451 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>clubmember Neural Nexus Group – Artificial Intelligence & Data Science Club</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
-    <style>
-        body {
-            background-image: url(images-1/profile.jpeg);
-            z-index: 1;
-            height: 100%;
-            width: 100%;
-            background-size: cover;
-            background-repeat: no-repeat;
-            align-items: center;
-            background-attachment: fixed;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            overflow-y: auto;
-            padding: 10px;
-
-        }
-
-        .container {
-            position: relative;
-            height: 100%;
-            background-color: rgba(225, 225, 225, .1);
-            border: 2px rgba(225, 225, 225, .2);
-            backdrop-filter: blur(30px);
-            background-size: cover;
-            border-radius: 30px; 
-            transform: scale(0);
-            animation: zoom-in 1s ease forwards;
-
-        }
-
-
-        @keyframes zoom-in {
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .navbar {
-            width: 100%;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-            height: 90px;
-            display: flex;
-            background-color: rgb(240, 244, 248);
-            border-top-left-radius: 30px;
-            border-top-right-radius: 30px;
-        }
-
-        .logo {
-            position: absolute;
-            left: 4px;
-            background-color: whitesmoke;
-            background-image: url(images-1/logo.jpeg);
-            height: 70px;
-            width: 70px;
-            background-size: cover;
-            border-radius: 300px;
-            margin-top: 6px;
-        }
-
-        .clgname {
-            margin-left: 30px;
-            position: absolute;
-            left: 50px;
-        }
-
-        .name {
-            font-size: 40px;
-            margin-bottom: 0;
-            font-weight: 900;
-            color: red;
-            font-weight: bolder;
-            margin-top: 0;
-        }
-
-        .institute {
-            font-size: x-small;
-            font-weight: 900;
-            margin-top: 0px;
-            color: rgb(4, 4, 98);
-            margin-bottom: 0px;
-        }
-
-        .ugc {
-            font-size: x-small;
-            color: brown;
-            font-weight: 900;
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-
-        .rec {
-            font-size: xx-small;
-            font-weight: 900;
-            margin-top: 0;
-            color: rgb(4, 4, 98);
-        }
-
-        .app {
-            font-size: xx-small;
-            font-weight: 900;
-        }
-
-        .sublogo-1 {
-            background-image: url(images-1/sublogo-3.jpeg);
-            height: 50px;
-            width: 50px;
-            background-size: cover;
-            position: absolute;
-            right: 113px;
-            top: 10px;
-            border-radius: 300px;
-        }
-
-        .sublogo-2 {
-            background-image: url(images-1/sublogo-2.jpeg);
-            height: 50px;
-            width: 50px;
-            background-size: cover;
-            position: absolute;
-            right: 60px;
-            top: 10px;
-            border-radius: 300px;
-        }
-
-        .sublogo-3 {
-            background-image: url(images-1/sublogo-1.jpeg);
-            height: 50px;
-            width: 50px;
-            background-size: cover;
-            position: absolute;
-            right: 5px;
-            top: 10px;
-            border-radius: 300px;
-        }
-
-        .sublogo-4 {
-            background-image: url(images-1/clublogo.jpeg);
-            height: 55px;
-            width: 55px;
-            background-size: cover;
-            position: absolute;
-            right: 165px;
-            top: 8px;
-            border-radius: 300px;
-        }
-
-
-
-
-        /** header **/
-        header {
-            position: sticky;
-            top: 90px;
-            z-index: 999;
-            background-color: rgb(240, 244, 248);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            z-index: 100;
-        }
-
-        .homebut {
-            font-size: 15px;
-            color: black;
-            text-decoration: none;
-            background-color: white;
-            padding: 10px;
-            border-radius: 100px;
-
-        }
-
-        .nav a {
-            font-size: 15px;
-            color: black;
-            background-color: white;
-            padding: 10px;
-            border-radius: 100px;
-        }
-
-
-
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, 200px);
-            grid-template-rows: repeat(auto-fit, 200px);
-            gap: 40px;
-            padding: 40px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container-4 {
-            font-size: 0.8em;
-            position: relative;
-            color: white;
-            border-radius: 30px;
-            text-align: center;
-            box-shadow: 1px 1px 20px black;
-        }
-
-        .container-4:hover {
-            transform: scale(1.1);
-        }
-
-        p {
-            margin: 0;
-            margin-top: 30px;
-            margin-left: 40px;
-            font-family: "Cormorant Garamond", serif;
-            font-optical-sizing: auto;
-            font-style: normal;
-
-            color: whitesmoke;
-            padding: 0;
-            font-weight: 400;
-        }
-
-        h3 {
-            margin-top: 100px;
-            margin-bottom: 0;
-            font-size: 20px;
-            font-family: sans-serif;
-        }
-
-        h4,
-        h5 {
-            font-size: 12px;
-            font-family: sans-serif;
-        }
-
-        h4,
-        h5 {
-            margin: 0;
-            padding: 0;
-        }
-
-        img {
-            width: 100%;
-            border-radius: 30px;
-        }
-
-
-        .content {
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.6);
-            border-radius: 30px;
-            opacity: 0;
-            transition: 0.3s ease;
-        }
-
-        .content:hover {
-            opacity: 1;
-        }
-
-
-
-        .last {
-            margin-top: 200px;
-            max-height: fit-content;
-            width: 100%;
-            background: lightgray;
-            z-index: 1;
-        }
-
-
-        .logo-1 {
-            position: absolute;
-            left: 4px;
-            background-color: whitesmoke;
-            background-image: url(images-1/logo.jpeg);
-            height: 70px;
-            width: 70px;
-            background-size: cover;
-            border-radius: 300px;
-            margin-left: 40px;
-
-        }
-
-        .clgname-1 {
-            margin-left: 10px;
-            position: absolute;
-            left: 70px;
-            position: relative;
-            margin-left: 50px;
-
-        }
-
-        .name-1 {
-            font-size: 30px;
-            font-weight: 900;
-            color: red;
-            margin: 0;
-            font-weight: bolder;
-        }
-
-        .institute-1 {
-            font-size: x-small;
-            font-weight: 900;
-            margin: 0;
-            color: rgb(4, 4, 98);
-            margin-top: 0px;
-        }
-
-        .ugc-1 {
-            font-size: x-small;
-            color: brown;
-            font-weight: 900;
-            margin: 0;
-        }
-
-        .rec-1 {
-            font-size: xx-small;
-            font-weight: 900;
-            margin: 0;
-            color: black;
-        }
-
-        .app-1 {
-            font-size: xx-small;
-            font-weight: 900;
-        }
-
-        .info {
-            font-size: 13px;
-            margin-top: 15px;
-            margin-left: 70px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: black;
-        }
-
-        .address {
-            font-size: 11px;
-            margin-left: 20px;
-            font-weight: 400;
-            margin-top: 1px;
-            color: black;
-            margin: 0;
-            margin-left: 30px;
-        }
-
-        .details-8 {
-            width: 300px;
-            height: 120px;
-            color: rgb(65, 64, 64);
-            font-size: 11px;
-            font-weight: 400;
-            margin-top: 20px;
-            margin-left: 20px;
-            margin-left: 60px;
-        }
-
-        .details-7 {
-            margin-top: 18px;
-            border-bottom: 2px solid rgb(65, 64, 64);
-            color: rgb(65, 64, 64);
-            font-size: 13px;
-            margin: 10px;
-            font-weight: 400;
-
-        }
-
-        .social-1 {
-            display: flex;
-
-        }
-
-        .social-2 {
-            font-size: 11px;
-            color: rgb(168, 62, 62);
-        }
-
-        .social-3 {
-            font-size: 11px;
-            margin-left: 5px;
-            color: green;
-        }
-
-
-
-        @media (max-width:599px) {
-            p {
-                font-size: 30px;
-            }
-
-            .grid {
-                grid-template-columns: repeat(auto-fit, 200px);
-            }
-        }
-        @media (max-width:499px) {
-       .navbar{
-       height:60px;
-       }
-       .logo{
-        height: 50px;
-        width:50px;
-        margin-left: 10px;
-       }
-       .clgname{
-        left: 0px;
-       }
-      
-       .name{
-       font-size: 18px; 
-       margin-top: 5px;
-       }
-       .institute{
-        font-size: 9px;
-       }
-       .ugc{
-        font-size: 9px;
-       }
-       .rec{
-        font-size: 9px;
-       }
-       .sublogo-1{
-        height:35px;
-        width:35px;
-        right:90px;
-       }
-       .sublogo-2{
-        height:40px;
-        width:40px;
-        right:48px;
-       }
-       .sublogo-3{
-        height:40px;
-        width:40px;
-       }
-       .sublogo-4{
-        height:40px;
-        width:40px;
-        right:125px;
-       }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Meet the team behind Neural Nexus — AI &amp; Data Science Club, Sri Indu Institute of Engineering &amp; Technology.">
+  <title>Club Members — Neural Nexus | SIIET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: #080810; color: white; min-height: 100vh; }
+
+    /* NAVBAR */
+    .navbar {
+      width: 100%; height: 72px; display: flex; align-items: center;
+      background: rgba(8,8,16,0.97); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(230,57,70,0.2);
+      position: sticky; top: 0; z-index: 999;
+    }
+    .logo {
+      position: absolute; left: 8px; top: 8px;
+      background-image: url(images-1/logo.jpeg); height: 56px; width: 56px;
+      background-size: cover; border-radius: 50%;
+      border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35);
+    }
+    .clgname { margin-left: 76px; }
+    .name { font-size: clamp(16px,4vw,28px); font-weight: 900; color: #e63946; line-height: 1.1; }
+    .institute { font-size: 11px; font-weight: 700; color: #ccc; }
+    .ugc { font-size: 10px; color: rgba(230,57,70,0.8); font-weight: 700; }
+    .rec { font-size: 9px; color: #888; }
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 {
+      height: 46px; width: 46px; background-size: cover; border-radius: 50%;
+      position: absolute; border: 2px solid rgba(255,255,255,0.15);
+    }
+    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); right: 156px; top: 13px; }
+    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); right: 107px; top: 13px; }
+    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); right: 58px; top: 13px; }
+    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); right: 9px; top: 13px; }
+    @media(max-width:600px) {
+      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 36px; width: 36px; }
+      .sublogo-4 { right: 118px; top: 18px; }
+      .sublogo-1 { right: 80px; top: 18px; }
+      .sublogo-2 { right: 42px; top: 18px; }
+      .sublogo-3 { right: 4px; top: 18px; }
     }
 
+    /* HEADER NAV */
+    header {
+      position: sticky; top: 72px; z-index: 998;
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0808 100%);
+      border-bottom: 1px solid rgba(230,57,70,0.15);
+      display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;
+    }
+    .homebut {
+      font-size: 15px; color: #e63946; text-decoration: none;
+      padding: 9px 14px; border-radius: 8px; transition: all 0.2s;
+      background: rgba(230,57,70,0.15);
+    }
+    .nav { display: flex; gap: 4px; }
+    .nav a {
+      font-size: 15px; color: #ccc; text-decoration: none;
+      padding: 9px 14px; border-radius: 8px; transition: all 0.2s;
+    }
+    .homebut:hover,.nav a:hover {
+      background: #e63946; color: white; transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(230,57,70,0.4);
+    }
+    .nav a.active { background: rgba(230,57,70,0.2); color: #e63946; }
 
-       /** header **/
-     header{
-      top:60px;
-     }
-     .homebut{
-    font-size:10px;
+    /* HERO */
+    .club-hero {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 56px 20px 44px;
+      background: linear-gradient(135deg, #0a0a14 0%, #1a0a0f 50%, #0a0e1a 100%);
+      position: relative; overflow: hidden; text-align: center;
+    }
+    .club-hero::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 30% 50%, rgba(230,57,70,0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 70% 50%, rgba(69,123,157,0.1) 0%, transparent 60%);
+    }
+    .club-hero::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent);
+    }
+    .clublogo-hero {
+      width: 110px; height: 110px; border-radius: 50%; border: 3px solid #e63946;
+      background-image: url(images-1/clublogo.jpeg); background-size: cover; background-position: center;
+      box-shadow: 0 0 0 8px rgba(230,57,70,0.1), 0 0 40px rgba(230,57,70,0.25);
+      margin-bottom: 24px; position: relative; z-index: 1;
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%,100% { box-shadow: 0 0 0 8px rgba(230,57,70,0.1), 0 0 40px rgba(230,57,70,0.25); }
+      50% { box-shadow: 0 0 0 14px rgba(230,57,70,0.05), 0 0 60px rgba(230,57,70,0.35); }
+    }
+    .club-hero h1 {
+      font-size: clamp(32px, 6vw, 60px); font-weight: 900; letter-spacing: -1.5px;
+      background: linear-gradient(135deg, #fff 0%, #e63946 60%, #ff6b7a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      position: relative; z-index: 1; margin-bottom: 10px;
+    }
+    .club-hero p {
+      color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; position: relative; z-index: 1;
+    }
 
-    } 
-    .nav a{
-   font-size: 10px;
-   }
+    /* FILTER TABS */
+    .filter-bar {
+      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+      padding: 28px 20px 20px;
+      background: #0a0a14;
+    }
+    .filter-btn {
+      padding: 9px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(230,57,70,0.2); border-color: rgba(230,57,70,0.4); color: #e63946;
+    }
 
-        @media (min-width:600px) {
-            p {
-                font-family: "Cormorant Garamond", serif;
-                font-size: 50px;
-            }
+    /* MEMBER GRID */
+    .member-section { padding: 0 20px 60px; background: #080810; }
+    .section-label {
+      font-size: 11px; font-weight: 800; color: rgba(230,57,70,0.7); letter-spacing: 3px;
+      text-transform: uppercase; padding: 32px 0 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px;
+    }
+    .member-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px; max-width: 1200px; margin: 0 auto;
+    }
+    .member-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; overflow: hidden; transition: all 0.3s; cursor: default;
+      position: relative;
+    }
+    .member-card:hover {
+      border-color: rgba(230,57,70,0.35); background: rgba(230,57,70,0.04);
+      transform: translateY(-4px); box-shadow: 0 12px 40px rgba(230,57,70,0.12);
+    }
+    .member-photo {
+      width: 100%; aspect-ratio: 1; object-fit: cover; object-position: top;
+      display: block; filter: grayscale(20%); transition: filter 0.3s;
+    }
+    .member-card:hover .member-photo { filter: grayscale(0%); }
+    .member-info { padding: 14px 16px; }
+    .member-name { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
+    .member-year { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+    .member-role {
+      display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; padding: 3px 10px; border-radius: 50px;
+      background: rgba(230,57,70,0.15); color: #e63946; border: 1px solid rgba(230,57,70,0.3);
+    }
+    .member-phone { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; }
+    .role-badge-organiser { background: rgba(69,123,157,0.15); color: #7aadcd; border-color: rgba(69,123,157,0.3); }
+    .role-badge-creative { background: rgba(106,90,205,0.15); color: #b8a4ff; border-color: rgba(106,90,205,0.3); }
+    .role-badge-volunteer { background: rgba(39,174,96,0.15); color: #5dde8a; border-color: rgba(39,174,96,0.3); }
+    .role-badge-advisor { background: rgba(243,156,18,0.15); color: #f5c842; border-color: rgba(243,156,18,0.3); }
+    .role-badge-treasure { background: rgba(230,57,70,0.15); color: #e63946; border-color: rgba(230,57,70,0.3); }
 
-           
+    /* FOOTER */
+    footer { background: #04040a; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 24px 0; }
+    .footer-inner { display: flex; flex-wrap: wrap; gap: 32px; max-width: 1100px; margin: 0 auto; padding-bottom: 32px; }
+    .footer-col { flex: 1; min-width: 200px; }
+    .footer-col .logo-f {
+      width: 50px; height: 50px; border-radius: 50%;
+      background-image: url(images-1/logo.jpeg); background-size: cover;
+      border: 2px solid #e63946; margin-bottom: 12px;
+    }
+    .footer-col .name-f { font-size: 18px; font-weight: 900; color: #e63946; }
+    .footer-col .inst-f { font-size: 11px; color: #999; margin-top: 2px; }
+    .footer-heading { font-size: 12px; font-weight: 800; color: #e63946; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+    .footer-col p, .footer-col a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; display: block; margin-bottom: 7px; line-height: 1.6; }
+    .footer-col a:hover { color: #e63946; }
+    .footer-social { display: flex; gap: 14px; margin-top: 12px; }
+    .footer-social a { font-size: 20px !important; color: rgba(255,255,255,0.35) !important; transition: color 0.2s; margin: 0 !important; display: inline !important; }
+    .footer-social a:hover { color: #e63946 !important; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); text-align: center; padding: 16px; color: rgba(255,255,255,0.25); font-size: 12px; }
 
+    /* ADMIN FAB */
+    .admin-fab {
+      position: fixed; bottom: 28px; right: 28px;
+      background: linear-gradient(135deg,#c0392b,#96281b); color: white;
+      border-radius: 50px; padding: 13px 22px; font-size: 14px; font-weight: 700;
+      box-shadow: 0 6px 24px rgba(192,57,43,0.45); display: flex; align-items: center;
+      gap: 8px; z-index: 999; text-decoration: none; transition: transform 0.2s;
+    }
+    .admin-fab:hover { transform: translateY(-2px); }
 
-
-            /** navbar **/
-            .navbar {
-                width: 100%;
-                height: 130px;
-
-            }
-
-            .logo {
-                position: absolute;
-                left: 4px;
-                background-color: whitesmoke;
-                background-image: url(images-1/logo.jpeg);
-                height: 120px;
-                width: 120px;
-                background-size: cover;
-                border-radius: 300px;
-                margin-top: 6px;
-            }
-
-            .clgname {
-                margin-left: 10px;
-                position: absolute;
-                left: 140px;
-            }
-
-            .name {
-                font-size: 60px;
-                font-weight: 900;
-                color: red;
-                font-weight: bolder;
-            }
-
-            .institute {
-                font-size: medium;
-                font-weight: 900;
-                margin-top: 0px;
-                color: rgb(4, 4, 98);
-                margin-top: 0px;
-            }
-
-            .ugc {
-                font-size: medium;
-                color: brown;
-                font-weight: 900;
-            }
-
-            .rec {
-                font-size: medium;
-                font-weight: 900;
-            }
-
-            .app {
-                font-size: medium;
-                font-weight: 900;
-            }
-
-            .sublogo-1 {
-                margin-top: 16px;
-                height: 75px;
-                width: 75px;
-                right: 180px;
-            }
-
-            .sublogo-2 {
-                margin-top: 16px;
-                height: 80px;
-                width: 80px;
-                right: 95px;
-            }
-
-            .sublogo-3 {
-                margin-top: 16px;
-                height: 80px;
-                width: 80px;
-                right: 10px;
-            }
-
-            .sublogo-4 {
-                margin-top: 16px;
-                height: 80px;
-                width: 80px;
-                right: 260px;
-            }
-        }
-    </style>
+    @media(max-width:600px) {
+      .member-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .filter-bar { padding: 20px 12px 16px; }
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="navbar">
-            <div class="logo"></div>
-            <div class="clgname">
-                <p class="name">Sri Indu</p>
-                <p class="institute">Institute of Engineering & Technology</p>
-                <p class="ugc">UGC Autonomous Institution</p>
-                <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
-            </div>
-            <div class="sublogo-1"></div>
-            <div class="sublogo-2"></div>
-            <div class="sublogo-3"></div>
-            <div class="sublogo-4"></div>
 
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname">
+      <p class="name">Sri Indu</p>
+      <p class="institute">Institute of Engineering &amp; Technology</p>
+      <p class="ugc">UGC Autonomous Institution</p>
+      <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
+    </div>
+    <div class="sublogo-4"></div>
+    <div class="sublogo-1"></div>
+    <div class="sublogo-2"></div>
+    <div class="sublogo-3"></div>
+  </div>
+
+  <!-- HEADER NAV -->
+  <header>
+    <a href="home.html" class="homebut" title="Home"><i class="fa-solid fa-house"></i></a>
+    <nav class="nav">
+      <a href="quiz.html" title="Achievements"><i class="fa-solid fa-trophy"></i></a>
+      <a href="clubmembers.html" class="active" title="Members"><i class="fa-solid fa-user"></i></a>
+      <a href="faculty.html" title="Faculty"><i class="fa-solid fa-graduation-cap"></i></a>
+      <a href="gallery.html" title="Events"><i class="fa-solid fa-calendar"></i></a>
+      <a href="#contact" title="Contact"><i class="fa-solid fa-comment"></i></a>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="club-hero">
+    <div class="clublogo-hero"></div>
+    <h1>Our Team</h1>
+    <p>✦ Neural Nexus Club Members ✦</p>
+  </section>
+
+  <!-- MEMBERS CONTENT -->
+  <div class="member-section">
+
+    <div class="section-label">⚡ Organisers</div>
+    <div class="member-grid">
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-1.jpeg" alt="T.Rakesh Reddy" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">T.Rakesh Reddy</div>
+          <div class="member-year">AI&amp;DS · 4th Year</div>
+          <span class="member-role role-badge-organiser">Organiser</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
         </div>
-
-
-        <header>
-            <a href="#" class="homebut"><i class="fa-solid fa-house"></i></a>
-            <nav class="nav">
-                <a href=""><i class="fa-solid fa-trophy"></i></a>
-                <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
-                <a href="faculty.html"><i class="fa-solid fa-graduation-cap"></i></a>
-                <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
-                <a href="#"><i class="fa-solid fa-comment"></i></a>
-            </nav>
-        </header>
-
-
-        <p>&middot;Club Member's</p>
-        <div class="grid">
-            <div class="container-4">
-                <img src="images-1/member-1.jpeg">
-                <div class="content">
-                    <h3>T.Rakesh Reddy</h3>
-                    <h4>AI&DS(4th year)</h4>
-                    <h4>Organiser</h4>
-                    <h5>7095995652</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-3.jpeg">
-                <div class="content">
-                    <h3>B.Ashwitha Reddy</h3>
-                    <h4>AI&DS(3rd year)</h4>
-                    <h4>Organiser</h4>
-                    <h5>9392966384</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-8.jpeg">
-                <div class="content">
-                    <h3>Thota.Pavani</h3>
-                    <h4>AI&DS(2nd year)</h4>
-                    <h4>Organiser</h4>
-                    <h5>7702098099</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-11.jpeg">
-                <div class="content">
-                    <h3>Shashank</h3>
-                    <h4>AI&DS(3rd year)</h4>
-                    <h4>Organiser</h4>
-                    <h5>6309732860</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-12.jpeg">
-                <div class="content">
-                    <h3>Tejasri</h3>
-                    <h4>AI&DS(4th year)</h4>
-                    <h4>Organiser</h4>
-                    <h5>7095995652</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-13.jpeg">
-                <div class="content">
-                    <h3>Kishore</h3>
-                    <h4>AI&DS(4th year)</h4>
-                    <h4>creative</h4>
-                    <h5>7095995652</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-14.jpeg">
-                <div class="content">
-                    <h3>Abhinav</h3>
-                    <h4>AI&DS(3rd year)</h4>
-                    <h4>Creative</h4>
-                    <h5>8328081391</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-5.jpeg">
-                <div class="content">
-                    <h3>Barkam.aravind</h3>
-                    <h4>AI&DS(2nd year)</h4>
-                    <h4>Creative</h4>
-                    <h5>7095995652</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-15.jpeg">
-                <div class="content">
-                    <h3>Swathi</h3>
-                    <h4>AI&DS(3rd year)</h4>
-                    <h4>Creative</h4>
-                    <h5>9866375904</h5>
-                </div>
-            </div>
-            
-            <div class="container-4">
-                <img src="images-1/member-11.jpeg">
-                <div class="content">
-                    <h3>Vishnu</h3>
-                    <h4>AI&DS(2nd year)</h4>
-                    <h4>Volunter</h4>
-                    <h5>9652965303</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-16.jpeg">
-                <div class="content">
-                    <h3>Varsha</h3>
-                    <h4>AI&DS(3rd year)</h4>
-                    <h4>Volunter</h4>
-                    <h5>7995961801</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-6.jpeg">
-                <div class="content">
-                    <h3>I.shiva</h3>
-                    <h4>AI&DS(4th year)</h4>
-                    <h4>Volunter</h4>
-                    <h5>7095995652</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-4.jpeg">
-                <div class="content">
-                    <h3>Shiva Kumar</h3>
-                    <h4>AI&DS(2nd year)</h4>
-                    <h4>Club Advisor</h4>
-                    <h5>9492003133</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-17.jpeg">
-                <div class="content">
-                    <h3>Priyanka</h3>
-                    <h4>AI&DS(3rd year)</h4>
-                    <h4>Club Advisor</h4>
-                    <h5>8121195365</h5>
-                </div>
-            </div>
-             <div class="container-4">
-                <img src="images-1/member-18.jpeg">
-                <div class="content">
-                    <h3>Rishika</h3>
-                    <h4>AI&DS(4th year)</h4>
-                    <h4>Treasure</h4>
-                    <h5>7095995652</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-19.jpeg">
-                <div class="content">
-                    <h3>Akshaya</h3>
-                    <h4>AI&DS(2nd year)</h4>
-                    <h4>Treasure</h4>
-                    <h5>8106498481</h5>
-                </div>
-            </div>
-            <div class="container-4">
-                <img src="images-1/member-20.jpeg">
-                <div class="content">
-                    <h3>chand Basha</h3>
-                    <h4>AI&DS(3rd year)</h4>
-                    <h4>Treasure</h4>
-                    <h5>9491441166</h5>
-                </div>
-            </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-3.jpeg" alt="B.Ashwitha Reddy" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">B.Ashwitha Reddy</div>
+          <div class="member-year">AI&amp;DS · 3rd Year</div>
+          <span class="member-role role-badge-organiser">Organiser</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9392966384</div>
         </div>
-  <!-- Admin FAB -->
-  <a href="admin.html" style="position:fixed;bottom:28px;right:28px;background:linear-gradient(135deg,#c0392b,#96281b);color:white;border:none;border-radius:50px;padding:13px 22px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(192,57,43,0.45);display:flex;align-items:center;gap:8px;z-index:999;text-decoration:none;">
-    <i class="fa-solid fa-lock"></i> Admin
-  </a>
-
-        <footer>
-            <div class="last">
-                <div class="last-1">
-                    <div class="all">
-
-                        <div class="logo-1"></div>
-                        <div class="clgname-1">
-                            <p class="name-1">Sri Indu</p>
-                            <p class="institute-1">Institute of Engineering & Technology</p>
-                            <p class="ugc-1">UGC Autonomous Institution</p>
-                            <p class="rec-1">Institution, Recognized under 2(f) of UGC Act 1956.</p>
-                        </div>
-
-                        <div class="list">
-                            <p class="info">College Contact info</p>
-                            <ul class="address">Sheriguda, Rangareddy, Telangana</ul>
-                            <ul class="address">PIN:501510</ul>
-                            <ul class="address">Mobile:93947187999, 8096951507</ul>
-                            <ul class="address">Email: acct.siiet@gmail.com</ul>
-                            <ul class="address"><a href="https://sriindu.ac.in/"
-                                    style="text-decoration: none; color:black">web: siiet.ac.in</a></ul>
-                        </div>
-                    </div>
-
-                    <div class="all-2"></div>
-                    <div class="details-8">
-                        <p class="details-7">Contact us &middot; 9014196561</p>
-                        <p class="details-7">CLub Mail &middot;neuralnexus.siiet@gmail.com</p>
-                        <p class="details-7">Social Media Handlings</p>
-                        <p class="details-7">Faculty Member's</p>
-
-                    </div>
-
-
-                </div>
-
-        </footer>
-
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-8.jpeg" alt="Thota Pavani" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Thota Pavani</div>
+          <div class="member-year">AI&amp;DS · 2nd Year</div>
+          <span class="member-role role-badge-organiser">Organiser</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7702098099</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-11.jpeg" alt="Shashank" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Shashank</div>
+          <div class="member-year">AI&amp;DS · 3rd Year</div>
+          <span class="member-role role-badge-organiser">Organiser</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>6309732860</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-12.jpeg" alt="Tejasri" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Tejasri</div>
+          <div class="member-year">AI&amp;DS · 4th Year</div>
+          <span class="member-role role-badge-organiser">Organiser</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
+        </div>
+      </div>
     </div>
 
-</body>
+    <div class="section-label">🎨 Creative Team</div>
+    <div class="member-grid">
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-13.jpeg" alt="Kishore" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Kishore</div>
+          <div class="member-year">AI&amp;DS · 4th Year</div>
+          <span class="member-role role-badge-creative">Creative</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-14.jpeg" alt="Abhinav" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Abhinav</div>
+          <div class="member-year">AI&amp;DS · 3rd Year</div>
+          <span class="member-role role-badge-creative">Creative</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>8328081391</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-5.jpeg" alt="Barkam Aravind" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Barkam Aravind</div>
+          <div class="member-year">AI&amp;DS · 2nd Year</div>
+          <span class="member-role role-badge-creative">Creative</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-15.jpeg" alt="Swathi" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Swathi</div>
+          <div class="member-year">AI&amp;DS · 3rd Year</div>
+          <span class="member-role role-badge-creative">Creative</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9866375904</div>
+        </div>
+      </div>
+    </div>
 
+    <div class="section-label">🙋 Volunteers</div>
+    <div class="member-grid">
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-11.jpeg" alt="Vishnu" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Vishnu</div>
+          <div class="member-year">AI&amp;DS · 2nd Year</div>
+          <span class="member-role role-badge-volunteer">Volunteer</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9652965303</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-16.jpeg" alt="Varsha" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Varsha</div>
+          <div class="member-year">AI&amp;DS · 3rd Year</div>
+          <span class="member-role role-badge-volunteer">Volunteer</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7995961801</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-6.jpeg" alt="I.Shiva" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">I.Shiva</div>
+          <div class="member-year">AI&amp;DS · 4th Year</div>
+          <span class="member-role role-badge-volunteer">Volunteer</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">🧠 Club Advisors</div>
+    <div class="member-grid">
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-4.jpeg" alt="Shiva Kumar" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Shiva Kumar</div>
+          <div class="member-year">AI&amp;DS · 2nd Year</div>
+          <span class="member-role role-badge-advisor">Club Advisor</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9492003133</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-17.jpeg" alt="Priyanka" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Priyanka</div>
+          <div class="member-year">AI&amp;DS · 3rd Year</div>
+          <span class="member-role role-badge-advisor">Club Advisor</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>8121195365</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">💰 Treasurers</div>
+    <div class="member-grid">
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-18.jpeg" alt="Rishika" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Rishika</div>
+          <div class="member-year">AI&amp;DS · 4th Year</div>
+          <span class="member-role role-badge-treasure">Treasurer</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-19.jpeg" alt="Akshaya" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Akshaya</div>
+          <div class="member-year">AI&amp;DS · 2nd Year</div>
+          <span class="member-role role-badge-treasure">Treasurer</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>8106498481</div>
+        </div>
+      </div>
+      <div class="member-card">
+        <img class="member-photo" src="images-1/member-20.jpeg" alt="Chand Basha" loading="lazy">
+        <div class="member-info">
+          <div class="member-name">Chand Basha</div>
+          <div class="member-year">AI&amp;DS · 3rd Year</div>
+          <span class="member-role role-badge-treasure">Treasurer</span>
+          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9491441166</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer id="contact">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="logo-f"></div>
+        <div class="name-f">Sri Indu</div>
+        <div class="inst-f">Institute of Engineering &amp; Technology<br>UGC Autonomous Institution</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">College Contact</div>
+        <p>Sheriguda, Rangareddy, Telangana</p>
+        <p>PIN: 501510</p>
+        <p>📞 93947187999, 8096951507</p>
+        <p>✉️ acct.siiet@gmail.com</p>
+        <a href="https://sriindu.ac.in/" target="_blank">🌐 sriindu.ac.in</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Neural Nexus</div>
+        <p>📱 9014196561</p>
+        <p>✉️ neuralnexus.siiet@gmail.com</p>
+        <p style="margin-top:8px;color:rgba(255,255,255,0.3);font-size:11px;letter-spacing:1px;">FOLLOW US</p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"><i class="fa-brands fa-telegram"></i></a>
+          <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">Copyright &copy; 2025 Neural Nexus Group | All rights reserved.</div>
+  </footer>
+
+  <a href="admin.html" class="admin-fab"><i class="fa-solid fa-lock"></i> Admin</a>
+
+</body>
 </html>
