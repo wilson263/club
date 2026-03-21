@@ -283,6 +283,33 @@
 
     </div>
 
+    <!-- ENQUIRY FORM -->
+    <div class="section-label">💬 Send Us a Message</div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;margin-bottom:32px;max-width:600px">
+      <form onsubmit="submitContactForm(event)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Your Name *</label>
+            <input type="text" id="cf-name" placeholder="Rahul Kumar" required style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;outline:none;box-sizing:border-box;font-family:Inter,sans-serif">
+          </div>
+          <div>
+            <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Email</label>
+            <input type="email" id="cf-email" placeholder="your@email.com" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;outline:none;box-sizing:border-box;font-family:Inter,sans-serif">
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Phone</label>
+          <input type="tel" id="cf-phone" placeholder="9876543210" style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;outline:none;box-sizing:border-box;font-family:Inter,sans-serif">
+        </div>
+        <div style="margin-bottom:18px">
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Message *</label>
+          <textarea id="cf-message" placeholder="Write your message or enquiry here..." rows="5" required style="width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px 14px;font-size:14px;color:#fff;outline:none;resize:vertical;box-sizing:border-box;font-family:Inter,sans-serif"></textarea>
+        </div>
+        <button type="submit" id="cf-submit" style="padding:14px 28px;background:#e63946;border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:Inter,sans-serif">💬 Send Message</button>
+        <div id="cf-msg" style="display:none;margin-top:12px;font-size:14px;font-weight:600;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,0.05)"></div>
+      </form>
+    </div>
+
     <!-- EVENTS -->
     <div class="section-label">📅 Our Activities</div>
     <div class="events-row">
@@ -347,5 +374,8 @@
 
   <a href="admin.html" class="admin-fab"><i class="fa-solid fa-lock"></i> Admin</a>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-content.js"></script>
 </body>
 </html>

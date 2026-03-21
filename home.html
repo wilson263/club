@@ -628,7 +628,7 @@
 
     <!-- ══ NEWS TICKER ══ -->
     <div class="news-ticker">
-      <span class="news-ticker-inner">
+      <span class="news-ticker-inner" id="ticker-text">
         🚀 Neural Nexus Club is now live! &nbsp;&nbsp;&nbsp;
         📅 Upcoming events — stay tuned! &nbsp;&nbsp;&nbsp;
         🏆 Neural Nexus Quiz Competition — December 2024 &nbsp;&nbsp;&nbsp;
@@ -802,6 +802,14 @@
             <p class="details-1" style="padding:0">✉️ neuralnexus.siiet@gmail.com</p>
             <p class="details-1" style="padding:0">📱 <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank" style="color:inherit;text-decoration:none">@siiet_ai_ds_club</a></p>
           </div>
+          <!-- Quick Links -->
+          <div style="flex:1;min-width:200px">
+            <p class="info">Quick Links</p>
+            <p class="details-1" style="padding:0"><a href="resources.html" style="color:inherit;text-decoration:none">📚 Resources Library</a></p>
+            <p class="details-1" style="padding:0"><a href="projects.html" style="color:inherit;text-decoration:none">💡 Project Showcase</a></p>
+            <p class="details-1" style="padding:0"><a href="register.html" style="color:inherit;text-decoration:none">📝 Event Registration</a></p>
+            <p class="details-1" style="padding:0"><a href="contact.html" style="color:inherit;text-decoration:none">💬 Contact / Enquiry</a></p>
+          </div>
         </div>
       </div>
 
@@ -834,6 +842,7 @@
     window.addEventListener("load", () => {
       loadHomePageImages();
       loadHomeStats();
+      loadTicker();
     });
   </script>
 </body>

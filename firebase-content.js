@@ -38,6 +38,23 @@ function animateCounter(el, target) {
   requestAnimationFrame(step);
 }
 
+// ── Load announcements into ticker ──
+async function loadTicker() {
+  if (!db) return;
+  const tickerEl = document.getElementById("ticker-text");
+  if (!tickerEl) return;
+  try {
+    const snap = await db.collection("announcements").orderBy("order").get();
+    if (snap.empty) return;
+    const texts = snap.docs.map(d => d.data().text).filter(Boolean);
+    if (texts.length > 0) {
+      tickerEl.innerHTML = texts.join(" &nbsp;&nbsp;✦&nbsp;&nbsp; ") + " &nbsp;&nbsp;✦&nbsp;&nbsp; ";
+    }
+  } catch(e) {
+    console.warn("Could not load ticker:", e);
+  }
+}
+
 // ── Load dynamic stats for home page ──
 async function loadHomeStats() {
   if (!db) return;
@@ -51,9 +68,10 @@ async function loadHomeStats() {
     const memberCount = membersSnap.size;
     const eventCount  = eventsSnap.size;
     const workshopCount = eventsSnap.docs.filter(d => {
+      const type  = (d.data().type  || "").toLowerCase();
       const title = (d.data().title || "").toLowerCase();
       const desc  = (d.data().desc  || "").toLowerCase();
-      return title.includes("workshop") || desc.includes("workshop");
+      return type === "workshop" || title.includes("workshop") || desc.includes("workshop");
     }).length;
 
     const elMembers   = document.getElementById("stat-members-count");
@@ -157,4 +175,156 @@ function makeEventCard(ev) {
       </div>
     </div>
   `;
+}
+
+// ── Submit contact form ──
+async function submitContactForm(event) {
+  if (event) event.preventDefault();
+  if (!db) { showContactMsg("error", "Service unavailable. Please try again later."); return; }
+  const name    = (document.getElementById("cf-name")    || {}).value || "";
+  const email   = (document.getElementById("cf-email")   || {}).value || "";
+  const phone   = (document.getElementById("cf-phone")   || {}).value || "";
+  const message = (document.getElementById("cf-message") || {}).value || "";
+  const btn     = document.getElementById("cf-submit");
+  if (!name.trim() || !message.trim()) { showContactMsg("error", "Please fill in your name and message."); return; }
+  if (btn) { btn.disabled = true; btn.textContent = "Sending..."; }
+  try {
+    await db.collection("contacts").add({
+      name: name.trim(), email: email.trim(), phone: phone.trim(), message: message.trim(),
+      read: false, submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showContactMsg("success", "✅ Message sent! We'll get back to you soon.");
+    ["cf-name","cf-email","cf-phone","cf-message"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+  } catch(e) { showContactMsg("error", "Error sending message. Please try again."); }
+  if (btn) { btn.disabled = false; btn.textContent = "Send Message"; }
+}
+
+function showContactMsg(type, msg) {
+  const el = document.getElementById("cf-msg");
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = "block";
+  el.style.color = type === "success" ? "#27ae60" : "#e63946";
+  setTimeout(() => { el.style.display = "none"; }, 5000);
+}
+
+// ── Load resources for public page ──
+async function loadPublicResources() {
+  const container = document.getElementById("resources-container");
+  if (!container || !db) return;
+  try {
+    const snap = await db.collection("resources").orderBy("addedAt", "desc").get();
+    if (snap.empty) { container.innerHTML = '<p style="color:#aaa;text-align:center;padding:40px">No resources yet. Check back soon!</p>'; return; }
+    const icons = { notes: "📄", video: "🎥", tool: "🔧", link: "🔗" };
+    const byType = {};
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (!byType[d.type]) byType[d.type] = [];
+      byType[d.type].push(d);
+    });
+    container.innerHTML = "";
+    Object.keys(byType).forEach(type => {
+      const section = document.createElement("div");
+      section.style.marginBottom = "32px";
+      const typeNames = { notes: "Notes & PDFs", video: "Video Resources", tool: "Tools", link: "Useful Links" };
+      section.innerHTML = `<h3 style="font-size:16px;font-weight:700;color:#e63946;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px">${icons[type]||"🔗"} ${typeNames[type]||type}</h3>`;
+      byType[type].forEach(r => {
+        section.innerHTML += `
+          <a href="${r.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;text-decoration:none;color:inherit;margin-bottom:10px;transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,0.04)'">
+            <span style="font-size:26px;flex-shrink:0">${icons[r.type]||"🔗"}</span>
+            <div style="flex:1">
+              <div style="font-weight:700;font-size:14px">${r.title}</div>
+              ${r.category ? `<div style="font-size:12px;color:#aaa;margin-top:3px">📂 ${r.category}</div>` : ""}
+              ${r.description ? `<div style="font-size:12px;color:#bbb;margin-top:4px">${r.description}</div>` : ""}
+            </div>
+            <span style="font-size:18px;flex-shrink:0">→</span>
+          </a>`;
+      });
+      container.appendChild(section);
+    });
+  } catch(e) { container.innerHTML = '<p style="color:#aaa;text-align:center;padding:40px">Could not load resources.</p>'; }
+}
+
+// ── Load projects for public page ──
+async function loadPublicProjects() {
+  const container = document.getElementById("projects-container");
+  if (!container || !db) return;
+  try {
+    const snap = await db.collection("projects").orderBy("addedAt", "desc").get();
+    if (snap.empty) { container.innerHTML = '<p style="color:#aaa;text-align:center;padding:40px">No projects yet. Check back soon!</p>'; return; }
+    container.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      container.innerHTML += `
+        <div style="padding:20px 24px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:16px;margin-bottom:16px">
+          <div style="display:flex;align-items:flex-start;gap:16px">
+            <div style="font-size:36px;flex-shrink:0">💡</div>
+            <div style="flex:1">
+              <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:6px">${d.title}</div>
+              ${d.team ? `<div style="font-size:13px;color:#aaa;margin-bottom:4px">👥 Team: ${d.team}</div>` : ""}
+              ${d.year ? `<div style="font-size:13px;color:#aaa;margin-bottom:8px">📅 ${d.year}</div>` : ""}
+              <div style="font-size:14px;color:#ccc;line-height:1.6">${d.description || ""}</div>
+              ${d.link ? `<a href="${d.link}" target="_blank" rel="noopener" style="display:inline-block;margin-top:12px;padding:8px 20px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);border-radius:8px;color:#e63946;text-decoration:none;font-size:13px;font-weight:700">🔗 View Project</a>` : ""}
+            </div>
+          </div>
+        </div>`;
+    });
+  } catch(e) { container.innerHTML = '<p style="color:#aaa;text-align:center;padding:40px">Could not load projects.</p>'; }
+}
+
+// ── Load upcoming events + handle registration ──
+async function loadUpcomingEventsForRegistration() {
+  const select = document.getElementById("reg-event-select");
+  if (!select || !db) return;
+  try {
+    const snap = await db.collection("events").where("type", "==", "upcoming").orderBy("addedAt", "desc").get();
+    select.innerHTML = '<option value="">— Select an Event —</option>';
+    snap.forEach(doc => {
+      const opt = document.createElement("option");
+      opt.value = doc.id;
+      opt.dataset.title = doc.data().title || "";
+      opt.textContent = doc.data().title + (doc.data().date ? " (" + doc.data().date + ")" : "");
+      select.appendChild(opt);
+    });
+    if (snap.empty) {
+      select.innerHTML = '<option value="">No upcoming events at the moment</option>';
+    }
+  } catch(e) { console.warn("Error loading events:", e); }
+}
+
+async function submitRegistration(event) {
+  if (event) event.preventDefault();
+  if (!db) { showRegMsg("error", "Service unavailable. Please try again later."); return; }
+  const select   = document.getElementById("reg-event-select");
+  const eventId  = select ? select.value : "";
+  const eventTitle = select && select.options[select.selectedIndex] ? (select.options[select.selectedIndex].dataset.title || "") : "";
+  const name     = (document.getElementById("reg-name")     || {}).value || "";
+  const email    = (document.getElementById("reg-email")    || {}).value || "";
+  const phone    = (document.getElementById("reg-phone")    || {}).value || "";
+  const yearDept = (document.getElementById("reg-yeardept") || {}).value || "";
+  const btn      = document.getElementById("reg-submit");
+  if (!eventId)      { showRegMsg("error", "Please select an event."); return; }
+  if (!name.trim())  { showRegMsg("error", "Please enter your name."); return; }
+  if (!email.trim()) { showRegMsg("error", "Please enter your email."); return; }
+  if (btn) { btn.disabled = true; btn.textContent = "Registering..."; }
+  try {
+    await db.collection("registrations").add({
+      eventId, eventTitle, name: name.trim(), email: email.trim(),
+      phone: phone.trim(), yearDept: yearDept.trim(),
+      registeredAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showRegMsg("success", "✅ Registered successfully! We'll confirm via email soon.");
+    ["reg-name","reg-email","reg-phone","reg-yeardept"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    if (select) select.value = "";
+  } catch(e) { showRegMsg("error", "Error registering. Please try again."); }
+  if (btn) { btn.disabled = false; btn.textContent = "Register Now"; }
+}
+
+function showRegMsg(type, msg) {
+  const el = document.getElementById("reg-msg");
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = "block";
+  el.style.color = type === "success" ? "#27ae60" : "#e63946";
+  setTimeout(() => { el.style.display = "none"; }, 6000);
 }

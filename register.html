@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Register for Events — Neural Nexus AI & DS Club, SIIET">
+  <title>Event Registration — Neural Nexus | SIIET</title>
+  <link rel="icon" type="image/jpeg" href="images-1/clublogo.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="home.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { font-family: 'Inter', Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: #080810 !important; background-image: none !important; }
+    .container { background: transparent !important; border: none !important; backdrop-filter: none !important; border-radius: 0 !important; }
+    .navbar { background: #080810 !important; border-bottom: 1px solid rgba(230,57,70,0.2) !important; height: 72px !important; border-radius: 0 !important; position: sticky !important; top: 0 !important; z-index: 999 !important; }
+    .logo { background-image: url(images-1/logo.jpeg); border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35); margin-top: 10px !important; }
+    .name { color: #e63946 !important; font-size: 34px !important; }
+    .institute, .ugc, .rec { color: #ccc !important; }
+    .sublogo-group { display: flex !important; align-items: center !important; gap: 6px !important; position: absolute !important; right: 10px !important; top: 50% !important; transform: translateY(-50%) !important; }
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { filter: brightness(1.2) !important; position: static !important; width: 42px !important; height: 42px !important; border-radius: 50% !important; border: 2px solid rgba(230,57,70,0.4) !important; flex-shrink: 0 !important; }
+    header { background: linear-gradient(135deg, #0d0d1a 0%, #1a0808 100%) !important; }
+    .page-hero { padding: 60px 24px 40px; text-align: center; background: linear-gradient(135deg, #0a0a1a 0%, #1a0810 100%); border-bottom: 1px solid rgba(230,57,70,0.15); }
+    .page-hero h1 { font-size: 42px; font-weight: 900; color: #fff; margin: 0 0 12px; }
+    .page-hero h1 span { color: #e63946; }
+    .page-hero p { font-size: 16px; color: rgba(255,255,255,0.5); max-width: 600px; margin: 0 auto; }
+    .reg-wrap { max-width: 600px; margin: 0 auto; padding: 60px 24px; }
+    .reg-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 36px; }
+    .reg-card h2 { font-size: 22px; font-weight: 800; color: #fff; margin: 0 0 24px; }
+    .f-group { margin-bottom: 18px; }
+    .f-label { display: block; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 7px; }
+    .f-input { width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 13px 16px; font-size: 14px; color: #fff; outline: none; transition: border 0.2s; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    .f-input:focus { border-color: #e63946; background: rgba(255,255,255,0.09); }
+    .f-input::placeholder { color: rgba(255,255,255,0.3); }
+    .f-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M6 8L0 0h12z' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+    .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #e63946, #c62a36); border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; transition: opacity 0.2s; margin-top: 8px; font-family: 'Inter', sans-serif; }
+    .submit-btn:hover { opacity: 0.9; }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #reg-msg { display: none; margin-top: 16px; font-size: 14px; font-weight: 600; padding: 12px 16px; border-radius: 10px; background: rgba(255,255,255,0.05); }
+    .note { font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; margin-top: 16px; line-height: 1.5; }
+    .page-footer { background: #040408; color: rgba(255,255,255,0.4); text-align: center; padding: 16px; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname">
+      <p class="name">Sri Indu</p>
+      <p class="institute">Institute of Engineering &amp; Technology</p>
+      <p class="ugc">UGC Autonomous Institution</p>
+      <p class="rec">Recognized under 2(f) of UGC Act 1956</p>
+    </div>
+    <div class="sublogo-group">
+      <div class="sublogo-4"></div>
+      <div class="sublogo-1"></div>
+      <div class="sublogo-2"></div>
+      <div class="sublogo-3"></div>
+    </div>
+  </div>
+
+  <header>
+    <a href="home.html" class="homebut" title="Home">⌂</a>
+    <nav class="nav">
+      <a href="achievements.html" title="Achievements">🏆</a>
+      <a href="clubmembers.html" title="Members">👤</a>
+      <a href="faculty.html" title="Faculty">🎓</a>
+      <a href="gallery.html" title="Events">📅</a>
+      <a href="contact.html" title="Contact">💬</a>
+    </nav>
+  </header>
+
+  <div class="page-hero">
+    <h1>📝 Event <span>Registration</span></h1>
+    <p>Register for upcoming Neural Nexus events. Fill in your details and we'll confirm your spot.</p>
+  </div>
+
+  <div class="reg-wrap">
+    <div class="reg-card">
+      <h2>Register for an Event</h2>
+      <form onsubmit="submitRegistration(event)">
+        <div class="f-group">
+          <label class="f-label">Select Event *</label>
+          <select class="f-input f-select" id="reg-event-select" required>
+            <option value="">Loading events...</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Full Name *</label>
+          <input type="text" class="f-input" id="reg-name" placeholder="e.g. Rahul Kumar" required>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Email Address *</label>
+          <input type="email" class="f-input" id="reg-email" placeholder="your@email.com" required>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Phone Number</label>
+          <input type="tel" class="f-input" id="reg-phone" placeholder="e.g. 9876543210">
+        </div>
+        <div class="f-group">
+          <label class="f-label">Year &amp; Department</label>
+          <input type="text" class="f-input" id="reg-yeardept" placeholder="e.g. AI&DS — 2nd Year">
+        </div>
+        <button type="submit" class="submit-btn" id="reg-submit">📝 Register Now</button>
+        <div id="reg-msg"></div>
+        <p class="note">By registering, you agree to be contacted by the club regarding this event. Your information is kept confidential.</p>
+      </form>
+    </div>
+  </div>
+
+  <div class="page-footer">© 2025 Neural Nexus Group — AI &amp; DS Club, SIIET. All rights reserved.</div>
+</div>
+
+<a href="admin.html" class="admin-fab" title="Admin Panel">🔐 Admin</a>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-content.js"></script>
+<script>
+  window.addEventListener("load", () => { loadUpcomingEventsForRegistration(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Project Showcase — Neural Nexus AI & DS Club, SIIET">
+  <title>Projects — Neural Nexus | SIIET</title>
+  <link rel="icon" type="image/jpeg" href="images-1/clublogo.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="home.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { font-family: 'Inter', Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: #080810 !important; background-image: none !important; }
+    .container { background: transparent !important; border: none !important; backdrop-filter: none !important; border-radius: 0 !important; }
+    .navbar { background: #080810 !important; border-bottom: 1px solid rgba(230,57,70,0.2) !important; height: 72px !important; border-radius: 0 !important; position: sticky !important; top: 0 !important; z-index: 999 !important; }
+    .logo { background-image: url(images-1/logo.jpeg); border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35); margin-top: 10px !important; }
+    .name { color: #e63946 !important; font-size: 34px !important; }
+    .institute, .ugc, .rec { color: #ccc !important; }
+    .sublogo-group { display: flex !important; align-items: center !important; gap: 6px !important; position: absolute !important; right: 10px !important; top: 50% !important; transform: translateY(-50%) !important; }
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { filter: brightness(1.2) !important; position: static !important; width: 42px !important; height: 42px !important; border-radius: 50% !important; border: 2px solid rgba(230,57,70,0.4) !important; flex-shrink: 0 !important; }
+    header { background: linear-gradient(135deg, #0d0d1a 0%, #1a0808 100%) !important; }
+    .page-hero { padding: 60px 24px 40px; text-align: center; background: linear-gradient(135deg, #0a0a1a 0%, #1a0810 100%); border-bottom: 1px solid rgba(230,57,70,0.15); }
+    .page-hero h1 { font-size: 42px; font-weight: 900; color: #fff; margin: 0 0 12px; }
+    .page-hero h1 span { color: #e63946; }
+    .page-hero p { font-size: 16px; color: rgba(255,255,255,0.5); max-width: 600px; margin: 0 auto; }
+    .page-body { max-width: 900px; margin: 0 auto; padding: 50px 24px; }
+    .page-footer { background: #040408; color: rgba(255,255,255,0.4); text-align: center; padding: 16px; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname">
+      <p class="name">Sri Indu</p>
+      <p class="institute">Institute of Engineering &amp; Technology</p>
+      <p class="ugc">UGC Autonomous Institution</p>
+      <p class="rec">Recognized under 2(f) of UGC Act 1956</p>
+    </div>
+    <div class="sublogo-group">
+      <div class="sublogo-4"></div>
+      <div class="sublogo-1"></div>
+      <div class="sublogo-2"></div>
+      <div class="sublogo-3"></div>
+    </div>
+  </div>
+
+  <header>
+    <a href="home.html" class="homebut" title="Home">⌂</a>
+    <nav class="nav">
+      <a href="achievements.html" title="Achievements">🏆</a>
+      <a href="clubmembers.html" title="Members">👤</a>
+      <a href="faculty.html" title="Faculty">🎓</a>
+      <a href="gallery.html" title="Events">📅</a>
+      <a href="contact.html" title="Contact">💬</a>
+    </nav>
+  </header>
+
+  <div class="page-hero">
+    <h1>💡 <span>Project</span> Showcase</h1>
+    <p>Innovative projects built by Neural Nexus members. Explore ideas, learn from peers, and get inspired to build something amazing.</p>
+  </div>
+
+  <div class="page-body">
+    <div id="projects-container">
+      <div style="text-align:center;padding:60px 0;color:rgba(255,255,255,0.4)">
+        <div style="font-size:48px;margin-bottom:16px">💡</div>
+        <p>Loading projects...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">© 2025 Neural Nexus Group — AI &amp; DS Club, SIIET. All rights reserved.</div>
+</div>
+
+<a href="admin.html" class="admin-fab" title="Admin Panel">🔐 Admin</a>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-content.js"></script>
+<script>
+  window.addEventListener("load", () => { loadPublicProjects(); });
+</script>
+</body>
+</html>

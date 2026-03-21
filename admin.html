@@ -80,6 +80,23 @@
           <span class="nav-icon">👨‍🏫</span> Faculty
         </div>
 
+        <div class="nav-section-label">Content</div>
+        <div class="nav-item" data-panel="announcements" onclick="showPanel('announcements')">
+          <span class="nav-icon">📢</span> Announcements
+        </div>
+        <div class="nav-item" data-panel="resources" onclick="showPanel('resources')">
+          <span class="nav-icon">📚</span> Resources
+        </div>
+        <div class="nav-item" data-panel="projects" onclick="showPanel('projects')">
+          <span class="nav-icon">💡</span> Projects
+        </div>
+        <div class="nav-item" data-panel="contacts" onclick="showPanel('contacts')">
+          <span class="nav-icon">✉️</span> Enquiry Inbox
+        </div>
+        <div class="nav-item" data-panel="registrations" onclick="showPanel('registrations')">
+          <span class="nav-icon">📝</span> Registrations
+        </div>
+
         <div class="nav-section-label" id="admin-mgmt-label">Management</div>
         <div class="nav-item" id="admin-mgmt-btn" data-panel="admins" onclick="showPanel('admins')">
           <span class="nav-icon">👥</span> Admins
@@ -151,6 +168,26 @@
               <div class="stat-num" id="stat-admins">—</div>
               <div class="stat-label">Admins</div>
             </div>
+            <div class="stat-card">
+              <div class="stat-icon">✉️</div>
+              <div class="stat-num" id="stat-contacts">—</div>
+              <div class="stat-label">Enquiries</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📝</div>
+              <div class="stat-num" id="stat-registrations">—</div>
+              <div class="stat-label">Registrations</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📚</div>
+              <div class="stat-num" id="stat-resources">—</div>
+              <div class="stat-label">Resources</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">💡</div>
+              <div class="stat-num" id="stat-projects">—</div>
+              <div class="stat-label">Projects</div>
+            </div>
           </div>
 
           <div class="card">
@@ -177,6 +214,15 @@
               </div>
               <div class="quick-btn" id="quick-add-admin-btn" style="display:none" onclick="openAddAdminModal()">
                 <div class="quick-btn-icon">👥</div>Add Admin
+              </div>
+              <div class="quick-btn" onclick="showPanel('announcements')">
+                <div class="quick-btn-icon">📢</div>Announcements
+              </div>
+              <div class="quick-btn" onclick="showPanel('contacts')">
+                <div class="quick-btn-icon">✉️</div>View Enquiries
+              </div>
+              <div class="quick-btn" onclick="showPanel('registrations')">
+                <div class="quick-btn-icon">📝</div>View Registrations
               </div>
             </div>
           </div>
@@ -241,6 +287,7 @@
                 <select class="f-input" id="evt-type">
                   <option value="upcoming">Upcoming</option>
                   <option value="conducted">Conducted</option>
+                  <option value="workshop">Workshop</option>
                 </select>
               </div>
               <div class="f-group">
@@ -270,6 +317,7 @@
               <button class="tab-btn active" onclick="filterEvents('all',this)">All</button>
               <button class="tab-btn" onclick="filterEvents('conducted',this)">Conducted</button>
               <button class="tab-btn" onclick="filterEvents('upcoming',this)">Upcoming</button>
+              <button class="tab-btn" onclick="filterEvents('workshop',this)">Workshop</button>
             </div>
             <div class="event-list" id="events-list">
               <div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading events...</div>
@@ -372,6 +420,98 @@
             </div>
             <div class="limit-msg" id="admin-limit-msg">
               ⚠️ Maximum of 3 temporary admins reached. Remove one to add another.
+            </div>
+          </div>
+        </div>
+
+        <!-- ── ANNOUNCEMENTS ── -->
+        <div class="panel" id="panel-announcements">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">📢</span> News Ticker Announcements</div>
+            </div>
+            <p class="hint-text">These announcements appear in the scrolling ticker on the home page. Add, edit, or remove entries. Drag to reorder.</p>
+            <div class="f-group">
+              <label class="f-label">New Announcement</label>
+              <div style="display:flex;gap:10px">
+                <input type="text" class="f-input" id="ann-text" placeholder="e.g. 🚀 AI Workshop coming soon — Register now!" style="margin-bottom:0;flex:1">
+                <button class="btn btn-primary" onclick="addAnnouncement()" style="flex-shrink:0">➕ Add</button>
+              </div>
+            </div>
+            <div id="ann-list" style="margin-top:14px">
+              <div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── RESOURCES ── -->
+        <div class="panel" id="panel-resources">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">📚</span> Resources Library</div>
+              <button class="btn btn-primary" onclick="openResourceModal()">➕ Add Resource</button>
+            </div>
+            <p class="hint-text">Upload study materials, notes, links, YouTube videos, and tools. Students can access these from the Resources page.</p>
+            <div class="tab-group">
+              <button class="tab-btn active" onclick="filterResources('all',this)">All</button>
+              <button class="tab-btn" onclick="filterResources('notes',this)">Notes</button>
+              <button class="tab-btn" onclick="filterResources('video',this)">Videos</button>
+              <button class="tab-btn" onclick="filterResources('tool',this)">Tools</button>
+              <button class="tab-btn" onclick="filterResources('link',this)">Links</button>
+            </div>
+            <div id="resources-list" style="margin-top:14px">
+              <div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── PROJECTS ── -->
+        <div class="panel" id="panel-projects">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">💡</span> Project Showcase</div>
+              <button class="btn btn-primary" onclick="openProjectModal()">➕ Add Project</button>
+            </div>
+            <p class="hint-text">Showcase student projects here. Each entry appears on the Projects page with title, team, description, and link.</p>
+            <div id="projects-list" style="margin-top:14px">
+              <div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CONTACTS / ENQUIRY INBOX ── -->
+        <div class="panel" id="panel-contacts">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">✉️</span> Enquiry Inbox</div>
+            </div>
+            <p class="hint-text">Messages submitted via the Contact Us form on the website appear here. Mark them as read once reviewed.</p>
+            <div class="tab-group">
+              <button class="tab-btn active" onclick="filterContacts('all',this)">All</button>
+              <button class="tab-btn" onclick="filterContacts('unread',this)">Unread</button>
+              <button class="tab-btn" onclick="filterContacts('read',this)">Read</button>
+            </div>
+            <div id="contacts-list" style="margin-top:14px">
+              <div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── REGISTRATIONS ── -->
+        <div class="panel" id="panel-registrations">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">📝</span> Event Registrations</div>
+            </div>
+            <p class="hint-text">Students who registered for upcoming events appear here. Filter by event to see participant lists.</p>
+            <div class="f-group" style="margin-bottom:14px">
+              <label class="f-label">Filter by Event</label>
+              <select class="f-input" id="reg-event-filter" onchange="loadRegistrations()" style="margin-bottom:0">
+                <option value="all">All Events</option>
+              </select>
+            </div>
+            <div id="registrations-list">
+              <div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>
             </div>
           </div>
         </div>
@@ -532,6 +672,108 @@
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
       <button class="btn btn-ghost" onclick="closeFacultyModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveFaculty()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ RESOURCE MODAL -->
+<div class="modal-overlay" id="resource-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="resource-modal-title">Add Resource</h3>
+      <button class="modal-close" onclick="closeResourceModal()">✕</button>
+    </div>
+    <input type="hidden" id="resource-edit-id">
+    <div class="form-grid">
+      <div class="f-group">
+        <label class="f-label">Resource Type</label>
+        <select class="f-input" id="resource-type">
+          <option value="notes">📄 Notes / PDF</option>
+          <option value="video">🎥 YouTube / Video</option>
+          <option value="tool">🔧 Tool</option>
+          <option value="link">🔗 Link</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Subject / Category</label>
+        <input type="text" class="f-input" id="resource-category" placeholder="e.g. Machine Learning, Python">
+      </div>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Title *</label>
+      <input type="text" class="f-input" id="resource-title" placeholder="e.g. Python Basics Notes">
+    </div>
+    <div class="f-group">
+      <label class="f-label">URL / Link *</label>
+      <input type="url" class="f-input" id="resource-url" placeholder="e.g. https://youtube.com/... or https://drive.google.com/...">
+    </div>
+    <div class="f-group">
+      <label class="f-label">Description</label>
+      <textarea class="f-input" id="resource-desc" placeholder="Brief description of this resource..." rows="2" style="resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeResourceModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveResource()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PROJECT MODAL -->
+<div class="modal-overlay" id="project-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="project-modal-title">Add Project</h3>
+      <button class="modal-close" onclick="closeProjectModal()">✕</button>
+    </div>
+    <input type="hidden" id="project-edit-id">
+    <div class="f-group">
+      <label class="f-label">Project Title *</label>
+      <input type="text" class="f-input" id="project-title" placeholder="e.g. Smart Attendance System">
+    </div>
+    <div class="f-group">
+      <label class="f-label">Team Members</label>
+      <input type="text" class="f-input" id="project-team" placeholder="e.g. Rahul, Priya, Arjun">
+    </div>
+    <div class="f-group">
+      <label class="f-label">Description *</label>
+      <textarea class="f-input" id="project-desc" placeholder="Describe the project briefly..." rows="3" style="resize:vertical"></textarea>
+    </div>
+    <div class="form-grid">
+      <div class="f-group">
+        <label class="f-label">Project Link (GitHub / Demo)</label>
+        <input type="url" class="f-input" id="project-link" placeholder="e.g. https://github.com/...">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Year</label>
+        <input type="text" class="f-input" id="project-year" placeholder="e.g. 2024">
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeProjectModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProject()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ ADD ADMIN MODAL -->
+<div class="modal-overlay" id="add-admin-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Add Temporary Admin</h3>
+      <button class="modal-close" onclick="closeAddAdminModal()">✕</button>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Email</label>
+      <input type="email" class="f-input" id="modal-admin-email" placeholder="email@example.com">
+    </div>
+    <div class="f-group">
+      <label class="f-label">Password (6+ chars)</label>
+      <input type="password" class="f-input" id="modal-admin-password" placeholder="••••••••">
+    </div>
+    <div id="modal-admin-error" class="login-error" style="display:none;margin-bottom:10px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeAddAdminModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-add-admin-btn" onclick="submitAddAdminModal()">➕ Add Admin</button>
     </div>
   </div>
 </div>

@@ -244,7 +244,12 @@ const panelTitles = {
   achievements: "Achievements",
   "club-members": "Club Members",
   faculty: "Faculty Members",
-  admins: "Admin Accounts"
+  admins: "Admin Accounts",
+  announcements: "Announcements Manager",
+  resources: "Resources Library",
+  projects: "Project Showcase",
+  contacts: "Enquiry Inbox",
+  registrations: "Event Registrations"
 };
 
 function showPanel(name) {
@@ -265,6 +270,11 @@ function showPanel(name) {
   if (name === "faculty")       loadFaculty();
   if (name === "admins")        loadAdmins();
   if (name === "overview")      loadStats();
+  if (name === "announcements") loadAnnouncements();
+  if (name === "resources")     loadResources();
+  if (name === "projects")      loadProjects();
+  if (name === "contacts")      loadContacts();
+  if (name === "registrations") { loadRegistrationEvents(); loadRegistrations(); }
 }
 
 // ─── STATS ────────────────────────────────────────
@@ -276,7 +286,11 @@ async function loadStats() {
     db.collection("achievements").get(),
     db.collection("admins").get(),
     db.collection("club_members").get(),
-    db.collection("faculty_members").get()
+    db.collection("faculty_members").get(),
+    db.collection("contacts").get(),
+    db.collection("registrations").get(),
+    db.collection("resources").get(),
+    db.collection("projects").get()
   ]);
   const val = (r) => r.status === "fulfilled" ? r.value.size : "—";
   document.getElementById("stat-home-images").textContent   = val(results[0]);
@@ -286,6 +300,10 @@ async function loadStats() {
   document.getElementById("stat-admins").textContent        = val(results[4]);
   document.getElementById("stat-members").textContent       = val(results[5]);
   document.getElementById("stat-faculty-count").textContent = val(results[6]);
+  document.getElementById("stat-contacts").textContent      = val(results[7]);
+  document.getElementById("stat-registrations").textContent = val(results[8]);
+  document.getElementById("stat-resources").textContent     = val(results[9]);
+  document.getElementById("stat-projects").textContent      = val(results[10]);
 }
 function loadDashboardData() { loadStats(); }
 
@@ -421,7 +439,7 @@ function renderEventList(type) {
         ${ev.desc ? `<div style="font-size:12px;color:#bbb;margin-top:4px">${ev.desc}</div>` : ""}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
-        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;background:${ev.type==='conducted'?'rgba(39,174,96,0.2)':'rgba(41,128,185,0.2)'};color:${ev.type==='conducted'?'#27ae60':'#5dade2'}">${ev.type==='conducted'?'Conducted':'Upcoming'}</span>
+        <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:100px;background:${ev.type==='conducted'?'rgba(39,174,96,0.2)':ev.type==='workshop'?'rgba(155,89,182,0.2)':'rgba(41,128,185,0.2)'};color:${ev.type==='conducted'?'#27ae60':ev.type==='workshop'?'#bb8fce':'#5dade2'}">${ev.type==='conducted'?'Conducted':ev.type==='workshop'?'Workshop':'Upcoming'}</span>
         <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="deleteEvent('${ev.id}', '${ev.imageUrl}')">🗑 Delete</button>
       </div>
     </div>
@@ -953,6 +971,352 @@ async function deleteFaculty(docId, photoUrl) {
     if (photoUrl) await storage.refFromURL(photoUrl).delete().catch(() => {});
     showToast("Faculty deleted", "info"); loadFaculty(); loadStats();
   } catch(e) { showToast("Error deleting faculty", "error"); }
+}
+
+// ─── ANNOUNCEMENTS ────────────────────────────────
+async function loadAnnouncements() {
+  const list = document.getElementById("ann-list");
+  list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>';
+  try {
+    const snap = await db.collection("announcements").orderBy("order").get();
+    if (snap.empty) {
+      list.innerHTML = '<div class="empty-state"><div class="es-icon">📢</div><p>No announcements yet. Add one above.</p></div>';
+      return;
+    }
+    list.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;margin-bottom:8px";
+      row.innerHTML = `
+        <span style="flex:1;font-size:14px">${d.text}</span>
+        <button class="btn btn-danger" style="padding:6px 12px;font-size:12px;flex-shrink:0" onclick="deleteAnnouncement('${doc.id}')">🗑 Delete</button>
+      `;
+      list.appendChild(row);
+    });
+  } catch(e) { list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading announcements</p></div>'; }
+}
+
+async function addAnnouncement() {
+  const text = document.getElementById("ann-text").value.trim();
+  if (!text) { showToast("Please enter announcement text", "error"); return; }
+  try {
+    const snap = await db.collection("announcements").orderBy("order", "desc").limit(1).get();
+    const maxOrder = snap.empty ? 0 : (snap.docs[0].data().order || 0);
+    await db.collection("announcements").add({ text, order: maxOrder + 1, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    document.getElementById("ann-text").value = "";
+    showToast("Announcement added!", "success");
+    loadAnnouncements();
+  } catch(e) { showToast("Error: " + e.message, "error"); }
+}
+
+async function deleteAnnouncement(docId) {
+  if (!confirm("Delete this announcement?")) return;
+  try {
+    await db.collection("announcements").doc(docId).delete();
+    showToast("Announcement deleted", "info");
+    loadAnnouncements();
+  } catch(e) { showToast("Error deleting announcement", "error"); }
+}
+
+// ─── RESOURCES ────────────────────────────────────
+let allResources = [];
+let currentResourceFilter = "all";
+
+async function loadResources() {
+  const list = document.getElementById("resources-list");
+  list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>';
+  try {
+    const snap = await db.collection("resources").orderBy("addedAt", "desc").get();
+    allResources = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderResources(currentResourceFilter);
+  } catch(e) { list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading resources</p></div>'; }
+}
+
+function filterResources(type, btn) {
+  currentResourceFilter = type;
+  document.querySelectorAll("#panel-resources .tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderResources(type);
+}
+
+const resourceTypeIcons = { notes: "📄", video: "🎥", tool: "🔧", link: "🔗" };
+
+function renderResources(type) {
+  const list = document.getElementById("resources-list");
+  const filtered = type === "all" ? allResources : allResources.filter(r => r.type === type);
+  if (!filtered.length) { list.innerHTML = '<div class="empty-state"><div class="es-icon">📚</div><p>No resources yet.</p></div>'; return; }
+  list.innerHTML = filtered.map(r => `
+    <div style="display:flex;align-items:center;gap:14px;padding:12px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;margin-bottom:8px">
+      <div style="font-size:28px;flex-shrink:0">${resourceTypeIcons[r.type] || "🔗"}</div>
+      <div style="flex:1;overflow:hidden">
+        <div style="font-weight:700;font-size:14px">${r.title}</div>
+        ${r.category ? `<div style="font-size:12px;color:#aaa;margin-top:2px">📂 ${r.category}</div>` : ""}
+        ${r.description ? `<div style="font-size:12px;color:#bbb;margin-top:4px">${r.description}</div>` : ""}
+        <a href="${r.url}" target="_blank" style="font-size:12px;color:#e63946;word-break:break-all">${r.url}</a>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick='openResourceModal(${JSON.stringify({id:r.id,...r})})'>✏️</button>
+        <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="deleteResource('${r.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function openResourceModal(existing) {
+  document.getElementById("resource-modal").classList.add("open");
+  if (existing && typeof existing === "object") {
+    document.getElementById("resource-modal-title").textContent = "Edit Resource";
+    document.getElementById("resource-edit-id").value  = existing.id || "";
+    document.getElementById("resource-type").value     = existing.type || "link";
+    document.getElementById("resource-category").value = existing.category || "";
+    document.getElementById("resource-title").value    = existing.title || "";
+    document.getElementById("resource-url").value      = existing.url || "";
+    document.getElementById("resource-desc").value     = existing.description || "";
+  } else {
+    document.getElementById("resource-modal-title").textContent = "Add Resource";
+    document.getElementById("resource-edit-id").value  = "";
+    document.getElementById("resource-type").value     = "notes";
+    document.getElementById("resource-category").value = "";
+    document.getElementById("resource-title").value    = "";
+    document.getElementById("resource-url").value      = "";
+    document.getElementById("resource-desc").value     = "";
+  }
+}
+
+function closeResourceModal() { document.getElementById("resource-modal").classList.remove("open"); }
+
+async function saveResource() {
+  const id   = document.getElementById("resource-edit-id").value;
+  const type = document.getElementById("resource-type").value;
+  const cat  = document.getElementById("resource-category").value.trim();
+  const title= document.getElementById("resource-title").value.trim();
+  const url  = document.getElementById("resource-url").value.trim();
+  const desc = document.getElementById("resource-desc").value.trim();
+  if (!title) { showToast("Please enter a title", "error"); return; }
+  if (!url)   { showToast("Please enter a URL", "error"); return; }
+  const data = { type, category: cat, title, url, description: desc, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+  try {
+    if (id) { await db.collection("resources").doc(id).update(data); showToast("Resource updated!", "success"); }
+    else { data.addedBy = currentUser.email; data.addedAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("resources").add(data); showToast("Resource added!", "success"); }
+    closeResourceModal();
+    loadResources();
+  } catch(e) { showToast("Error saving resource: " + e.message, "error"); }
+}
+
+async function deleteResource(docId) {
+  if (!confirm("Delete this resource?")) return;
+  try {
+    await db.collection("resources").doc(docId).delete();
+    showToast("Resource deleted", "info"); loadResources();
+  } catch(e) { showToast("Error deleting resource", "error"); }
+}
+
+// ─── PROJECTS ─────────────────────────────────────
+async function loadProjects() {
+  const list = document.getElementById("projects-list");
+  list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>';
+  try {
+    const snap = await db.collection("projects").orderBy("addedAt", "desc").get();
+    if (snap.empty) { list.innerHTML = '<div class="empty-state"><div class="es-icon">💡</div><p>No projects yet. Click "Add Project" to add one.</p></div>'; return; }
+    list.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      const card = document.createElement("div");
+      card.style.cssText = "padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;margin-bottom:10px";
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:14px">
+          <div style="font-size:32px">💡</div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:15px">${d.title}</div>
+            ${d.team ? `<div style="font-size:12px;color:#aaa;margin-top:3px">👥 ${d.team}</div>` : ""}
+            ${d.year ? `<div style="font-size:12px;color:#aaa">📅 ${d.year}</div>` : ""}
+            <div style="font-size:13px;color:#bbb;margin-top:6px">${d.description || ""}</div>
+            ${d.link ? `<a href="${d.link}" target="_blank" style="font-size:12px;color:#e63946;display:inline-block;margin-top:4px">🔗 ${d.link}</a>` : ""}
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick='openProjectModal(${JSON.stringify({id:doc.id,...d})})'>✏️ Edit</button>
+            <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="deleteProject('${doc.id}')">🗑️</button>
+          </div>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  } catch(e) { list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading projects</p></div>'; }
+}
+
+function openProjectModal(existing) {
+  document.getElementById("project-modal").classList.add("open");
+  if (existing && typeof existing === "object") {
+    document.getElementById("project-modal-title").textContent = "Edit Project";
+    document.getElementById("project-edit-id").value = existing.id || "";
+    document.getElementById("project-title").value   = existing.title || "";
+    document.getElementById("project-team").value    = existing.team || "";
+    document.getElementById("project-desc").value    = existing.description || "";
+    document.getElementById("project-link").value    = existing.link || "";
+    document.getElementById("project-year").value    = existing.year || "";
+  } else {
+    document.getElementById("project-modal-title").textContent = "Add Project";
+    document.getElementById("project-edit-id").value = "";
+    document.getElementById("project-title").value   = "";
+    document.getElementById("project-team").value    = "";
+    document.getElementById("project-desc").value    = "";
+    document.getElementById("project-link").value    = "";
+    document.getElementById("project-year").value    = new Date().getFullYear();
+  }
+}
+
+function closeProjectModal() { document.getElementById("project-modal").classList.remove("open"); }
+
+async function saveProject() {
+  const id    = document.getElementById("project-edit-id").value;
+  const title = document.getElementById("project-title").value.trim();
+  const team  = document.getElementById("project-team").value.trim();
+  const desc  = document.getElementById("project-desc").value.trim();
+  const link  = document.getElementById("project-link").value.trim();
+  const year  = document.getElementById("project-year").value.trim();
+  if (!title) { showToast("Please enter a project title", "error"); return; }
+  const data = { title, team, description: desc, link, year, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+  try {
+    if (id) { await db.collection("projects").doc(id).update(data); showToast("Project updated!", "success"); }
+    else { data.addedBy = currentUser.email; data.addedAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("projects").add(data); showToast("Project added!", "success"); }
+    closeProjectModal();
+    loadProjects();
+  } catch(e) { showToast("Error saving project: " + e.message, "error"); }
+}
+
+async function deleteProject(docId) {
+  if (!confirm("Delete this project?")) return;
+  try {
+    await db.collection("projects").doc(docId).delete();
+    showToast("Project deleted", "info"); loadProjects();
+  } catch(e) { showToast("Error deleting project", "error"); }
+}
+
+// ─── CONTACTS / ENQUIRY INBOX ─────────────────────
+let allContacts = [];
+let currentContactFilter = "all";
+
+async function loadContacts() {
+  const list = document.getElementById("contacts-list");
+  list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>';
+  try {
+    const snap = await db.collection("contacts").orderBy("submittedAt", "desc").get();
+    allContacts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderContacts(currentContactFilter);
+  } catch(e) { list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading enquiries</p></div>'; }
+}
+
+function filterContacts(type, btn) {
+  currentContactFilter = type;
+  document.querySelectorAll("#panel-contacts .tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderContacts(type);
+}
+
+function renderContacts(type) {
+  const list = document.getElementById("contacts-list");
+  const filtered = type === "all" ? allContacts : allContacts.filter(c => type === "unread" ? !c.read : c.read);
+  if (!filtered.length) { list.innerHTML = `<div class="empty-state"><div class="es-icon">✉️</div><p>No ${type === "all" ? "" : type} enquiries.</p></div>`; return; }
+  list.innerHTML = filtered.map(c => `
+    <div style="padding:16px;background:${c.read ? 'rgba(255,255,255,0.03)' : 'rgba(230,57,70,0.06)'};border:1px solid ${c.read ? 'rgba(255,255,255,0.07)' : 'rgba(230,57,70,0.2)'};border-radius:12px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:16px">👤</span>
+        <strong style="font-size:14px">${c.name || "Anonymous"}</strong>
+        <span style="font-size:12px;color:#aaa">${c.email || ""}</span>
+        ${c.phone ? `<span style="font-size:12px;color:#aaa">📞 ${c.phone}</span>` : ""}
+        <span style="margin-left:auto;font-size:11px;color:${c.read ? '#aaa' : '#e63946'};font-weight:700">${c.read ? "Read" : "● Unread"}</span>
+      </div>
+      <div style="font-size:13px;color:#ccc;padding:10px;background:rgba(0,0,0,0.2);border-radius:8px;margin-bottom:10px">${c.message || ""}</div>
+      <div style="display:flex;gap:8px">
+        ${!c.read ? `<button class="btn btn-primary" style="padding:6px 14px;font-size:12px" onclick="markContactRead('${c.id}')">✅ Mark as Read</button>` : ""}
+        <button class="btn btn-danger" style="padding:6px 14px;font-size:12px" onclick="deleteContact('${c.id}')">🗑 Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function markContactRead(docId) {
+  try {
+    await db.collection("contacts").doc(docId).update({ read: true, readAt: firebase.firestore.FieldValue.serverTimestamp() });
+    showToast("Marked as read", "success"); loadContacts();
+  } catch(e) { showToast("Error", "error"); }
+}
+
+async function deleteContact(docId) {
+  if (!confirm("Delete this enquiry?")) return;
+  try {
+    await db.collection("contacts").doc(docId).delete();
+    showToast("Enquiry deleted", "info"); loadContacts();
+  } catch(e) { showToast("Error deleting enquiry", "error"); }
+}
+
+// ─── REGISTRATIONS ────────────────────────────────
+async function loadRegistrationEvents() {
+  const select = document.getElementById("reg-event-filter");
+  const currentVal = select.value;
+  try {
+    const snap = await db.collection("events").where("type", "==", "upcoming").orderBy("addedAt", "desc").get();
+    select.innerHTML = '<option value="all">All Events</option>';
+    snap.forEach(doc => {
+      const opt = document.createElement("option");
+      opt.value = doc.id;
+      opt.textContent = doc.data().title || doc.id;
+      select.appendChild(opt);
+    });
+    if (currentVal) select.value = currentVal;
+  } catch(e) { /* silently fail */ }
+}
+
+async function loadRegistrations() {
+  const list = document.getElementById("registrations-list");
+  const eventId = document.getElementById("reg-event-filter").value;
+  list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>';
+  try {
+    let query = db.collection("registrations").orderBy("registeredAt", "desc");
+    if (eventId !== "all") query = db.collection("registrations").where("eventId", "==", eventId).orderBy("registeredAt", "desc");
+    const snap = await query.get();
+    if (snap.empty) { list.innerHTML = '<div class="empty-state"><div class="es-icon">📝</div><p>No registrations yet.</p></div>'; return; }
+    list.innerHTML = `
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:1px solid rgba(255,255,255,0.1)">
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">#</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Name</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Email</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Phone</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Year/Dept</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Event</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${snap.docs.map((doc, i) => {
+              const d = doc.data();
+              return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
+                <td style="padding:10px 12px;color:#aaa">${i+1}</td>
+                <td style="padding:10px 12px;font-weight:600">${d.name || "—"}</td>
+                <td style="padding:10px 12px;color:#aaa">${d.email || "—"}</td>
+                <td style="padding:10px 12px;color:#aaa">${d.phone || "—"}</td>
+                <td style="padding:10px 12px;color:#aaa">${d.yearDept || "—"}</td>
+                <td style="padding:10px 12px;color:#aaa">${d.eventTitle || d.eventId || "—"}</td>
+                <td style="padding:10px 12px"><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteRegistration('${doc.id}')">🗑</button></td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } catch(e) { list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading registrations. Ensure Firestore indexes are set up.</p></div>'; console.error(e); }
+}
+
+async function deleteRegistration(docId) {
+  if (!confirm("Delete this registration?")) return;
+  try {
+    await db.collection("registrations").doc(docId).delete();
+    showToast("Registration deleted", "info"); loadRegistrations();
+  } catch(e) { showToast("Error deleting registration", "error"); }
 }
 
 // ─── HELPERS ──────────────────────────────────────
