@@ -24,55 +24,40 @@ let currentUser = null;
 let isPermanentAdmin = false;
 let allEvents = [];
 
-function hideAuthLoading() {
-  if (window._nn_authFallback) { clearTimeout(window._nn_authFallback); window._nn_authFallback = null; }
-  const el = document.getElementById("auth-loading");
-  if (el) el.style.display = "none";
-}
-
 if (isConfigured) {
   firebase.initializeApp(firebaseConfig);
   auth    = firebase.auth();
   db      = firebase.firestore();
   storage = firebase.storage();
 
-  // Set LOCAL persistence (fire-and-forget — do NOT await, so auth listener starts immediately)
+  // Persist session across page navigation
   auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
-  // Safety net: if Firebase hasn't responded in 4 seconds, show login
-  const authTimeout = setTimeout(() => { hideAuthLoading(); showLogin(); }, 4000);
-
   auth.onAuthStateChanged(async (user) => {
-    clearTimeout(authTimeout);
     if (user) {
       currentUser = user;
       const cachedRole = localStorage.getItem("nn_role_" + user.uid);
       if (cachedRole !== null) {
         isPermanentAdmin = cachedRole === "true";
-        hideAuthLoading();
         updateSidebarForRole(user);
         showDashboard();
         loadCurrentUser(user);
       } else if (user.email === PERMANENT_ADMIN_EMAIL) {
         isPermanentAdmin = true;
         localStorage.setItem("nn_role_" + user.uid, "true");
-        hideAuthLoading();
         updateSidebarForRole(user);
         showDashboard();
         loadCurrentUser(user);
       } else {
         await loadCurrentUser(user);
-        hideAuthLoading();
         showDashboard();
       }
     } else {
       currentUser = null;
-      hideAuthLoading();
       showLogin();
     }
   });
 } else {
-  hideAuthLoading();
   showLogin();
   document.getElementById("config-banner").style.display = "flex";
 }
