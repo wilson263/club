@@ -138,13 +138,84 @@ function updateSidebarForRole(user) {
   document.getElementById("sidebar-name").textContent   = user.email || "Admin";
   document.getElementById("sidebar-role").textContent   = isPermanentAdmin ? "Permanent Admin" : "Temp Admin";
   if (isPermanentAdmin) {
-    document.getElementById("admin-mgmt-label").style.display = "block";
-    document.getElementById("admin-mgmt-btn").style.display   = "flex";
-    document.getElementById("guide-admin").style.display      = "flex";
+    document.getElementById("admin-mgmt-label").style.display  = "block";
+    document.getElementById("admin-mgmt-btn").style.display    = "flex";
+    document.getElementById("guide-admin").style.display       = "flex";
+    document.getElementById("quick-add-admin-btn").style.display = "flex";
   } else {
-    document.getElementById("admin-mgmt-label").style.display = "none";
-    document.getElementById("admin-mgmt-btn").style.display   = "none";
+    document.getElementById("admin-mgmt-label").style.display  = "none";
+    document.getElementById("admin-mgmt-btn").style.display    = "none";
+    document.getElementById("quick-add-admin-btn").style.display = "none";
   }
+}
+
+// ─── ADD TEMP ADMIN MODAL ──────────────────────────
+function openAddAdminModal() {
+  document.getElementById("modal-admin-email").value    = "";
+  document.getElementById("modal-admin-password").value = "";
+  document.getElementById("modal-admin-error").style.display = "none";
+  document.getElementById("add-admin-modal").classList.add("open");
+  document.getElementById("modal-admin-email").focus();
+}
+
+function closeAddAdminModal() {
+  document.getElementById("add-admin-modal").classList.remove("open");
+}
+
+async function submitAddAdminModal() {
+  const email    = document.getElementById("modal-admin-email").value.trim();
+  const password = document.getElementById("modal-admin-password").value;
+  const errBox   = document.getElementById("modal-admin-error");
+  const btn      = document.getElementById("modal-add-admin-btn");
+
+  errBox.style.display = "none";
+
+  if (!email || !password) { errBox.textContent = "Please enter both email and password."; errBox.style.display = "block"; return; }
+  if (password.length < 6) { errBox.textContent = "Password must be at least 6 characters."; errBox.style.display = "block"; return; }
+
+  btn.disabled = true;
+  btn.textContent = "Adding...";
+
+  try {
+    const snap = await db.collection("admins").get();
+    const tempCount = snap.docs.filter(d => !d.data().isPermanent).length;
+    if (tempCount >= MAX_TEMP_ADMINS) {
+      errBox.textContent = "Maximum of 3 temporary admins already reached. Remove one first.";
+      errBox.style.display = "block";
+      btn.disabled = false; btn.textContent = "➕ Add Admin";
+      return;
+    }
+
+    const signUpUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`;
+    const res = await fetch(signUpUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, returnSecureToken: false })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const code = data.error && data.error.message;
+      errBox.textContent = code === "EMAIL_EXISTS" ? "This email is already registered." : "Error: " + (data.error ? data.error.message : "Unknown error");
+      errBox.style.display = "block";
+      btn.disabled = false; btn.textContent = "➕ Add Admin";
+      return;
+    }
+
+    await db.collection("admins").doc(data.localId).set({
+      email, name: email.split("@")[0], isPermanent: false,
+      addedBy: currentUser.email,
+      addedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeAddAdminModal();
+    showToast(`Temporary admin added: ${email}`, "success");
+  } catch(e) {
+    errBox.textContent = "Error: " + e.message;
+    errBox.style.display = "block";
+  }
+
+  btn.disabled = false;
+  btn.textContent = "➕ Add Admin";
 }
 
 // ─── LOAD USER ─────────────────────────────────────
