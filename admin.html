@@ -20,6 +20,15 @@
   </div>
   <style>@keyframes authbar{0%{width:0%;margin-left:0}50%{width:100%;margin-left:0}100%{width:0%;margin-left:100%}}</style>
 </div>
+<!-- Standalone fallback — no Firebase needed. If scripts take >5s to load, show login form -->
+<script>
+window._nn_authFallback = setTimeout(function() {
+  var L = document.getElementById('auth-loading');
+  var S = document.getElementById('login-screen');
+  if (L) L.style.display = 'none';
+  if (S) S.style.display = 'flex';
+}, 5000);
+</script>
 
 <!-- ═══════════════════════════ LOGIN -->
 <div id="login-screen" style="display:none">
