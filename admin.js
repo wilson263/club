@@ -336,7 +336,6 @@ async function loadStats() {
 }
 function loadDashboardData() { loadStats(); }
 
-// ─── STORAGE UPLOAD HELPER ────────────────────────────────────────────────────
 // ─── IMAGE COMPRESS + STORE ──────────────────────────────────────────────────
 // Compresses an image client-side using Canvas and returns a data URL.
 // Images are stored directly in Firestore — no Firebase Storage needed,
@@ -361,10 +360,18 @@ function compressImage(file, maxPx, quality) {
         canvas.width = width; canvas.height = height;
         canvas.getContext("2d").drawImage(img, 0, 0, width, height);
         const dataUrl = canvas.toDataURL("image/jpeg", quality);
-        // Guard against images that compress larger than 900 KB
-        if (dataUrl.length > 950000) {
-          const dataUrl2 = canvas.toDataURL("image/jpeg", 0.4);
-          resolve(dataUrl2);
+        // Guard against images that compress larger than 850 KB — double-pass
+        if (dataUrl.length > 870000) {
+          const dataUrl2 = canvas.toDataURL("image/jpeg", 0.35);
+          if (dataUrl2.length > 870000) {
+            // Last resort: shrink canvas by half and retry
+            const c2 = document.createElement("canvas");
+            c2.width = Math.round(width / 2); c2.height = Math.round(height / 2);
+            c2.getContext("2d").drawImage(canvas, 0, 0, c2.width, c2.height);
+            resolve(c2.toDataURL("image/jpeg", 0.5));
+          } else {
+            resolve(dataUrl2);
+          }
         } else {
           resolve(dataUrl);
         }
