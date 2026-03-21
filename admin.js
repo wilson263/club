@@ -707,13 +707,14 @@ async function loadMembers() {
   const grid = document.getElementById("member-admin-grid");
   grid.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);grid-column:1/-1">⏳ Loading...</div>';
   try {
-    const snap = await db.collection("club_members").orderBy("order").get();
+    const snap = await db.collection("club_members").get();
     if (snap.empty) {
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🧑‍🤝‍🧑</div><p>No members yet. Click "Add Member" to add one.</p></div>';
       return;
     }
     grid.innerHTML = "";
-    snap.forEach(doc => {
+    const memberDocs = snap.docs.slice().sort((a, b) => ((a.data().order||99) - (b.data().order||99)));
+    memberDocs.forEach(doc => {
       const d = doc.data();
       const card = document.createElement("div");
       card.className = "admin-member-card";
@@ -861,13 +862,14 @@ async function loadFaculty() {
   const grid = document.getElementById("faculty-admin-grid");
   grid.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);grid-column:1/-1">⏳ Loading...</div>';
   try {
-    const snap = await db.collection("faculty_members").orderBy("order").get();
+    const snap = await db.collection("faculty_members").get();
     if (snap.empty) {
       grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">👨‍🏫</div><p>No faculty yet. Click "Add Faculty" to add one.</p></div>';
       return;
     }
     grid.innerHTML = "";
-    snap.forEach(doc => {
+    const facultyDocs = snap.docs.slice().sort((a, b) => ((a.data().order||99) - (b.data().order||99)));
+    facultyDocs.forEach(doc => {
       const d = doc.data();
       const card = document.createElement("div");
       card.className = "admin-faculty-card";
@@ -1288,7 +1290,7 @@ async function loadRegistrationEvents() {
   const select = document.getElementById("reg-event-filter");
   const currentVal = select.value;
   try {
-    const snap = await db.collection("events").where("type", "==", "upcoming").orderBy("addedAt", "desc").get();
+    const snap = await db.collection("events").where("type", "==", "upcoming").get();
     select.innerHTML = '<option value="all">All Events</option>';
     snap.forEach(doc => {
       const opt = document.createElement("option");
@@ -1306,7 +1308,7 @@ async function loadRegistrations() {
   list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>';
   try {
     let query = db.collection("registrations").orderBy("registeredAt", "desc");
-    if (eventId !== "all") query = db.collection("registrations").where("eventId", "==", eventId).orderBy("registeredAt", "desc");
+    if (eventId !== "all") query = db.collection("registrations").where("eventId", "==", eventId);
     const snap = await query.get();
     if (snap.empty) { list.innerHTML = '<div class="empty-state"><div class="es-icon">📝</div><p>No registrations yet.</p></div>'; return; }
     list.innerHTML = `
@@ -1435,9 +1437,10 @@ async function loadAdminLeaderboard() {
   const el = document.getElementById("lb-admin-list");
   if (!el) return;
   try {
-    const snap = await db.collection("leaderboard").orderBy("points","desc").get();
+    const snap = await db.collection("leaderboard").get();
     if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🏅</div><p>No entries yet.</p></div>'; return; }
-    el.innerHTML = snap.docs.map((d,i) => {
+    const lbDocs = snap.docs.slice().sort((a,b) => (b.data().points||0) - (a.data().points||0));
+    el.innerHTML = lbDocs.map((d,i) => {
       const a = d.data();
       return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
         <strong style="color:#e63946;min-width:26px">#${i+1}</strong>
@@ -1648,9 +1651,10 @@ async function loadAdminPress() {
   const el = document.getElementById("press-admin-list");
   if (!el) return;
   try {
-    const snap = await db.collection("press").orderBy("date","desc").get();
+    const snap = await db.collection("press").get();
     if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📰</div><p>No coverage yet.</p></div>'; return; }
-    el.innerHTML = snap.docs.map(d => {
+    const pressDocs = snap.docs.slice().sort((a,b) => (b.data().date||"").localeCompare(a.data().date||""));
+    el.innerHTML = pressDocs.map(d => {
       const a = d.data();
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
         <div><strong style="color:#fff">${a.title||"Untitled"}</strong><br>
@@ -1700,9 +1704,10 @@ async function loadAdminMinutes() {
   const el = document.getElementById("minutes-admin-list");
   if (!el) return;
   try {
-    const snap = await db.collection("minutes").orderBy("date","desc").get();
+    const snap = await db.collection("minutes").get();
     if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📋</div><p>No minutes uploaded yet.</p></div>'; return; }
-    el.innerHTML = snap.docs.map(d => {
+    const minutesDocs = snap.docs.slice().sort((a,b) => (b.data().date||"").localeCompare(a.data().date||""));
+    el.innerHTML = minutesDocs.map(d => {
       const a = d.data();
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
         <div><strong style="color:#fff">${a.title||"Minutes"}</strong> ${a.meetingType?`<span style="font-size:11px;background:rgba(230,57,70,0.15);color:#e63946;padding:2px 8px;border-radius:8px">${a.meetingType}</span>`:""}<br>
@@ -1731,9 +1736,11 @@ async function loadAdminSponsors() {
   const el = document.getElementById("sponsors-admin-list");
   if (!el) return;
   try {
-    const snap = await db.collection("sponsors").orderBy("tier").get();
+    const snap = await db.collection("sponsors").get();
     if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🤝</div><p>No sponsors yet.</p></div>'; return; }
-    el.innerHTML = snap.docs.map(d => {
+    const tierOrder = { gold: 0, silver: 1, bronze: 2, supporter: 3 };
+    const sponsorDocs = snap.docs.slice().sort((a,b) => (tierOrder[a.data().tier]??9) - (tierOrder[b.data().tier]??9));
+    el.innerHTML = sponsorDocs.map(d => {
       const a = d.data();
       const colors = { gold:"#FFD700", silver:"#C0C0C0", bronze:"#CD7F32", supporter:"#5dade2" };
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
