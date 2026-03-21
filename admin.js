@@ -79,26 +79,40 @@ async function doLogin() {
   btn.disabled = true;
   hideLoginError();
 
+  const resetBtn = () => { btn.innerHTML = '🔐 Sign In'; btn.disabled = false; };
+
   try {
     await auth.signInWithEmailAndPassword(email, password);
+    // Success — onAuthStateChanged will call showDashboard(); button stays hidden with login screen
+    return;
   } catch (err) {
-    if ((err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") &&
-        email === PERMANENT_ADMIN_EMAIL && password === PERMANENT_ADMIN_PASSWORD) {
+    // Handle the case where the permanent admin account doesn't exist yet in Firebase Auth
+    const isInvalidCred = err.code === "auth/user-not-found" ||
+                          err.code === "auth/invalid-credential" ||
+                          err.code === "auth/invalid-login-credentials";
+    if (isInvalidCred && email === PERMANENT_ADMIN_EMAIL && password === PERMANENT_ADMIN_PASSWORD) {
       try {
         btn.innerHTML = '<span class="spin">⟳</span> Setting up account...';
         await auth.createUserWithEmailAndPassword(email, password);
+        // Success — onAuthStateChanged will handle the rest
         return;
       } catch (createErr) {
-        showLoginError("Could not create admin account: " + createErr.message);
-        btn.innerHTML = '🔐 Sign In'; btn.disabled = false; return;
+        // If account already exists, the original password may be wrong — just show error
+        if (createErr.code === "auth/email-already-in-use") {
+          showLoginError("Incorrect password for this admin account.");
+        } else {
+          showLoginError("Could not create admin account: " + createErr.message);
+        }
+        resetBtn();
+        return;
       }
     }
     let msg = "Invalid email or password.";
-    if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") msg = "No admin account found with this email.";
-    if (err.code === "auth/wrong-password")   msg = "Incorrect password.";
+    if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential" || err.code === "auth/invalid-login-credentials") msg = "No admin account found with this email.";
+    if (err.code === "auth/wrong-password")    msg = "Incorrect password.";
     if (err.code === "auth/too-many-requests") msg = "Too many attempts. Try again later.";
     showLoginError(msg);
-    btn.innerHTML = '🔐 Sign In'; btn.disabled = false;
+    resetBtn();
   }
 }
 
