@@ -27,15 +27,22 @@
     .institute { font-size: 11px; font-weight: 700; color: #ccc; }
     .ugc { font-size: 10px; color: rgba(230,57,70,0.8); font-weight: 700; }
     .rec { font-size: 9px; color: #888; }
-    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 46px; width: 46px; background-size: cover; border-radius: 50%; position: absolute; border: 2px solid rgba(255,255,255,0.15); }
-    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); right: 156px; top: 13px; }
-    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); right: 107px; top: 13px; }
-    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); right: 58px; top: 13px; }
-    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); right: 9px; top: 13px; }
-    @media(max-width:600px) {
-      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 36px; width: 36px; }
-      .sublogo-4 { right: 118px; top: 18px; } .sublogo-1 { right: 80px; top: 18px; }
-      .sublogo-2 { right: 42px; top: 18px; } .sublogo-3 { right: 4px; top: 18px; }
+    .sublogo-group {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 {
+      height: 44px; width: 44px; background-size: cover; border-radius: 50%;
+      position: static !important; border: 2px solid rgba(230,57,70,0.4); flex-shrink: 0;
+    }
+    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); }
+    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); }
+    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); }
+    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); }
+    @media(max-width:480px) {
+      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 30px !important; width: 30px !important; }
+      .sublogo-group { gap: 4px !important; right: 6px !important; }
+      .clgname { max-width: calc(100% - 145px) !important; }
     }
 
     /* HEADER NAV */
@@ -193,10 +200,12 @@
       <p class="ugc">UGC Autonomous Institution</p>
       <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
     </div>
-    <div class="sublogo-4"></div>
-    <div class="sublogo-1"></div>
-    <div class="sublogo-2"></div>
-    <div class="sublogo-3"></div>
+    <div class="sublogo-group">
+      <div class="sublogo-4"></div>
+      <div class="sublogo-1"></div>
+      <div class="sublogo-2"></div>
+      <div class="sublogo-3"></div>
+    </div>
   </div>
 
   <header>
