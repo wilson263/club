@@ -9,12 +9,13 @@ const MAX_TEMP_ADMINS = 3;
 // ─── FIREBASE CONFIG ─────────────────────────────
 // Paste your Firebase project config here
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAkYeTlfnicPo1JczB4rZZj61UnHFbvqVE",
+  authDomain: "neuralnexus-be2c7.firebaseapp.com",
+  projectId: "neuralnexus-be2c7",
+  storageBucket: "neuralnexus-be2c7.firebasestorage.app",
+  messagingSenderId: "1094362929898",
+  appId: "1:1094362929898:web:2c48716b8e23bbe05bd593",
+  measurementId: "G-NCXVDWM2GP"
 };
 
 const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
