@@ -377,12 +377,16 @@
       background: linear-gradient(135deg, #141428 0%, #1c0e14 100%) !important;
       border: 1px solid rgba(230,57,70,0.2) !important;
       border-radius: 20px !important;
-      overflow: hidden !important;
+      overflow: visible !important;
       display: flex !important;
       gap: 0 !important;
       box-shadow: 0 0 40px rgba(230,57,70,0.1) !important;
       transition: box-shadow 0.3s !important;
       flex-wrap: wrap !important;
+      height: auto !important;
+      min-height: unset !important;
+      padding: 0 !important;
+      align-items: stretch !important;
     }
 
     .conatiner-1:hover {
@@ -391,10 +395,11 @@
 
     .conatiner-1 img {
       width: 200px !important;
-      height: 100% !important;
+      height: auto !important;
       object-fit: cover !important;
       flex-shrink: 0 !important;
       min-height: 220px !important;
+      border-radius: 20px 0 0 20px !important;
     }
 
     .details-3 {
