@@ -175,6 +175,9 @@
               <div class="quick-btn" onclick="showPanel('faculty')">
                 <div class="quick-btn-icon">👨‍🏫</div>Manage Faculty
               </div>
+              <div class="quick-btn" id="quick-add-admin-btn" onclick="openAddAdminModal()" style="display:none;border-color:rgba(230,57,70,0.35);background:rgba(230,57,70,0.07)">
+                <div class="quick-btn-icon">👥</div>Add Temp Admin
+              </div>
             </div>
           </div>
 
@@ -529,6 +532,30 @@
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
       <button class="btn btn-ghost" onclick="closeFacultyModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveFaculty()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ ADD TEMP ADMIN MODAL -->
+<div class="modal-overlay" id="add-admin-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>➕ Add Temporary Admin</h3>
+      <button class="modal-close" onclick="closeAddAdminModal()">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Enter the email and password for the new temporary admin. They can log in and manage website content. Maximum 3 temporary admins allowed.</p>
+    <div class="f-group">
+      <label class="f-label">Email Address</label>
+      <input type="email" class="f-input" id="modal-admin-email" placeholder="admin@example.com">
+    </div>
+    <div class="f-group">
+      <label class="f-label">Password (6+ characters)</label>
+      <input type="password" class="f-input" id="modal-admin-password" placeholder="••••••••">
+    </div>
+    <div id="modal-admin-error" style="display:none;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#e63946;margin-bottom:12px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeAddAdminModal()">Cancel</button>
+      <button class="btn btn-green" id="modal-add-admin-btn" onclick="submitAddAdminModal()">➕ Add Admin</button>
     </div>
   </div>
 </div>
