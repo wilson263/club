@@ -245,7 +245,6 @@ header{
     height:250px;
     width:560px;
     background-size: cover;
-    background-image:url(images-1/1.jpeg);
     z-index: -1;
 }
 .gallbox{
@@ -826,7 +825,6 @@ header{
     height:600px;
     width:1450px;
     object-fit: fill;
-    background-image:url(images-1/1.jpeg);
 }
 .gallbox{
     background-color: rgba(225,225,225,.6);
@@ -1012,7 +1010,6 @@ header{
     height:200px;
     width:380px;
     background-size: cover;
-    background-image:url(images-1/1.jpeg) ;
     z-index: -1;
    }
    .gallbox{
