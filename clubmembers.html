@@ -19,37 +19,36 @@
       width: 100%; height: 72px; display: flex; align-items: center;
       background: #080810; backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(230,57,70,0.2);
-      position: sticky; top: 0; z-index: 999;
+      position: sticky; top: 0; z-index: 999; overflow: hidden;
     }
     .logo {
       position: absolute; left: 8px; top: 8px;
       background-image: url(images-1/logo.jpeg); height: 56px; width: 56px;
       background-size: cover; border-radius: 50%;
-      border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35);
+      border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35); flex-shrink: 0;
     }
-    .clgname { margin-left: 76px; }
-    .name { font-size: clamp(16px,4vw,28px); font-weight: 900; color: #e63946; line-height: 1.1; }
-    .institute { font-size: 11px; font-weight: 700; color: #ccc; }
-    .ugc { font-size: 10px; color: rgba(230,57,70,0.8); font-weight: 700; }
-    .rec { font-size: 9px; color: #888; }
-    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 {
-      height: 46px; width: 46px; background-size: cover; border-radius: 50%;
-      position: absolute; border: 2px solid rgba(255,255,255,0.15);
+    .clgname { margin-left: 76px; flex: 1; min-width: 0; padding-right: 8px; }
+    .name     { font-size: clamp(14px,3.5vw,24px); font-weight: 900; color: #e63946; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .institute { font-size: clamp(9px,1.8vw,11px); font-weight: 700; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ugc { font-size: clamp(8px,1.5vw,10px); color: rgba(230,57,70,0.8); font-weight: 700; }
+    .rec { font-size: clamp(7px,1.3vw,9px); color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Sub-logos: flex row, no absolute positioning — avoids overlap */
+    .sublogos {
+      display: flex; align-items: center; gap: 6px;
+      padding-right: 10px; flex-shrink: 0;
     }
-    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); right: 156px; top: 13px; }
-    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); right: 107px; top: 13px; }
-    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); right: 58px; top: 13px; }
-    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); right: 9px; top: 13px; }
-    @media(max-width:500px) {
-      .footer-inner { flex-direction: column; gap: 20px; }
-      .footer-col { width: 100%; }
+    .sublogo {
+      width: 38px; height: 38px; background-size: cover; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0;
     }
-    @media(max-width:600px) {
-      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 36px; width: 36px; }
-      .sublogo-4 { right: 118px; top: 18px; }
-      .sublogo-1 { right: 80px; top: 18px; }
-      .sublogo-2 { right: 42px; top: 18px; }
-      .sublogo-3 { right: 4px; top: 18px; }
+    @media (max-width: 480px) {
+      .sublogo { width: 28px; height: 28px; }
+      .sublogos { gap: 4px; padding-right: 6px; }
+    }
+    @media (max-width: 360px) {
+      .sublogo { width: 24px; height: 24px; }
+      .rec { display: none; }
     }
 
     /* HEADER NAV */
@@ -59,20 +58,10 @@
       border-bottom: 1px solid rgba(230,57,70,0.15);
       display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;
     }
-    .homebut {
-      font-size: 15px; color: #e63946; text-decoration: none;
-      padding: 9px 14px; border-radius: 8px; transition: all 0.2s;
-      background: rgba(230,57,70,0.15);
-    }
+    .homebut { font-size: 15px; color: #e63946; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; background: rgba(230,57,70,0.15); }
     .nav { display: flex; gap: 4px; }
-    .nav a {
-      font-size: 15px; color: #ccc; text-decoration: none;
-      padding: 9px 14px; border-radius: 8px; transition: all 0.2s;
-    }
-    .homebut:hover,.nav a:hover {
-      background: #e63946; color: white; transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(230,57,70,0.4);
-    }
+    .nav a { font-size: 15px; color: #ccc; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; }
+    .homebut:hover,.nav a:hover { background: #e63946; color: white; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(230,57,70,0.4); }
     .nav a.active { background: rgba(230,57,70,0.2); color: #e63946; }
 
     /* HERO */
@@ -88,10 +77,7 @@
         radial-gradient(ellipse 60% 50% at 30% 50%, rgba(230,57,70,0.15) 0%, transparent 70%),
         radial-gradient(ellipse 50% 60% at 70% 50%, rgba(69,123,157,0.1) 0%, transparent 60%);
     }
-    .club-hero::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent);
-    }
+    .club-hero::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent); }
     .clublogo-hero {
       width: 110px; height: 110px; border-radius: 50%; border: 3px solid #e63946;
       background-image: url(images-1/clublogo.jpeg); background-size: cover; background-position: center;
@@ -109,75 +95,41 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       position: relative; z-index: 1; margin-bottom: 10px;
     }
-    .club-hero p {
-      color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 700; letter-spacing: 3px;
-      text-transform: uppercase; position: relative; z-index: 1;
-    }
-
-    /* FILTER TABS */
-    .filter-bar {
-      display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-      padding: 28px 20px 20px;
-      background: #0a0a14;
-    }
-    .filter-btn {
-      padding: 9px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.5);
-      font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-    }
-    .filter-btn:hover, .filter-btn.active {
-      background: rgba(230,57,70,0.2); border-color: rgba(230,57,70,0.4); color: #e63946;
-    }
+    .club-hero p { color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; position: relative; z-index: 1; }
 
     /* MEMBER GRID */
-    .member-section { padding: 0 20px 60px; background: #080810; }
+    .member-section { padding: 0 20px 60px; background: #080810; max-width: 1200px; margin: 0 auto; }
     .section-label {
       font-size: 11px; font-weight: 800; color: rgba(230,57,70,0.7); letter-spacing: 3px;
       text-transform: uppercase; padding: 32px 0 16px;
       border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 24px;
     }
-    .member-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 20px; max-width: 1200px; margin: 0 auto;
-    }
+    .member-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
     .member-card {
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 16px; overflow: hidden; transition: all 0.3s; cursor: default;
-      position: relative;
+      border-radius: 16px; overflow: hidden; transition: all 0.3s; cursor: default; position: relative;
     }
-    .member-card:hover {
-      border-color: rgba(230,57,70,0.35); background: rgba(230,57,70,0.04);
-      transform: translateY(-4px); box-shadow: 0 12px 40px rgba(230,57,70,0.12);
-    }
-    .member-photo {
-      width: 100%; aspect-ratio: 1; object-fit: cover; object-position: top;
-      display: block; filter: grayscale(20%); transition: filter 0.3s;
-    }
+    .member-card:hover { border-color: rgba(230,57,70,0.35); background: rgba(230,57,70,0.04); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(230,57,70,0.12); }
+    .member-photo { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: top; display: block; filter: grayscale(20%); transition: filter 0.3s; background: rgba(255,255,255,0.05); }
     .member-card:hover .member-photo { filter: grayscale(0%); }
+    .member-photo-placeholder { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 48px; background: rgba(230,57,70,0.06); }
     .member-info { padding: 14px 16px; }
     .member-name { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
     .member-year { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
-    .member-role {
-      display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; padding: 3px 10px; border-radius: 50px;
-      background: rgba(230,57,70,0.15); color: #e63946; border: 1px solid rgba(230,57,70,0.3);
-    }
+    .member-role { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 50px; }
     .member-phone { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 6px; }
-    .role-badge-organiser { background: rgba(69,123,157,0.15); color: #7aadcd; border-color: rgba(69,123,157,0.3); }
-    .role-badge-creative { background: rgba(106,90,205,0.15); color: #b8a4ff; border-color: rgba(106,90,205,0.3); }
-    .role-badge-volunteer { background: rgba(39,174,96,0.15); color: #5dde8a; border-color: rgba(39,174,96,0.3); }
-    .role-badge-advisor { background: rgba(243,156,18,0.15); color: #f5c842; border-color: rgba(243,156,18,0.3); }
-    .role-badge-treasure { background: rgba(230,57,70,0.15); color: #e63946; border-color: rgba(230,57,70,0.3); }
+
+    /* Loading / empty states */
+    .loading-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.3); font-size: 15px; }
+    .loading-spinner { font-size: 28px; display: block; margin-bottom: 12px; animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-notice { text-align: center; padding: 48px 20px; color: rgba(255,255,255,0.25); font-size: 14px; }
 
     /* FOOTER */
     footer { background: #04040a; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 24px 0; }
     .footer-inner { display: flex; flex-wrap: wrap; gap: 32px; max-width: 1100px; margin: 0 auto; padding-bottom: 32px; }
     .footer-col { flex: 1 1 170px; min-width: 0; max-width: 100%; }
-    .footer-col .logo-f {
-      width: 50px; height: 50px; border-radius: 50%;
-      background-image: url(images-1/logo.jpeg); background-size: cover;
-      border: 2px solid #e63946; margin-bottom: 12px;
-    }
+    .footer-col .logo-f { width: 50px; height: 50px; border-radius: 50%; background-image: url(images-1/logo.jpeg); background-size: cover; border: 2px solid #e63946; margin-bottom: 12px; }
     .footer-col .name-f { font-size: 18px; font-weight: 900; color: #e63946; }
     .footer-col .inst-f { font-size: 11px; color: #999; margin-top: 2px; }
     .footer-heading { font-size: 12px; font-weight: 800; color: #e63946; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
@@ -188,7 +140,6 @@
     .footer-social a:hover { color: #e63946 !important; }
     .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); text-align: center; padding: 16px; color: rgba(255,255,255,0.25); font-size: 12px; }
 
-    /* ADMIN FAB */
     .admin-fab {
       position: fixed; bottom: 28px; right: 28px;
       background: linear-gradient(135deg,#c0392b,#96281b); color: white;
@@ -198,15 +149,16 @@
     }
     .admin-fab:hover { transform: translateY(-2px); }
 
-    @media(max-width:600px) {
+    @media (max-width: 600px) {
       .member-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-      .filter-bar { padding: 20px 12px 16px; }
+      .member-section { padding: 0 12px 40px; }
+      .footer-inner { flex-direction: column; gap: 20px; }
+      .footer-col { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <div class="navbar">
     <div class="logo"></div>
     <div class="clgname">
@@ -215,13 +167,14 @@
       <p class="ugc">UGC Autonomous Institution</p>
       <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
     </div>
-    <div class="sublogo-4"></div>
-    <div class="sublogo-1"></div>
-    <div class="sublogo-2"></div>
-    <div class="sublogo-3"></div>
+    <div class="sublogos">
+      <div class="sublogo" style="background-image:url(images-1/clublogo.jpeg)"></div>
+      <div class="sublogo" style="background-image:url(images-1/sublogo-3.jpeg)"></div>
+      <div class="sublogo" style="background-image:url(images-1/sublogo-2.jpeg)"></div>
+      <div class="sublogo" style="background-image:url(images-1/sublogo-1.jpeg)"></div>
+    </div>
   </div>
 
-  <!-- HEADER NAV -->
   <header>
     <a href="home.html" class="homebut" title="Home"><i class="fa-solid fa-house"></i></a>
     <nav class="nav">
@@ -233,191 +186,18 @@
     </nav>
   </header>
 
-  <!-- HERO -->
   <section class="club-hero">
     <div class="clublogo-hero"></div>
     <h1>Our Team</h1>
     <p>✦ Neural Nexus Club Members ✦</p>
   </section>
 
-  <!-- MEMBERS CONTENT -->
-  <div class="member-section">
-
-    <div class="section-label">⚡ Organisers</div>
-    <div class="member-grid">
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-1.jpeg" alt="T.Rakesh Reddy" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">T.Rakesh Reddy</div>
-          <div class="member-year">AI&amp;DS · 4th Year</div>
-          <span class="member-role role-badge-organiser">Organiser</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-3.jpeg" alt="B.Ashwitha Reddy" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">B.Ashwitha Reddy</div>
-          <div class="member-year">AI&amp;DS · 3rd Year</div>
-          <span class="member-role role-badge-organiser">Organiser</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9392966384</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-8.jpeg" alt="Thota Pavani" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Thota Pavani</div>
-          <div class="member-year">AI&amp;DS · 2nd Year</div>
-          <span class="member-role role-badge-organiser">Organiser</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7702098099</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-11.jpeg" alt="Shashank" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Shashank</div>
-          <div class="member-year">AI&amp;DS · 3rd Year</div>
-          <span class="member-role role-badge-organiser">Organiser</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>6309732860</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-12.jpeg" alt="Tejasri" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Tejasri</div>
-          <div class="member-year">AI&amp;DS · 4th Year</div>
-          <span class="member-role role-badge-organiser">Organiser</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-label">🎨 Creative Team</div>
-    <div class="member-grid">
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-13.jpeg" alt="Kishore" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Kishore</div>
-          <div class="member-year">AI&amp;DS · 4th Year</div>
-          <span class="member-role role-badge-creative">Creative</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-14.jpeg" alt="Abhinav" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Abhinav</div>
-          <div class="member-year">AI&amp;DS · 3rd Year</div>
-          <span class="member-role role-badge-creative">Creative</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>8328081391</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-5.jpeg" alt="Barkam Aravind" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Barkam Aravind</div>
-          <div class="member-year">AI&amp;DS · 2nd Year</div>
-          <span class="member-role role-badge-creative">Creative</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-15.jpeg" alt="Swathi" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Swathi</div>
-          <div class="member-year">AI&amp;DS · 3rd Year</div>
-          <span class="member-role role-badge-creative">Creative</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9866375904</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-label">🙋 Volunteers</div>
-    <div class="member-grid">
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-11.jpeg" alt="Vishnu" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Vishnu</div>
-          <div class="member-year">AI&amp;DS · 2nd Year</div>
-          <span class="member-role role-badge-volunteer">Volunteer</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9652965303</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-16.jpeg" alt="Varsha" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Varsha</div>
-          <div class="member-year">AI&amp;DS · 3rd Year</div>
-          <span class="member-role role-badge-volunteer">Volunteer</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7995961801</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-6.jpeg" alt="I.Shiva" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">I.Shiva</div>
-          <div class="member-year">AI&amp;DS · 4th Year</div>
-          <span class="member-role role-badge-volunteer">Volunteer</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-label">🧠 Club Advisors</div>
-    <div class="member-grid">
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-4.jpeg" alt="Shiva Kumar" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Shiva Kumar</div>
-          <div class="member-year">AI&amp;DS · 2nd Year</div>
-          <span class="member-role role-badge-advisor">Club Advisor</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9492003133</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-17.jpeg" alt="Priyanka" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Priyanka</div>
-          <div class="member-year">AI&amp;DS · 3rd Year</div>
-          <span class="member-role role-badge-advisor">Club Advisor</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>8121195365</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-label">💰 Treasurers</div>
-    <div class="member-grid">
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-18.jpeg" alt="Rishika" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Rishika</div>
-          <div class="member-year">AI&amp;DS · 4th Year</div>
-          <span class="member-role role-badge-treasure">Treasurer</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>7095995652</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-19.jpeg" alt="Akshaya" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Akshaya</div>
-          <div class="member-year">AI&amp;DS · 2nd Year</div>
-          <span class="member-role role-badge-treasure">Treasurer</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>8106498481</div>
-        </div>
-      </div>
-      <div class="member-card">
-        <img class="member-photo" src="images-1/member-20.jpeg" alt="Chand Basha" loading="lazy">
-        <div class="member-info">
-          <div class="member-name">Chand Basha</div>
-          <div class="member-year">AI&amp;DS · 3rd Year</div>
-          <span class="member-role role-badge-treasure">Treasurer</span>
-          <div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>9491441166</div>
-        </div>
-      </div>
+  <div class="member-section" id="members-root">
+    <div class="loading-state">
+      <span class="loading-spinner">⟳</span>Loading members...
     </div>
   </div>
 
-  <!-- FOOTER -->
   <footer id="contact">
     <div class="footer-inner">
       <div class="footer-col">
@@ -451,5 +231,109 @@
 
   <a href="admin.html" class="admin-fab"><i class="fa-solid fa-lock"></i> Admin</a>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAkYeTlfnicPo1JczB4rZZj61UnHFbvqVE",
+      authDomain: "neuralnexus-be2c7.firebaseapp.com",
+      projectId: "neuralnexus-be2c7",
+      storageBucket: "neuralnexus-be2c7.firebasestorage.app",
+      messagingSenderId: "1094362929898",
+      appId: "1:1094362929898:web:2c48716b8e23bbe05bd593"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const ROLE_COLORS = {
+      "President":      { bg: "rgba(230,57,70,0.15)",  color: "#e63946", border: "rgba(230,57,70,0.3)" },
+      "Vice President": { bg: "rgba(230,57,70,0.12)",  color: "#ff8c8c", border: "rgba(230,57,70,0.25)" },
+      "Secretary":      { bg: "rgba(243,156,18,0.15)", color: "#f5c842", border: "rgba(243,156,18,0.3)" },
+      "Treasurer":      { bg: "rgba(230,57,70,0.15)",  color: "#e63946", border: "rgba(230,57,70,0.3)" },
+      "Organiser":      { bg: "rgba(69,123,157,0.15)", color: "#7aadcd", border: "rgba(69,123,157,0.3)" },
+      "Creative":       { bg: "rgba(106,90,205,0.15)", color: "#b8a4ff", border: "rgba(106,90,205,0.3)" },
+      "Volunteer":      { bg: "rgba(39,174,96,0.15)",  color: "#5dde8a", border: "rgba(39,174,96,0.3)" },
+      "Advisor":        { bg: "rgba(243,156,18,0.15)", color: "#f5c842", border: "rgba(243,156,18,0.3)" },
+    };
+
+    const ROLE_ORDER = ["President","Vice President","Secretary","Treasurer","Advisor","Organiser","Creative","Volunteer"];
+    const ROLE_LABELS = {
+      "President":      "⭐ Leadership",
+      "Vice President": "⭐ Leadership",
+      "Secretary":      "📋 Management",
+      "Treasurer":      "💰 Treasurers",
+      "Advisor":        "🧠 Club Advisors",
+      "Organiser":      "⚡ Organisers",
+      "Creative":       "🎨 Creative Team",
+      "Volunteer":      "🙋 Volunteers",
+    };
+
+    async function loadMembers() {
+      const root = document.getElementById("members-root");
+      try {
+        const snap = await db.collection("club_members").orderBy("order").get();
+
+        if (snap.empty) {
+          root.innerHTML = '<div class="empty-notice">No members found.</div>';
+          return;
+        }
+
+        const members = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        // Group by role, preserving display order
+        const groups = {};
+        members.forEach(m => {
+          const role = m.role || "Volunteer";
+          if (!groups[role]) groups[role] = [];
+          groups[role].push(m);
+        });
+
+        let html = "";
+        const seenRoles = new Set();
+
+        // Follow ROLE_ORDER, then any leftover roles
+        const orderedRoles = [
+          ...ROLE_ORDER.filter(r => groups[r]),
+          ...Object.keys(groups).filter(r => !ROLE_ORDER.includes(r))
+        ];
+
+        orderedRoles.forEach(role => {
+          if (seenRoles.has(role)) return;
+          seenRoles.add(role);
+          const label = ROLE_LABELS[role] || role;
+          const rColor = ROLE_COLORS[role] || { bg: "rgba(255,255,255,0.07)", color: "#aaa", border: "rgba(255,255,255,0.12)" };
+
+          html += `<div class="section-label">${label}</div><div class="member-grid">`;
+          groups[role].forEach(m => {
+            const photoEl = m.photoUrl
+              ? `<img class="member-photo" src="${m.photoUrl}" alt="${m.name}" loading="lazy">`
+              : `<div class="member-photo-placeholder">👤</div>`;
+            const phoneEl = m.phone
+              ? `<div class="member-phone"><i class="fa-solid fa-phone" style="font-size:9px;margin-right:4px;"></i>${m.phone}</div>`
+              : "";
+            html += `
+              <div class="member-card">
+                ${photoEl}
+                <div class="member-info">
+                  <div class="member-name">${m.name || ""}</div>
+                  <div class="member-year">${m.year || ""}</div>
+                  <span class="member-role" style="background:${rColor.bg};color:${rColor.color};border:1px solid ${rColor.border}">${m.role || ""}</span>
+                  ${phoneEl}
+                </div>
+              </div>
+            `;
+          });
+          html += "</div>";
+        });
+
+        root.innerHTML = html;
+      } catch(e) {
+        console.error(e);
+        root.innerHTML = '<div class="empty-notice">⚠️ Could not load members. Please try again.</div>';
+      }
+    }
+
+    loadMembers();
+  </script>
 </body>
 </html>

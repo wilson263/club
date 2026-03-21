@@ -14,41 +14,40 @@
     html { scroll-behavior: smooth; }
     body { background: #080810; color: white; min-height: 100vh; }
 
+    /* NAVBAR */
     .navbar {
       width: 100%; height: 72px; display: flex; align-items: center;
       background: #080810; backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(230,57,70,0.2);
-      position: sticky; top: 0; z-index: 999;
+      position: sticky; top: 0; z-index: 999; overflow: hidden;
     }
     .logo {
       position: absolute; left: 8px; top: 8px;
       background-image: url(images-1/logo.jpeg); height: 56px; width: 56px;
       background-size: cover; border-radius: 50%;
-      border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35);
+      border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35); flex-shrink: 0;
     }
-    .clgname { margin-left: 76px; }
-    .name { font-size: clamp(16px,4vw,28px); font-weight: 900; color: #e63946; line-height: 1.1; }
-    .institute { font-size: 11px; font-weight: 700; color: #ccc; }
-    .ugc { font-size: 10px; color: rgba(230,57,70,0.8); font-weight: 700; }
-    .rec { font-size: 9px; color: #888; }
-    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 {
-      height: 46px; width: 46px; background-size: cover; border-radius: 50%;
-      position: absolute; border: 2px solid rgba(255,255,255,0.15);
+    .clgname { margin-left: 76px; flex: 1; min-width: 0; padding-right: 8px; }
+    .name     { font-size: clamp(14px,3.5vw,24px); font-weight: 900; color: #e63946; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .institute { font-size: clamp(9px,1.8vw,11px); font-weight: 700; color: #ccc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ugc { font-size: clamp(8px,1.5vw,10px); color: rgba(230,57,70,0.8); font-weight: 700; }
+    .rec { font-size: clamp(7px,1.3vw,9px); color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .sublogos {
+      display: flex; align-items: center; gap: 6px;
+      padding-right: 10px; flex-shrink: 0;
     }
-    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); right: 156px; top: 13px; }
-    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); right: 107px; top: 13px; }
-    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); right: 58px; top: 13px; }
-    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); right: 9px; top: 13px; }
-    @media(max-width:500px) {
-      .footer-inner { flex-direction: column; gap: 20px; }
-      .footer-col { width: 100%; }
+    .sublogo {
+      width: 38px; height: 38px; background-size: cover; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0;
     }
-    @media(max-width:600px) {
-      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 36px; width: 36px; }
-      .sublogo-4 { right: 118px; top: 18px; }
-      .sublogo-1 { right: 80px; top: 18px; }
-      .sublogo-2 { right: 42px; top: 18px; }
-      .sublogo-3 { right: 4px; top: 18px; }
+    @media (max-width: 480px) {
+      .sublogo { width: 28px; height: 28px; }
+      .sublogos { gap: 4px; padding-right: 6px; }
+    }
+    @media (max-width: 360px) {
+      .sublogo { width: 24px; height: 24px; }
+      .rec { display: none; }
     }
 
     header {
@@ -57,11 +56,7 @@
       border-bottom: 1px solid rgba(230,57,70,0.15);
       display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;
     }
-    .homebut {
-      font-size: 15px; color: #e63946; text-decoration: none;
-      padding: 9px 14px; border-radius: 8px; transition: all 0.2s;
-      background: rgba(230,57,70,0.15);
-    }
+    .homebut { font-size: 15px; color: #e63946; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; background: rgba(230,57,70,0.15); }
     .nav { display: flex; gap: 4px; }
     .nav a { font-size: 15px; color: #ccc; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; }
     .homebut:hover,.nav a:hover { background: #e63946; color: white; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(230,57,70,0.4); }
@@ -74,16 +69,8 @@
       background: linear-gradient(135deg, #0a0a14 0%, #1a0a0f 50%, #0a0e1a 100%);
       position: relative; overflow: hidden; text-align: center;
     }
-    .club-hero::before {
-      content: ''; position: absolute; inset: 0; pointer-events: none;
-      background:
-        radial-gradient(ellipse 60% 50% at 30% 50%, rgba(230,57,70,0.15) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 60% at 70% 50%, rgba(69,123,157,0.1) 0%, transparent 60%);
-    }
-    .club-hero::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent);
-    }
+    .club-hero::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 60% 50% at 30% 50%, rgba(230,57,70,0.15) 0%, transparent 70%), radial-gradient(ellipse 50% 60% at 70% 50%, rgba(69,123,157,0.1) 0%, transparent 60%); }
+    .club-hero::after  { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent); }
     .clublogo-hero {
       width: 110px; height: 110px; border-radius: 50%; border: 3px solid #e63946;
       background-image: url(images-1/clublogo.jpeg); background-size: cover; background-position: center;
@@ -95,24 +82,12 @@
       0%,100% { box-shadow: 0 0 0 8px rgba(230,57,70,0.1), 0 0 40px rgba(230,57,70,0.25); }
       50% { box-shadow: 0 0 0 14px rgba(230,57,70,0.05), 0 0 60px rgba(230,57,70,0.35); }
     }
-    .club-hero h1 {
-      font-size: clamp(32px, 6vw, 60px); font-weight: 900; letter-spacing: -1.5px;
-      background: linear-gradient(135deg, #fff 0%, #e63946 60%, #ff6b7a 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      position: relative; z-index: 1; margin-bottom: 10px;
-    }
-    .club-hero p {
-      color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 700; letter-spacing: 3px;
-      text-transform: uppercase; position: relative; z-index: 1;
-    }
+    .club-hero h1 { font-size: clamp(32px, 6vw, 60px); font-weight: 900; letter-spacing: -1.5px; background: linear-gradient(135deg, #fff 0%, #e63946 60%, #ff6b7a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; position: relative; z-index: 1; margin-bottom: 10px; }
+    .club-hero p  { color: rgba(255,255,255,0.45); font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; position: relative; z-index: 1; }
 
     /* CONTENT */
     .content-section { max-width: 900px; margin: 0 auto; padding: 60px 24px; }
-    .section-title {
-      font-size: 11px; font-weight: 800; color: rgba(230,57,70,0.7); letter-spacing: 3px;
-      text-transform: uppercase; margin-bottom: 32px; padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
+    .section-title { font-size: 11px; font-weight: 800; color: rgba(230,57,70,0.7); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.07); }
 
     /* HOD CARD */
     .hod-card {
@@ -121,58 +96,44 @@
       border-radius: 20px; padding: 32px; margin-bottom: 48px;
       position: relative; overflow: hidden;
     }
-    .hod-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, #e63946, transparent);
-    }
+    .hod-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #e63946, transparent); }
     .hod-photo {
       width: 140px; height: 180px; border-radius: 12px; object-fit: cover; object-position: top;
       border: 2px solid rgba(230,57,70,0.3); flex-shrink: 0;
-      background: rgba(255,255,255,0.05);
     }
     .hod-photo-placeholder {
       width: 140px; height: 180px; border-radius: 12px; background: rgba(230,57,70,0.08);
       border: 2px solid rgba(230,57,70,0.3); flex-shrink: 0; display: flex;
       align-items: center; justify-content: center; color: rgba(230,57,70,0.4); font-size: 48px;
     }
-    .hod-info h2 { font-size: 22px; font-weight: 900; color: white; margin-bottom: 4px; }
-    .hod-info .hod-title { font-size: 13px; color: #e63946; font-weight: 600; margin-bottom: 16px; }
-    .hod-badge {
-      display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1.5px;
-      text-transform: uppercase; padding: 4px 12px; border-radius: 50px;
-      background: rgba(230,57,70,0.15); color: #e63946; border: 1px solid rgba(230,57,70,0.3);
-      margin-bottom: 14px;
-    }
+    .hod-info h2   { font-size: 22px; font-weight: 900; color: white; margin-bottom: 4px; }
+    .hod-info .hod-title  { font-size: 13px; color: #e63946; font-weight: 600; margin-bottom: 16px; }
+    .hod-badge { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 50px; background: rgba(230,57,70,0.15); color: #e63946; border: 1px solid rgba(230,57,70,0.3); margin-bottom: 14px; }
     .hod-info p { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.8; }
-    .hod-info .view-profile {
-      display: inline-flex; align-items: center; gap: 8px; margin-top: 16px;
-      background: #e63946; color: white; text-decoration: none; padding: 10px 20px;
-      border-radius: 50px; font-size: 13px; font-weight: 700; transition: all 0.2s;
-    }
-    .hod-info .view-profile:hover { background: #c0392b; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(230,57,70,0.4); }
 
-    /* FACULTY TABLE */
-    .faculty-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;
-    }
+    /* FACULTY GRID */
+    .faculty-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
     .faculty-card {
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px; padding: 24px 20px; transition: all 0.2s; position: relative;
+      border-radius: 14px; padding: 20px; transition: all 0.2s; position: relative;
+      display: flex; gap: 14px; align-items: flex-start;
     }
-    .faculty-card:hover {
-      border-color: rgba(230,57,70,0.3); background: rgba(230,57,70,0.04);
-      transform: translateY(-3px); box-shadow: 0 10px 30px rgba(230,57,70,0.1);
+    .faculty-card:hover { border-color: rgba(230,57,70,0.3); background: rgba(230,57,70,0.04); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(230,57,70,0.1); }
+    .fac-photo-wrap {
+      width: 52px; height: 52px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+      background: rgba(230,57,70,0.08); border: 1px solid rgba(230,57,70,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 22px; color: #e63946;
     }
-    .faculty-card .fac-icon {
-      width: 48px; height: 48px; border-radius: 50%; background: rgba(230,57,70,0.1);
-      border: 1px solid rgba(230,57,70,0.25); display: flex; align-items: center; justify-content: center;
-      font-size: 20px; margin-bottom: 14px; color: #e63946;
-    }
-    .faculty-card .fac-name { font-size: 15px; font-weight: 700; color: white; margin-bottom: 6px; }
-    .faculty-card .fac-qual {
-      font-size: 12px; color: #e63946; font-weight: 600; margin-bottom: 4px;
-    }
-    .faculty-card .fac-desg { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .fac-photo { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 50%; }
+    .fac-body .fac-name { font-size: 14px; font-weight: 700; color: white; margin-bottom: 4px; }
+    .fac-body .fac-qual { font-size: 12px; color: #e63946; font-weight: 600; margin-bottom: 2px; }
+    .fac-body .fac-desg { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+    /* Loading / empty */
+    .loading-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.3); font-size: 15px; }
+    .loading-spinner { font-size: 28px; display: block; margin-bottom: 12px; animation: spin 1.2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-notice { text-align: center; padding: 48px 20px; color: rgba(255,255,255,0.25); font-size: 14px; }
 
     /* FOOTER */
     footer { background: #04040a; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 24px 0; }
@@ -189,18 +150,15 @@
     .footer-social a:hover { color: #e63946 !important; }
     .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); text-align: center; padding: 16px; color: rgba(255,255,255,0.25); font-size: 12px; }
 
-    .admin-fab {
-      position: fixed; bottom: 28px; right: 28px;
-      background: linear-gradient(135deg,#c0392b,#96281b); color: white;
-      border-radius: 50px; padding: 13px 22px; font-size: 14px; font-weight: 700;
-      box-shadow: 0 6px 24px rgba(192,57,43,0.45); display: flex; align-items: center;
-      gap: 8px; z-index: 999; text-decoration: none; transition: transform 0.2s;
-    }
+    .admin-fab { position: fixed; bottom: 28px; right: 28px; background: linear-gradient(135deg,#c0392b,#96281b); color: white; border-radius: 50px; padding: 13px 22px; font-size: 14px; font-weight: 700; box-shadow: 0 6px 24px rgba(192,57,43,0.45); display: flex; align-items: center; gap: 8px; z-index: 999; text-decoration: none; transition: transform 0.2s; }
     .admin-fab:hover { transform: translateY(-2px); }
 
-    @media(max-width:600px) {
+    @media (max-width: 600px) {
       .hod-card { flex-direction: column; }
-      .hod-photo-placeholder,.hod-photo { width: 100%; height: 200px; }
+      .hod-photo, .hod-photo-placeholder { width: 100%; height: 200px; }
+      .content-section { padding: 32px 16px; }
+      .footer-inner { flex-direction: column; gap: 20px; }
+      .footer-col { width: 100%; }
     }
   </style>
 </head>
@@ -214,10 +172,12 @@
       <p class="ugc">UGC Autonomous Institution</p>
       <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
     </div>
-    <div class="sublogo-4"></div>
-    <div class="sublogo-1"></div>
-    <div class="sublogo-2"></div>
-    <div class="sublogo-3"></div>
+    <div class="sublogos">
+      <div class="sublogo" style="background-image:url(images-1/clublogo.jpeg)"></div>
+      <div class="sublogo" style="background-image:url(images-1/sublogo-3.jpeg)"></div>
+      <div class="sublogo" style="background-image:url(images-1/sublogo-2.jpeg)"></div>
+      <div class="sublogo" style="background-image:url(images-1/sublogo-1.jpeg)"></div>
+    </div>
   </div>
 
   <header>
@@ -237,58 +197,9 @@
     <p>✦ Our Mentors &amp; Guides ✦</p>
   </section>
 
-  <div class="content-section">
-
-    <div class="section-title">🎓 Head of Department</div>
-    <div class="hod-card">
-      <div class="hod-photo-placeholder"><i class="fa-solid fa-user-tie"></i></div>
-      <div class="hod-info">
-        <div class="hod-badge">HOD · AI &amp; Data Science</div>
-        <h2>Dr. S. Venkata Pavan Kumar</h2>
-        <div class="hod-title">M.Tech, Ph.D</div>
-        <p>An experienced academic leader with over 15 years of expertise, having successfully headed departments including HOD CSE (Data Science) and HOD CSE (AI&amp;ML), demonstrating deep commitment to the direction of AI and Data Science fields.</p>
-        <a href="hodprofile.html" class="view-profile"><i class="fa-solid fa-id-card"></i> View Full Profile</a>
-      </div>
-    </div>
-
-    <div class="section-title">👩‍🏫 Faculty Members</div>
-    <div class="faculty-grid">
-      <div class="faculty-card">
-        <div class="fac-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-        <div class="fac-name">Mrs. M. Karuna</div>
-        <div class="fac-qual">M.Tech</div>
-        <div class="fac-desg">Professor</div>
-      </div>
-      <div class="faculty-card">
-        <div class="fac-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-        <div class="fac-name">Mrs. N. Kalyani</div>
-        <div class="fac-qual">M.Tech</div>
-        <div class="fac-desg">Professor</div>
-      </div>
-      <div class="faculty-card">
-        <div class="fac-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-        <div class="fac-name">Mr. B. Sai Tharun</div>
-        <div class="fac-qual">M.Tech</div>
-        <div class="fac-desg">Professor</div>
-      </div>
-      <div class="faculty-card">
-        <div class="fac-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-        <div class="fac-name">Mr. T. Ravi Charan</div>
-        <div class="fac-qual">M.Tech</div>
-        <div class="fac-desg">Professor</div>
-      </div>
-      <div class="faculty-card">
-        <div class="fac-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-        <div class="fac-name">Ms. S. Divya</div>
-        <div class="fac-qual">M.Tech</div>
-        <div class="fac-desg">Professor</div>
-      </div>
-      <div class="faculty-card">
-        <div class="fac-icon"><i class="fa-solid fa-chalkboard-user"></i></div>
-        <div class="fac-name">Mr. D. G. R. Kumar</div>
-        <div class="fac-qual">M.Tech</div>
-        <div class="fac-desg">Professor</div>
-      </div>
+  <div class="content-section" id="faculty-root">
+    <div class="loading-state">
+      <span class="loading-spinner">⟳</span>Loading faculty...
     </div>
   </div>
 
@@ -325,5 +236,91 @@
 
   <a href="admin.html" class="admin-fab"><i class="fa-solid fa-lock"></i> Admin</a>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAkYeTlfnicPo1JczB4rZZj61UnHFbvqVE",
+      authDomain: "neuralnexus-be2c7.firebaseapp.com",
+      projectId: "neuralnexus-be2c7",
+      storageBucket: "neuralnexus-be2c7.firebasestorage.app",
+      messagingSenderId: "1094362929898",
+      appId: "1:1094362929898:web:2c48716b8e23bbe05bd593"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function esc(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    async function loadFaculty() {
+      const root = document.getElementById("faculty-root");
+      try {
+        const snap = await db.collection("faculty_members").orderBy("order").get();
+
+        if (snap.empty) {
+          root.innerHTML = '<div class="empty-notice">No faculty members found.</div>';
+          return;
+        }
+
+        const all = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const hods    = all.filter(f => f.isHod === "yes");
+        const regular = all.filter(f => f.isHod !== "yes");
+
+        let html = "";
+
+        // HOD section
+        if (hods.length) {
+          html += `<div class="section-title">🎓 Head of Department</div>`;
+          hods.forEach(hod => {
+            const photoEl = hod.photoUrl
+              ? `<img class="hod-photo" src="${esc(hod.photoUrl)}" alt="${esc(hod.name)}">`
+              : `<div class="hod-photo-placeholder"><i class="fa-solid fa-user-tie"></i></div>`;
+            html += `
+              <div class="hod-card">
+                ${photoEl}
+                <div class="hod-info">
+                  <div class="hod-badge">HOD · AI &amp; Data Science</div>
+                  <h2>${esc(hod.name)}</h2>
+                  <div class="hod-title">${esc(hod.qualification)}</div>
+                  ${hod.bio ? `<p>${esc(hod.bio)}</p>` : ""}
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        // Regular faculty
+        if (regular.length) {
+          html += `<div class="section-title">👩‍🏫 Faculty Members</div><div class="faculty-grid">`;
+          regular.forEach(f => {
+            const photoEl = f.photoUrl
+              ? `<img class="fac-photo" src="${esc(f.photoUrl)}" alt="${esc(f.name)}" loading="lazy">`
+              : `<i class="fa-solid fa-chalkboard-user"></i>`;
+            html += `
+              <div class="faculty-card">
+                <div class="fac-photo-wrap">${photoEl}</div>
+                <div class="fac-body">
+                  <div class="fac-name">${esc(f.name)}</div>
+                  <div class="fac-qual">${esc(f.qualification)}</div>
+                  <div class="fac-desg">${esc(f.designation)}</div>
+                </div>
+              </div>
+            `;
+          });
+          html += `</div>`;
+        }
+
+        root.innerHTML = html || '<div class="empty-notice">No faculty found.</div>';
+      } catch(e) {
+        console.error(e);
+        root.innerHTML = '<div class="empty-notice">⚠️ Could not load faculty. Please try again.</div>';
+      }
+    }
+
+    loadFaculty();
+  </script>
 </body>
 </html>

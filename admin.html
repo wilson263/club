@@ -73,6 +73,12 @@
         <div class="nav-item" data-panel="achievements" onclick="showPanel('achievements')">
           <span class="nav-icon">🏆</span> Achievements
         </div>
+        <div class="nav-item" data-panel="club-members" onclick="showPanel('club-members')">
+          <span class="nav-icon">🧑‍🤝‍🧑</span> Club Members
+        </div>
+        <div class="nav-item" data-panel="faculty" onclick="showPanel('faculty')">
+          <span class="nav-icon">👨‍🏫</span> Faculty
+        </div>
 
         <div class="nav-section-label" id="admin-mgmt-label">Management</div>
         <div class="nav-item" id="admin-mgmt-btn" data-panel="admins" onclick="showPanel('admins')">
@@ -131,6 +137,16 @@
               <div class="stat-label">Achievements</div>
             </div>
             <div class="stat-card">
+              <div class="stat-icon">🧑‍🤝‍🧑</div>
+              <div class="stat-num" id="stat-members">—</div>
+              <div class="stat-label">Members</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">👨‍🏫</div>
+              <div class="stat-num" id="stat-faculty-count">—</div>
+              <div class="stat-label">Faculty</div>
+            </div>
+            <div class="stat-card">
               <div class="stat-icon">👥</div>
               <div class="stat-num" id="stat-admins">—</div>
               <div class="stat-label">Admins</div>
@@ -153,6 +169,12 @@
               <div class="quick-btn" onclick="showPanel('achievements')">
                 <div class="quick-btn-icon">🏆</div>Add Achievement
               </div>
+              <div class="quick-btn" onclick="showPanel('club-members')">
+                <div class="quick-btn-icon">🧑‍🤝‍🧑</div>Manage Members
+              </div>
+              <div class="quick-btn" onclick="showPanel('faculty')">
+                <div class="quick-btn-icon">👨‍🏫</div>Manage Faculty
+              </div>
             </div>
           </div>
 
@@ -173,7 +195,6 @@
               <div class="card-title"><span class="ct-icon">🖼️</span> Home Page Images</div>
             </div>
             <p class="hint-text">These images appear in the scrolling gallery on the home page. Upload high-quality landscape photos for best results.</p>
-
             <div class="upload-zone" id="home-upload-zone" onclick="document.getElementById('home-file-input').click()" ondragover="handleDragOver(event,'home-upload-zone')" ondragleave="handleDragLeave('home-upload-zone')" ondrop="handleDrop(event,'home-file-input')">
               <input type="file" id="home-file-input" multiple accept="image/*" onchange="uploadHomeImages(this.files)">
               <div class="uz-icon">🌄</div>
@@ -181,12 +202,10 @@
               <div class="uz-sub">PNG, JPG, WEBP — multiple files supported</div>
               <div class="uz-btn">Choose Files</div>
             </div>
-
             <div class="progress-wrapper" id="home-progress-wrapper">
               <div class="progress-label">Uploading...</div>
               <div class="progress-bar"><div class="progress-fill" id="home-progress-fill"></div></div>
             </div>
-
             <div class="img-count" id="home-image-count">Loading...</div>
             <div class="img-grid" id="home-image-grid">
               <div id="home-empty" class="empty-state">
@@ -202,7 +221,6 @@
             <div class="card-head">
               <div class="card-title"><span class="ct-icon">➕</span> Add New Event</div>
             </div>
-
             <div class="evt-img-wrap" onclick="document.getElementById('evt-image-input').click()">
               <input type="file" id="evt-image-input" accept="image/*" style="display:none" onchange="previewEventImage(this)">
               <div id="evt-preview-area">
@@ -210,7 +228,6 @@
                 <div style="font-size:13px;color:var(--muted)">Click to add event image (optional)</div>
               </div>
             </div>
-
             <div class="form-grid">
               <div class="f-group">
                 <label class="f-label">Event Title *</label>
@@ -236,15 +253,12 @@
               <label class="f-label">Description</label>
               <textarea class="f-input" id="evt-desc" placeholder="Brief description of the event..." rows="3" style="resize:vertical"></textarea>
             </div>
-
             <div class="progress-wrapper" id="evt-progress-wrapper">
               <div class="progress-label">Saving event...</div>
               <div class="progress-bar"><div class="progress-fill" id="evt-progress-fill"></div></div>
             </div>
-
             <button class="btn btn-primary" onclick="addEvent()">📅 Add Event</button>
           </div>
-
           <div class="card">
             <div class="card-head">
               <div class="card-title"><span class="ct-icon">📋</span> All Events</div>
@@ -267,7 +281,6 @@
               <div class="card-title"><span class="ct-icon">📷</span> Photo Gallery</div>
             </div>
             <p class="hint-text">Upload photos to the club gallery visible on the website. Multiple uploads supported.</p>
-
             <div class="upload-zone" id="gallery-upload-zone" onclick="document.getElementById('gallery-file-input').click()" ondragover="handleDragOver(event,'gallery-upload-zone')" ondragleave="handleDragLeave('gallery-upload-zone')" ondrop="handleDrop(event,'gallery-file-input')">
               <input type="file" id="gallery-file-input" multiple accept="image/*" onchange="uploadGalleryImages(this.files)">
               <div class="uz-icon">📸</div>
@@ -275,12 +288,10 @@
               <div class="uz-sub">Select multiple photos at once</div>
               <div class="uz-btn">Choose Photos</div>
             </div>
-
             <div class="progress-wrapper" id="gallery-progress-wrapper">
               <div class="progress-label">Uploading photos...</div>
               <div class="progress-bar"><div class="progress-fill" id="gallery-progress-fill"></div></div>
             </div>
-
             <div class="img-count" id="gallery-image-count">Loading...</div>
             <div class="img-grid" id="gallery-image-grid">
               <div id="gallery-empty" class="empty-state">
@@ -300,6 +311,34 @@
             <p class="hint-text">Manage achievements displayed on the Achievements page. Add, edit or remove entries.</p>
             <div class="ach-grid" id="ach-grid">
               <div style="text-align:center;padding:28px;color:var(--muted);grid-column:1/-1">⏳ Loading achievements...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CLUB MEMBERS ── -->
+        <div class="panel" id="panel-club-members">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">🧑‍🤝‍🧑</span> Club Members</div>
+              <button class="btn btn-primary" onclick="openMemberModal()">➕ Add Member</button>
+            </div>
+            <p class="hint-text">Add, edit, or remove club members. Changes are reflected on the Club Members page of the website.</p>
+            <div class="member-admin-grid" id="member-admin-grid">
+              <div style="text-align:center;padding:28px;color:var(--muted);grid-column:1/-1">⏳ Loading members...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── FACULTY ── -->
+        <div class="panel" id="panel-faculty">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">👨‍🏫</span> Faculty Members</div>
+              <button class="btn btn-primary" onclick="openFacultyModal()">➕ Add Faculty</button>
+            </div>
+            <p class="hint-text">Add, edit, or remove faculty members. Changes are reflected on the Faculty page of the website.</p>
+            <div class="faculty-admin-grid" id="faculty-admin-grid">
+              <div style="text-align:center;padding:28px;color:var(--muted);grid-column:1/-1">⏳ Loading faculty...</div>
             </div>
           </div>
         </div>
@@ -380,6 +419,120 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════ MEMBER MODAL -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="member-modal-title">Add Club Member</h3>
+      <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    </div>
+    <input type="hidden" id="member-edit-id">
+    <input type="hidden" id="member-existing-photo">
+    <div class="f-group" style="text-align:center">
+      <div id="member-photo-preview" onclick="document.getElementById('member-photo-input').click()" style="width:90px;height:90px;border-radius:50%;background:rgba(230,57,70,0.1);border:2px dashed rgba(230,57,70,0.4);margin:0 auto 10px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer">👤</div>
+      <input type="file" id="member-photo-input" accept="image/*" style="display:none" onchange="previewMemberPhoto(this)">
+      <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="document.getElementById('member-photo-input').click()">📷 Change Photo</button>
+    </div>
+    <div class="form-grid">
+      <div class="f-group">
+        <label class="f-label">Full Name *</label>
+        <input type="text" class="f-input" id="member-name" placeholder="e.g. Rahul Kumar">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Year &amp; Dept</label>
+        <input type="text" class="f-input" id="member-year" placeholder="e.g. AI&amp;DS · 3rd Year">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="f-group">
+        <label class="f-label">Role</label>
+        <select class="f-input" id="member-role">
+          <option value="President">President</option>
+          <option value="Vice President">Vice President</option>
+          <option value="Secretary">Secretary</option>
+          <option value="Treasurer">Treasurer</option>
+          <option value="Organiser">Organiser</option>
+          <option value="Creative">Creative</option>
+          <option value="Volunteer">Volunteer</option>
+          <option value="Advisor">Advisor</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label class="f-label">Phone</label>
+        <input type="text" class="f-input" id="member-phone" placeholder="e.g. 9876543210">
+      </div>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Display Order (lower = shown first)</label>
+      <input type="number" class="f-input" id="member-order" placeholder="e.g. 1" value="99">
+    </div>
+    <div class="progress-wrapper" id="member-progress-wrapper">
+      <div class="progress-label">Uploading photo...</div>
+      <div class="progress-bar"><div class="progress-fill" id="member-progress-fill"></div></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeMemberModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMember()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ FACULTY MODAL -->
+<div class="modal-overlay" id="faculty-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="faculty-modal-title">Add Faculty Member</h3>
+      <button class="modal-close" onclick="closeFacultyModal()">✕</button>
+    </div>
+    <input type="hidden" id="faculty-edit-id">
+    <input type="hidden" id="faculty-existing-photo">
+    <div class="f-group" style="text-align:center">
+      <div id="faculty-photo-preview" onclick="document.getElementById('faculty-photo-input').click()" style="width:90px;height:90px;border-radius:50%;background:rgba(230,57,70,0.1);border:2px dashed rgba(230,57,70,0.4);margin:0 auto 10px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer">👤</div>
+      <input type="file" id="faculty-photo-input" accept="image/*" style="display:none" onchange="previewFacultyPhoto(this)">
+      <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="document.getElementById('faculty-photo-input').click()">📷 Change Photo</button>
+    </div>
+    <div class="form-grid">
+      <div class="f-group">
+        <label class="f-label">Full Name *</label>
+        <input type="text" class="f-input" id="faculty-name" placeholder="e.g. Dr. A. Sharma">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Qualification</label>
+        <input type="text" class="f-input" id="faculty-qual" placeholder="e.g. Ph.D, M.Tech">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="f-group">
+        <label class="f-label">Designation</label>
+        <input type="text" class="f-input" id="faculty-desg" placeholder="e.g. Professor, Asst. Professor">
+      </div>
+      <div class="f-group">
+        <label class="f-label">Display Order (lower = shown first)</label>
+        <input type="number" class="f-input" id="faculty-order" placeholder="e.g. 1" value="99">
+      </div>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Mark as HoD?</label>
+      <select class="f-input" id="faculty-is-hod">
+        <option value="no">No — Regular Faculty</option>
+        <option value="yes">Yes — Show as Head of Department</option>
+      </select>
+    </div>
+    <div class="f-group">
+      <label class="f-label">Bio (shown for HoD on Faculty page)</label>
+      <textarea class="f-input" id="faculty-bio" placeholder="Brief description / background..." rows="3" style="resize:vertical"></textarea>
+    </div>
+    <div class="progress-wrapper" id="faculty-progress-wrapper">
+      <div class="progress-label">Uploading photo...</div>
+      <div class="progress-bar"><div class="progress-fill" id="faculty-progress-fill"></div></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-ghost" onclick="closeFacultyModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFaculty()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
 <div id="sidebar-overlay" onclick="closeSidebar()"></div>
 <div id="toast-container"></div>
 
@@ -391,7 +544,6 @@
 <script src="admin.js"></script>
 
 <script>
-  // Drag & Drop helpers
   function handleDragOver(e, zoneId) {
     e.preventDefault();
     document.getElementById(zoneId).classList.add('drag-over');
@@ -403,7 +555,6 @@
     e.preventDefault();
     const zone = e.currentTarget;
     zone.classList.remove('drag-over');
-    const input = document.getElementById(inputId);
     const files = e.dataTransfer.files;
     if (inputId === 'home-file-input') uploadHomeImages(files);
     else if (inputId === 'gallery-file-input') uploadGalleryImages(files);
