@@ -598,16 +598,19 @@
     .lightbox-next { right: 16px; }
     .lightbox-prev:hover, .lightbox-next:hover { background: rgba(230,57,70,0.7); }
 
-    /* Footer */
-    .last { background: #060610 !important; }
-    .last-1 { background: #0a0a18 !important; border-top: 1px solid rgba(255,255,255,0.06) !important; padding: 32px 24px !important; }
-    .logo-1 { background-image: url(images-1/logo.jpeg) !important; border-radius: 50% !important; border: 2px solid #e63946 !important; position: relative !important; left: auto !important; margin-left: 0 !important; }
-    .details-2 { width: auto !important; height: auto !important; min-width: 200px !important; }
-    .name-1      { color: #e63946 !important; }
-    .institute-1, .ugc-1, .rec-1, .address { color: rgba(255,255,255,0.6) !important; }
-    .info        { color: white !important; font-weight: 700 !important; margin-bottom: 10px !important; }
-    .details-1   { color: rgba(255,255,255,0.6) !important; font-size: 13px !important; line-height: 2 !important; }
-    .social-5    { background: #060610 !important; border-top: 1px solid rgba(255,255,255,0.06) !important; padding: 14px 20px !important; position: relative !important; right: auto !important; width: 100% !important; }
+    /* Footer grid */
+    .nn-footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .nn-footer-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+    }
+    @media (max-width: 520px) {
+      .nn-footer-grid { grid-template-columns: 1fr; gap: 24px; }
+    }
 
     /* Navbar sublogos: fix absolute stacking from gallery.css */
     .sublogo-group {
@@ -778,47 +781,64 @@
     </div>
 
     <!-- ══ FOOTER ══ -->
-    <div class="last">
-      <div class="last-1">
-        <div class="footer-top-row" style="display:flex;align-items:flex-start;flex-wrap:wrap;gap:24px;row-gap:28px">
+    <div style="background:#060610;margin-top:48px;border-top:2px solid rgba(230,57,70,0.3)">
+      <div style="max-width:1100px;margin:0 auto;padding:40px 28px 32px">
+        <div class="nn-footer-grid">
           <!-- College branding -->
-          <div style="display:flex;align-items:flex-start;gap:14px;flex:1;min-width:200px">
-            <div class="logo-1" style="width:56px;height:56px;background-image:url(images-1/logo.jpeg);background-size:cover;flex-shrink:0;border-radius:50%;border:2px solid #e63946"></div>
-            <div class="clgname-1">
-              <p class="name-1" style="font-size:26px;font-weight:900">Sri Indu</p>
-              <p class="institute-1" style="font-size:12px">Institute of Engineering &amp; Technology</p>
-              <p class="ugc-1" style="font-size:11px">UGC Autonomous Institution</p>
-              <p class="rec-1" style="font-size:10px">Recognized under 2(f) of UGC Act 1956</p>
+          <div style="display:flex;align-items:flex-start;gap:14px">
+            <div style="width:56px;height:56px;min-width:56px;background-image:url(images-1/logo.jpeg);background-size:cover;border-radius:50%;border:2px solid #e63946"></div>
+            <div>
+              <div style="font-size:22px;font-weight:900;color:#e63946;line-height:1.1">Sri Indu</div>
+              <div style="font-size:11px;color:rgba(255,255,255,0.75);font-weight:600;margin-top:3px">Institute of Engineering &amp; Technology</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px">UGC Autonomous Institution</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:1px">Recognized under 2(f) of UGC Act 1956</div>
             </div>
           </div>
           <!-- College Contact Info -->
-          <div class="list" style="flex:1;min-width:220px">
-            <p class="info">College Contact Info</p>
-            <ul class="address" style="list-style:none;padding:0">📍 Sheriguda, Rangareddy, Telangana — 501510</ul>
-            <ul class="address" style="list-style:none;padding:0">📞 93947187999, 8096951507</ul>
-            <ul class="address" style="list-style:none;padding:0">✉️ acct.siiet@gmail.com</ul>
-            <ul class="address" style="list-style:none;padding:0"><a href="https://sriindu.ac.in/" target="_blank" style="color:inherit">🌐 sriindu.ac.in</a></ul>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:white;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1)">College Contact Info</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:2.1">
+              <div>📍 Sheriguda, Rangareddy, Telangana — 501510</div>
+              <div>📞 93947187999, 8096951507</div>
+              <div>✉️ acct.siiet@gmail.com</div>
+              <div><a href="https://sriindu.ac.in/" target="_blank" style="color:rgba(255,255,255,0.65);text-decoration:none">🌐 sriindu.ac.in</a></div>
+            </div>
           </div>
           <!-- Club Contact -->
-          <div style="flex:1;min-width:200px">
-            <p class="info">Club Contact</p>
-            <p class="details-1" style="padding:0">📞 Contact us · 9014196561</p>
-            <p class="details-1" style="padding:0">✉️ neuralnexusgroup@gmail.com</p>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:white;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1)">Club Contact</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:2.1">
+              <div>📞 Contact us · 9014196561</div>
+              <div>✉️ neuralnexusgroup@gmail.com</div>
+              <div>📱 <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank" style="color:rgba(255,255,255,0.65);text-decoration:none">@siiet_ai_ds_club</a></div>
+            </div>
+          </div>
+          <!-- Quick Links -->
+          <div>
+            <div style="font-size:13px;font-weight:700;color:white;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1)">Quick Links</div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:2.1">
+              <div><a href="resources.html" style="color:rgba(255,255,255,0.65);text-decoration:none">📚 Resources Library</a></div>
+              <div><a href="projects.html" style="color:rgba(255,255,255,0.65);text-decoration:none">💡 Project Showcase</a></div>
+              <div><a href="register.html" style="color:rgba(255,255,255,0.65);text-decoration:none">📝 Event Registration</a></div>
+              <div><a href="contact.html" style="color:rgba(255,255,255,0.65);text-decoration:none">💬 Contact / Enquiry</a></div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="social-5" style="display:flex;align-items:center;padding:14px 24px">
-        <p class="social-6">Let's talk social</p>
-        <p class="social-7">&nbsp;#SIIET&nbsp;</p>
-        <div style="display:flex;gap:14px;margin-left:12px">
-          <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank" style="color:rgba(255,255,255,0.6);font-size:18px;text-decoration:none">📷</a>
+      <!-- Social bar -->
+      <div style="display:flex;align-items:center;padding:14px 28px;border-top:1px solid rgba(255,255,255,0.07);gap:12px;flex-wrap:wrap;background:#050510">
+        <span style="font-size:12px;color:rgba(255,255,255,0.7);font-weight:700">Let's talk social</span>
+        <span style="font-size:12px;color:#e63946;font-weight:800">&nbsp;#SIIET&nbsp;</span>
+        <div style="display:flex;gap:14px;margin-left:8px">
+          <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank" style="color:rgba(255,255,255,0.6);font-size:18px;text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='#e63946'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">📷</a>
           <a href="" style="color:rgba(255,255,255,0.6);font-size:18px;text-decoration:none">💬</a>
           <a href="" style="color:rgba(255,255,255,0.6);font-size:18px;text-decoration:none">📩</a>
+          <a href="" style="color:rgba(255,255,255,0.6);font-size:18px;text-decoration:none">🐦</a>
         </div>
       </div>
-      <footer style="background:#040408;color:rgba(255,255,255,0.4);text-align:center;padding:16px;font-size:12px">
+      <div style="background:#040408;color:rgba(255,255,255,0.4);text-align:center;padding:14px;font-size:12px;border-top:1px solid rgba(255,255,255,0.05)">
         © 2025 Neural Nexus Group — AI &amp; DS Club, SIIET. All rights reserved.
-      </footer>
+      </div>
     </div>
 
   </div><!-- /container -->
