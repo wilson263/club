@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAkYeTlfnicPo1JczB4rZZj61UnHFbvqVE",
   authDomain: "neuralnexus-be2c7.firebaseapp.com",
   projectId: "neuralnexus-be2c7",
-  storageBucket: "neuralnexus-be2c7.appspot.com",
+  storageBucket: "neuralnexus-be2c7.firebasestorage.app",
   messagingSenderId: "1094362929898",
   appId: "1:1094362929898:web:2c48716b8e23bbe05bd593",
   measurementId: "G-NCXVDWM2GP"
@@ -336,6 +336,31 @@ async function loadStats() {
 }
 function loadDashboardData() { loadStats(); }
 
+// ─── STORAGE UPLOAD HELPER (REST API — bypasses SDK CORS issues) ──────────────
+async function uploadFileToStorage(file, storagePath, onProgress) {
+  const bucket = firebaseConfig.storageBucket;
+  const idToken = await currentUser.getIdToken(true);
+  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket)}/o?uploadType=media&name=${encodeURIComponent(storagePath)}`;
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", uploadUrl);
+    xhr.setRequestHeader("Authorization", "Firebase " + idToken);
+    xhr.setRequestHeader("Content-Type", file.type || "image/jpeg");
+    xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const data = JSON.parse(xhr.responseText);
+        const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket)}/o/${encodeURIComponent(storagePath)}?alt=media&token=${data.downloadTokens}`;
+        resolve(downloadUrl);
+      } else {
+        reject(new Error(`Storage upload failed (${xhr.status}): ${xhr.responseText}`));
+      }
+    };
+    xhr.onerror = () => reject(new Error("Network error during upload"));
+    xhr.send(file);
+  });
+}
+
 // ─── HOME IMAGES ──────────────────────────────────
 async function uploadHomeImages(files) {
   if (!files.length) return;
@@ -345,27 +370,18 @@ async function uploadHomeImages(files) {
   try {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const ref  = storage.ref(`home_images/${Date.now()}_${file.name}`);
-      const task = ref.put(file);
-      await new Promise((resolve, reject) => {
-        task.on("state_changed",
-          snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
-          err => reject(err),
-          async () => {
-            try {
-              const url = await ref.getDownloadURL();
-              await db.collection("home_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
-              resolve();
-            } catch(e) { reject(e); }
-          }
-        );
+      const path = `home_images/${Date.now()}_${file.name}`;
+      const url = await uploadFileToStorage(file, path, pct => {
+        fill.style.width = ((i / files.length + pct / files.length) * 100) + "%";
       });
+      await db.collection("home_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
     }
+    fill.style.width = "100%";
     showToast(`${files.length} image(s) uploaded!`, "success");
     loadHomeImages();
   } catch(e) {
     console.error("Home image upload error:", e);
-    showToast("Upload failed: " + (e.message || "Unknown error. Check storage rules."), "error");
+    showToast("Upload failed: " + (e.message || "Unknown error"), "error");
   } finally {
     wrapper.style.display = "none"; fill.style.width = "0%";
     document.getElementById("home-file-input").value = "";
@@ -507,27 +523,18 @@ async function uploadGalleryImages(files) {
   try {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const ref  = storage.ref(`gallery_images/${Date.now()}_${file.name}`);
-      const task = ref.put(file);
-      await new Promise((resolve, reject) => {
-        task.on("state_changed",
-          snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
-          err => reject(err),
-          async () => {
-            try {
-              const url = await ref.getDownloadURL();
-              await db.collection("gallery_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
-              resolve();
-            } catch(e) { reject(e); }
-          }
-        );
+      const path = `gallery_images/${Date.now()}_${file.name}`;
+      const url = await uploadFileToStorage(file, path, pct => {
+        fill.style.width = ((i / files.length + pct / files.length) * 100) + "%";
       });
+      await db.collection("gallery_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
     }
+    fill.style.width = "100%";
     showToast(`${files.length} photo(s) uploaded!`, "success");
     loadGalleryImages();
   } catch(e) {
     console.error("Gallery image upload error:", e);
-    showToast("Upload failed: " + (e.message || "Unknown error. Check storage rules."), "error");
+    showToast("Upload failed: " + (e.message || "Unknown error"), "error");
   } finally {
     wrapper.style.display = "none"; fill.style.width = "0%";
     document.getElementById("gallery-file-input").value = "";
