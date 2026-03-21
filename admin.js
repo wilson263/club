@@ -396,6 +396,7 @@ function previewEventImage(input) {
 }
 
 async function addEvent() {
+  if (!checkAuth()) return;
   const title = document.getElementById("evt-title").value.trim();
   const type  = document.getElementById("evt-type").value;
   const date  = document.getElementById("evt-date").value;
@@ -427,7 +428,7 @@ async function addEvent() {
     document.getElementById("evt-image-input").value = "";
     document.getElementById("evt-preview-area").innerHTML = `<div style="font-size:28px">🖼️</div><div style="font-size:14px">Click to select image</div>`;
     loadEvents();
-  } catch(e) { showToast("Error: " + e.message, "error"); }
+  } catch(e) { handleFirebaseError(e, "addEvent"); }
   wrapper.style.display = "none"; fill.style.width = "0%";
 }
 
@@ -678,6 +679,7 @@ function openAchievementModal(existing) {
 function closeAchievementModal() { document.getElementById("ach-modal").classList.remove("open"); }
 
 async function saveAchievement() {
+  if (!checkAuth()) return;
   const id    = document.getElementById("ach-edit-id").value;
   const emoji = document.getElementById("ach-emoji").value.trim() || "🏆";
   const cat   = document.getElementById("ach-cat").value.trim();
@@ -691,7 +693,7 @@ async function saveAchievement() {
     if (id) { await db.collection("achievements").doc(id).update(data); showToast("Achievement updated!", "success"); }
     else { data.addedBy = currentUser.email; data.addedAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("achievements").add(data); showToast("Achievement added!", "success"); }
     closeAchievementModal(); loadAchievements(); loadStats();
-  } catch(e) { showToast("Error saving achievement: " + e.message, "error"); }
+  } catch(e) { handleFirebaseError(e, "saveAchievement"); }
 }
 
 async function deleteAchievement(docId) {
@@ -786,6 +788,7 @@ function previewMemberPhoto(input) {
 }
 
 async function saveMember() {
+  if (!checkAuth()) return;
   const id    = document.getElementById("member-edit-id").value;
   const name  = document.getElementById("member-name").value.trim();
   const year  = document.getElementById("member-year").value.trim();
@@ -829,7 +832,7 @@ async function saveMember() {
     closeMemberModal();
     loadMembers();
     loadStats();
-  } catch(e) { showToast("Error saving member: " + e.message, "error"); console.error(e); }
+  } catch(e) { handleFirebaseError(e, "saveMember"); }
 
   wrapper.style.display = "none"; fill.style.width = "0%";
 }
@@ -943,6 +946,7 @@ function previewFacultyPhoto(input) {
 }
 
 async function saveFaculty() {
+  if (!checkAuth()) return;
   const id            = document.getElementById("faculty-edit-id").value;
   const name          = document.getElementById("faculty-name").value.trim();
   const qualification = document.getElementById("faculty-qual").value.trim();
@@ -987,7 +991,7 @@ async function saveFaculty() {
     closeFacultyModal();
     loadFaculty();
     loadStats();
-  } catch(e) { showToast("Error saving faculty: " + e.message, "error"); console.error(e); }
+  } catch(e) { handleFirebaseError(e, "saveFaculty"); }
 
   wrapper.style.display = "none"; fill.style.width = "0%";
 }
@@ -1029,6 +1033,7 @@ async function loadAnnouncements() {
 }
 
 async function addAnnouncement() {
+  if (!checkAuth()) return;
   const text = document.getElementById("ann-text").value.trim();
   if (!text) { showToast("Please enter announcement text", "error"); return; }
   try {
@@ -1041,7 +1046,7 @@ async function addAnnouncement() {
     document.getElementById("ann-text").value = "";
     showToast("Announcement added!", "success");
     loadAnnouncements();
-  } catch(e) { showToast("Error: " + e.message, "error"); console.error("addAnnouncement error:", e); }
+  } catch(e) { handleFirebaseError(e, "addAnnouncement"); }
 }
 
 async function deleteAnnouncement(docId) {
@@ -1121,6 +1126,7 @@ function openResourceModal(existing) {
 function closeResourceModal() { document.getElementById("resource-modal").classList.remove("open"); }
 
 async function saveResource() {
+  if (!checkAuth()) return;
   const id   = document.getElementById("resource-edit-id").value;
   const type = document.getElementById("resource-type").value;
   const cat  = document.getElementById("resource-category").value.trim();
@@ -1135,7 +1141,7 @@ async function saveResource() {
     else { data.addedBy = currentUser.email; data.addedAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("resources").add(data); showToast("Resource added!", "success"); }
     closeResourceModal();
     loadResources();
-  } catch(e) { showToast("Error saving resource: " + e.message, "error"); }
+  } catch(e) { handleFirebaseError(e, "saveResource"); }
 }
 
 async function deleteResource(docId) {
@@ -1203,6 +1209,7 @@ function openProjectModal(existing) {
 function closeProjectModal() { document.getElementById("project-modal").classList.remove("open"); }
 
 async function saveProject() {
+  if (!checkAuth()) return;
   const id    = document.getElementById("project-edit-id").value;
   const title = document.getElementById("project-title").value.trim();
   const team  = document.getElementById("project-team").value.trim();
@@ -1216,7 +1223,7 @@ async function saveProject() {
     else { data.addedBy = currentUser.email; data.addedAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("projects").add(data); showToast("Project added!", "success"); }
     closeProjectModal();
     loadProjects();
-  } catch(e) { showToast("Error saving project: " + e.message, "error"); }
+  } catch(e) { handleFirebaseError(e, "saveProject"); }
 }
 
 async function deleteProject(docId) {
@@ -1405,6 +1412,29 @@ function renderAdminList(containerId, items, renderFn) {
   el.innerHTML = items.map(renderFn).join("");
 }
 
+// Helper: verify admin is logged in before any write
+function checkAuth() {
+  if (!currentUser) {
+    showToast("You are not logged in. Please refresh and log in again.", "error");
+    return false;
+  }
+  return true;
+}
+
+// Helper: convert Firebase errors into readable messages
+function handleFirebaseError(e, label) {
+  console.error(label + " error:", e);
+  let msg = e.message || "Unknown error";
+  if (e.code === "permission-denied" || msg.includes("permission") || msg.includes("insufficient")) {
+    msg = "Permission denied. Your Firebase security rules need to be updated — see the README or contact the site admin.";
+  } else if (e.code === "unavailable" || msg.includes("network")) {
+    msg = "Network error. Please check your internet connection and try again.";
+  } else if (e.code === "unauthenticated") {
+    msg = "Not authenticated. Please log out and log in again.";
+  }
+  showToast("❌ " + msg, "error");
+}
+
 // ── ALUMNI ──────────────────────────────────────────────
 async function loadAdminAlumni() {
   const el = document.getElementById("alumni-admin-list");
@@ -1423,6 +1453,7 @@ async function loadAdminAlumni() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function saveAlumni() {
+  if (!checkAuth()) return;
   const name = document.getElementById("al-name").value.trim();
   const batch = document.getElementById("al-batch").value.trim();
   if (!name || !batch) { showToast("Name and batch year are required","error"); return; }
@@ -1431,7 +1462,7 @@ async function saveAlumni() {
     showToast("Alumni added!","success");
     ["al-name","al-batch","al-company","al-role","al-linkedin"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminAlumni();
-  } catch(e) { showToast("Error saving alumni: " + e.message, "error"); console.error("saveAlumni error:", e); }
+  } catch(e) { handleFirebaseError(e, "saveAlumni"); }
 }
 
 // ── LEADERBOARD ─────────────────────────────────────────
@@ -1453,6 +1484,7 @@ async function loadAdminLeaderboard() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function saveLeaderboard() {
+  if (!checkAuth()) return;
   const name = document.getElementById("lb-name").value.trim();
   const pts = parseInt(document.getElementById("lb-points").value)||0;
   if (!name) { showToast("Name is required","error"); return; }
@@ -1462,7 +1494,7 @@ async function saveLeaderboard() {
     showToast("Entry added!","success");
     ["lb-name","lb-dept","lb-points","lb-badges"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminLeaderboard();
-  } catch(e) { showToast("Error saving entry: " + e.message, "error"); console.error("saveLeaderboard error:", e); }
+  } catch(e) { handleFirebaseError(e, "saveLeaderboard"); }
 }
 
 // ── PLACEMENTS ──────────────────────────────────────────
@@ -1483,6 +1515,7 @@ async function loadAdminPlacements() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function savePlacement() {
+  if (!checkAuth()) return;
   const name = document.getElementById("pl-name").value.trim();
   const company = document.getElementById("pl-company").value.trim();
   if (!name || !company) { showToast("Name and company are required","error"); return; }
@@ -1491,7 +1524,7 @@ async function savePlacement() {
     showToast("Placement added!","success");
     ["pl-name","pl-company","pl-role","pl-year","pl-package","pl-emoji"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminPlacements();
-  } catch(e) { showToast("Error saving placement: " + e.message, "error"); console.error("savePlacement error:", e); }
+  } catch(e) { handleFirebaseError(e, "savePlacement"); }
 }
 
 // ── BLOG ────────────────────────────────────────────────
@@ -1512,6 +1545,7 @@ async function loadAdminBlog() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function saveBlog() {
+  if (!checkAuth()) return;
   const title = document.getElementById("bl-title").value.trim();
   if (!title) { showToast("Title is required","error"); return; }
   try {
@@ -1519,7 +1553,7 @@ async function saveBlog() {
     showToast("Article published!","success");
     ["bl-title","bl-author","bl-cat","bl-url","bl-cover","bl-excerpt","bl-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminBlog();
-  } catch(e) { showToast("Error publishing article: " + e.message, "error"); console.error("saveBlog error:", e); }
+  } catch(e) { handleFirebaseError(e, "saveBlog"); }
 }
 
 // ── NEWSLETTER ──────────────────────────────────────────
@@ -1549,6 +1583,7 @@ async function checkQuizStatus() {
   } catch(e) { el.textContent = "Error checking quiz status."; console.error("checkQuizStatus error:", e); }
 }
 async function startQuizSession() {
+  if (!checkAuth()) return;
   const q = document.getElementById("qz-question").value.trim();
   const opts = document.getElementById("qz-options").value.trim().split("\n").map(o=>o.trim()).filter(Boolean);
   const correct = parseInt(document.getElementById("qz-correct").value)-1;
@@ -1558,14 +1593,15 @@ async function startQuizSession() {
     await db.collection("quiz_sessions").where("active","==",true).get().then(snap=>Promise.all(snap.docs.map(d=>d.ref.update({active:false}))));
     await db.collection("quiz_sessions").add({ question: q, options: opts, correctIndex: correct, timer, active: true, questionNumber: Date.now(), startedAt: firebase.firestore.FieldValue.serverTimestamp() });
     showToast("Quiz is now LIVE!","success"); checkQuizStatus();
-  } catch(e) { showToast("Error starting quiz: " + e.message, "error"); console.error("startQuizSession error:", e); }
+  } catch(e) { handleFirebaseError(e, "startQuizSession"); }
 }
 async function stopQuizSession() {
+  if (!checkAuth()) return;
   try {
     const snap = await db.collection("quiz_sessions").where("active","==",true).get();
     await Promise.all(snap.docs.map(d=>d.ref.update({active:false})));
     showToast("Quiz ended","info"); checkQuizStatus();
-  } catch(e) { showToast("Error stopping quiz: " + e.message, "error"); console.error("stopQuizSession error:", e); }
+  } catch(e) { handleFirebaseError(e, "stopQuizSession"); }
 }
 
 // ── FEEDBACK ────────────────────────────────────────────
@@ -1625,6 +1661,7 @@ async function toggleAttSession(id, active, cb) {
   } catch(e) { showToast("Error updating session: " + e.message, "error"); console.error("toggleAttSession error:", e); }
 }
 async function createAttendanceSession() {
+  if (!checkAuth()) return;
   const title = document.getElementById("att-title").value.trim();
   const code = document.getElementById("att-code-inp").value.trim().toUpperCase();
   const date = document.getElementById("att-date").value;
@@ -1634,7 +1671,7 @@ async function createAttendanceSession() {
     showToast("Session created! Show code: "+code,"success");
     ["att-title","att-code-inp","att-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminAttendance();
-  } catch(e) { showToast("Error creating session: " + e.message, "error"); console.error("createAttendanceSession error:", e); }
+  } catch(e) { handleFirebaseError(e, "createAttendanceSession"); }
 }
 
 // ── CERTIFICATES ─────────────────────────────────────────
@@ -1652,6 +1689,7 @@ async function loadAdminCertificates() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function issueCertificate() {
+  if (!checkAuth()) return;
   const issuedTo = document.getElementById("cert-to").value.trim();
   const event = document.getElementById("cert-event").value.trim();
   const date = document.getElementById("cert-date").value;
@@ -1663,7 +1701,7 @@ async function issueCertificate() {
     showToast("Certificate issued! Code: "+code,"success");
     ["cert-to","cert-event","cert-date","cert-code-inp"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminCertificates();
-  } catch(e) { showToast("Error issuing certificate: " + e.message, "error"); console.error("issueCertificate error:", e); }
+  } catch(e) { handleFirebaseError(e, "issueCertificate"); }
 }
 
 // ── PRESS ────────────────────────────────────────────────
@@ -1685,6 +1723,7 @@ async function loadAdminPress() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function savePress() {
+  if (!checkAuth()) return;
   const title = document.getElementById("pr-title").value.trim();
   if (!title) { showToast("Headline is required","error"); return; }
   try {
@@ -1692,7 +1731,7 @@ async function savePress() {
     showToast("Coverage added!","success");
     ["pr-title","pr-source","pr-date","pr-url","pr-icon"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminPress();
-  } catch(e) { showToast("Error saving coverage: " + e.message, "error"); console.error("savePress error:", e); }
+  } catch(e) { handleFirebaseError(e, "savePress"); }
 }
 
 // ── OPEN SOURCE ──────────────────────────────────────────
@@ -1713,6 +1752,7 @@ async function loadAdminOSS() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function saveOSS() {
+  if (!checkAuth()) return;
   const title = document.getElementById("oss-title").value.trim();
   if (!title) { showToast("Repo name is required","error"); return; }
   try {
@@ -1720,7 +1760,7 @@ async function saveOSS() {
     showToast("Repository added!","success");
     ["oss-title","oss-desc","oss-lang","oss-stars","oss-link"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminOSS();
-  } catch(e) { showToast("Error saving repository: " + e.message, "error"); console.error("saveOSS error:", e); }
+  } catch(e) { handleFirebaseError(e, "saveOSS"); }
 }
 
 // ── MINUTES ──────────────────────────────────────────────
@@ -1745,6 +1785,7 @@ async function loadAdminMinutes() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function saveMinutes() {
+  if (!checkAuth()) return;
   const title = document.getElementById("mn-title").value.trim();
   const fileUrl = document.getElementById("mn-url").value.trim();
   const date = document.getElementById("mn-date").value;
@@ -1754,7 +1795,7 @@ async function saveMinutes() {
     showToast("Minutes uploaded!","success");
     ["mn-title","mn-date","mn-type","mn-url"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminMinutes();
-  } catch(e) { showToast("Error uploading minutes: " + e.message, "error"); console.error("saveMinutes error:", e); }
+  } catch(e) { handleFirebaseError(e, "saveMinutes"); }
 }
 
 // ── SPONSORS ─────────────────────────────────────────────
@@ -1778,6 +1819,7 @@ async function loadAdminSponsors() {
   } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
 }
 async function saveSponsor() {
+  if (!checkAuth()) return;
   const name = document.getElementById("sp-name").value.trim();
   if (!name) { showToast("Company name is required","error"); return; }
   try {
@@ -1785,7 +1827,7 @@ async function saveSponsor() {
     showToast("Sponsor added!","success");
     ["sp-name","sp-website","sp-logo"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminSponsors();
-  } catch(e) { showToast("Error saving sponsor: " + e.message, "error"); console.error("saveSponsor error:", e); }
+  } catch(e) { handleFirebaseError(e, "saveSponsor"); }
 }
 
 // ── SHARED DELETE HELPER ──────────────────────────────────
