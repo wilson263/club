@@ -284,54 +284,61 @@ async function loadPublicProjects() {
 async function loadUpcomingEventsForRegistration(selectId) {
   const id = selectId || "reg-event-select";
   const select = document.getElementById(id);
-  if (!select || !db) return;
+  if (!select) return;
+
+  select.innerHTML = '<option value="">— Loading announcements… —</option>';
+
+  if (!db) {
+    select.innerHTML = '<option value="">Service unavailable — try refreshing</option>';
+    return;
+  }
+
   try {
+    const annSnap = await db.collection("announcements").get();
+    const evSnap  = await db.collection("events").get();
+
     select.innerHTML = '<option value="">— Select an Event / Announcement —</option>';
-    let hasOptions = false;
+    let count = 0;
 
-    // Load upcoming events
-    try {
-      const evSnap = await db.collection("events").where("type", "==", "upcoming").orderBy("addedAt", "desc").get();
-      if (!evSnap.empty) {
-        const grp = document.createElement("optgroup");
-        grp.label = "📅 Upcoming Events";
-        evSnap.forEach(doc => {
-          const d = doc.data();
-          const opt = document.createElement("option");
-          opt.value = doc.id;
-          opt.dataset.title = d.title || "";
-          opt.textContent = (d.title || "Untitled Event") + (d.date ? " (" + d.date + ")" : "");
-          grp.appendChild(opt);
-        });
-        select.appendChild(grp);
-        hasOptions = true;
-      }
-    } catch(e) { console.warn("Events load error:", e); }
-
-    // Load announcements
-    try {
-      const annSnap = await db.collection("announcements").orderBy("addedAt", "desc").get();
-      if (!annSnap.empty) {
-        const grp = document.createElement("optgroup");
-        grp.label = "📢 Announcements";
-        annSnap.forEach(doc => {
-          const d = doc.data();
-          const text = d.title || d.text || "Untitled Announcement";
-          const opt = document.createElement("option");
-          opt.value = "ann_" + doc.id;
-          opt.dataset.title = text;
-          opt.textContent = text.length > 60 ? text.substring(0, 60) + "…" : text;
-          grp.appendChild(opt);
-        });
-        select.appendChild(grp);
-        hasOptions = true;
-      }
-    } catch(e) { console.warn("Announcements load error:", e); }
-
-    if (!hasOptions) {
-      select.innerHTML = '<option value="">No events or announcements available</option>';
+    if (!evSnap.empty) {
+      const grp = document.createElement("optgroup");
+      grp.label = "📅 Events";
+      evSnap.forEach(doc => {
+        const d = doc.data();
+        const title = d.title || "Untitled Event";
+        const opt = document.createElement("option");
+        opt.value = doc.id;
+        opt.dataset.title = title;
+        opt.textContent = title + (d.date ? " (" + d.date + ")" : "");
+        grp.appendChild(opt);
+        count++;
+      });
+      select.appendChild(grp);
     }
-  } catch(e) { console.warn("Error loading registration options:", e); }
+
+    if (!annSnap.empty) {
+      const grp = document.createElement("optgroup");
+      grp.label = "📢 Announcements";
+      annSnap.forEach(doc => {
+        const d = doc.data();
+        const text = d.title || d.text || "Untitled Announcement";
+        const opt = document.createElement("option");
+        opt.value = "ann_" + doc.id;
+        opt.dataset.title = text;
+        opt.textContent = text.length > 65 ? text.substring(0, 65) + "…" : text;
+        grp.appendChild(opt);
+        count++;
+      });
+      select.appendChild(grp);
+    }
+
+    if (count === 0) {
+      select.innerHTML = '<option value="">No announcements yet — check back soon</option>';
+    }
+  } catch(e) {
+    console.warn("Error loading registration options:", e);
+    select.innerHTML = '<option value="">Could not load — please refresh the page</option>';
+  }
 }
 
 async function submitRegistration(event) {
