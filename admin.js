@@ -337,58 +337,55 @@ async function loadStats() {
 function loadDashboardData() { loadStats(); }
 
 // ─── STORAGE UPLOAD HELPER ────────────────────────────────────────────────────
-// Tries default bucket first, then legacy appspot.com bucket as fallback.
-function _sdkUpload(storageInstance, file, storagePath, onProgress) {
-  return new Promise((resolve, reject) => {
-    const task  = storageInstance.ref(storagePath).put(file);
-    const timer = setTimeout(() => { task.cancel(); reject(new Error("Upload timed out after 90s")); }, 90000);
-    task.on("state_changed",
-      snap => { if (onProgress) onProgress(snap.bytesTransferred / snap.totalBytes * 0.95); },
-      err  => { clearTimeout(timer); reject(err); },
-      ()   => {
-        clearTimeout(timer);
-        task.snapshot.ref.getDownloadURL()
-          .then(u => { if (onProgress) onProgress(1); resolve(u); })
-          .catch(reject);
-      }
-    );
-  });
-}
-
+// ─── STORAGE UPLOAD — uses Firebase Storage REST API directly via XHR
+// This bypasses the compat SDK bucket connectivity issues entirely and works
+// with both firebasestorage.app and appspot.com bucket formats.
 async function uploadFileToStorage(file, storagePath, onProgress) {
-  // Attempt 1 — default bucket (firebasestorage.app)
+  if (!auth.currentUser) throw new Error("Not authenticated");
+
+  let token;
   try {
-    return await _sdkUpload(storage, file, storagePath, onProgress);
-  } catch (e1) {
-    const code1 = e1.code || "";
-    console.warn("Attempt 1 failed:", code1, e1.message);
-
-    // If it's a clear auth/rules error, don't bother trying other buckets
-    if (code1 === "storage/unauthorized" || code1 === "storage/unauthenticated") {
-      throw new Error("Permission denied — check Firebase Storage security rules (storage/unauthorized)");
-    }
-
-    // Attempt 2 — legacy appspot.com bucket (Firebase compat SDK prefers this format)
-    const legacyBucket = firebaseConfig.projectId + ".appspot.com";
-    console.warn(`Trying legacy bucket: gs://${legacyBucket}`);
-    try {
-      const altStorage = firebase.app().storage(`gs://${legacyBucket}`);
-      return await _sdkUpload(altStorage, file, storagePath, onProgress);
-    } catch (e2) {
-      const code2 = e2.code || "";
-      console.warn("Attempt 2 failed:", code2, e2.message);
-
-      // Build a helpful error message based on the most informative code
-      const code = code2 || code1;
-      if (code === "storage/bucket-not-found" || code === "storage/unknown") {
-        throw new Error(
-          "Firebase Storage is not reachable. Please make sure Storage is enabled in your Firebase Console " +
-          "(Firebase Console → Storage → Get Started) and that your security rules allow writes. [" + code + "]"
-        );
-      }
-      throw new Error(`Upload failed [${code}]: ${e2.message}`);
-    }
+    token = await auth.currentUser.getIdToken(true);
+  } catch (e) {
+    throw new Error("Failed to get auth token: " + e.message);
   }
+
+  const bucket  = firebaseConfig.storageBucket;
+  const encoded = encodeURIComponent(storagePath);
+  const url     = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o?uploadType=media&name=${encoded}`;
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Authorization", "Firebase " + token);
+    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+
+    xhr.upload.addEventListener("progress", e => {
+      if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total * 0.95);
+    });
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const data  = JSON.parse(xhr.responseText);
+          const token = data.downloadTokens;
+          const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encoded}?alt=media&token=${token}`;
+          if (onProgress) onProgress(1);
+          resolve(downloadUrl);
+        } catch (e) {
+          reject(new Error("Failed to parse upload response: " + e.message));
+        }
+      } else {
+        let msg = `Upload failed (${xhr.status})`;
+        try { const d = JSON.parse(xhr.responseText); if (d.error) msg = d.error.message || msg; } catch (_) {}
+        reject(new Error(msg));
+      }
+    });
+
+    xhr.addEventListener("error",  () => reject(new Error("Network error during upload — check your connection")));
+    xhr.addEventListener("abort",  () => reject(new Error("Upload was aborted")));
+    xhr.send(file);
+  });
 }
 
 // ─── HOME IMAGES ──────────────────────────────────
