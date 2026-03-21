@@ -41,6 +41,7 @@ if (isConfigured) {
         isPermanentAdmin = cachedRole === "true";
         updateSidebarForRole(user);
         showDashboard();
+        logActivity("login", "Admin signed in");
         loadCurrentUser(user);
       } else if (user.email === PERMANENT_ADMIN_EMAIL) {
         isPermanentAdmin = true;
@@ -139,6 +140,7 @@ function updateSidebarForRole(user) {
     document.getElementById("admin-mgmt-btn").style.display    = "flex";
     document.getElementById("guide-admin").style.display       = "flex";
     document.getElementById("quick-add-admin-btn").style.display = "flex";
+    const clrBtn = document.getElementById("clear-log-btn"); if (clrBtn) clrBtn.style.display = "inline-flex";
   } else {
     document.getElementById("admin-mgmt-label").style.display  = "none";
     document.getElementById("admin-mgmt-btn").style.display    = "none";
@@ -425,6 +427,7 @@ async function addEvent() {
     }
     await db.collection("events").add({ title, type, date, venue, desc, imageUrl, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
     showToast("Event added!", "success");
+    await logActivity("event", `Added new event: "${title}"`);
     ["evt-title","evt-date","evt-venue","evt-desc"].forEach(id => document.getElementById(id).value = "");
     document.getElementById("evt-image-input").value = "";
     document.getElementById("evt-preview-area").innerHTML = `<div style="font-size:28px">🖼️</div><div style="font-size:14px">Click to select image</div>`;
@@ -482,7 +485,7 @@ async function deleteEvent(docId, imageUrl) {
   try {
     await db.collection("events").doc(docId).delete();
     if (imageUrl) await storage.refFromURL(imageUrl).delete().catch(() => {});
-    showToast("Event deleted", "info"); loadEvents();
+    showToast("Event deleted", "info"); await logActivity("event", "Deleted an event"); loadEvents();
   } catch(e) { showToast("Error deleting event", "error"); }
 }
 
@@ -694,8 +697,8 @@ async function saveAchievement() {
   if (!title) { showToast("Please enter a title", "error"); return; }
   const data = { emoji, category: cat, year, title, description: desc, badge, updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
   try {
-    if (id) { await db.collection("achievements").doc(id).update(data); showToast("Achievement updated!", "success"); }
-    else { data.addedBy = currentUser.email; data.addedAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("achievements").add(data); showToast("Achievement added!", "success"); }
+    if (id) { await db.collection("achievements").doc(id).update(data); showToast("Achievement updated!", "success"); await logActivity("achievement", `Updated achievement: "${title}"`); }
+    else { data.addedBy = currentUser.email; data.addedAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection("achievements").add(data); showToast("Achievement added!", "success"); await logActivity("achievement", `Added achievement: "${title}"`); }
     closeAchievementModal(); loadAchievements(); loadStats();
   } catch(e) { handleFirebaseError(e, "saveAchievement"); }
 }
@@ -704,7 +707,7 @@ async function deleteAchievement(docId) {
   if (!confirm("Delete this achievement?")) return;
   try {
     await db.collection("achievements").doc(docId).delete();
-    showToast("Achievement deleted", "info"); loadAchievements(); loadStats();
+    showToast("Achievement deleted", "info"); await logActivity("achievement", "Deleted an achievement"); loadAchievements(); loadStats();
   } catch(e) { showToast("Error deleting achievement", "error"); }
 }
 
@@ -827,11 +830,13 @@ async function saveMember() {
     if (id) {
       await db.collection("club_members").doc(id).update(data);
       showToast("Member updated!", "success");
+      await logActivity("member", `Updated member: "${name}"`);
     } else {
       data.addedBy = currentUser.email;
       data.addedAt = firebase.firestore.FieldValue.serverTimestamp();
       await db.collection("club_members").add(data);
       showToast("Member added!", "success");
+      await logActivity("member", `Added member: "${name}"`);
     }
     closeMemberModal();
     loadMembers();
@@ -846,7 +851,7 @@ async function deleteMember(docId, photoUrl) {
   try {
     await db.collection("club_members").doc(docId).delete();
     if (photoUrl) await storage.refFromURL(photoUrl).delete().catch(() => {});
-    showToast("Member deleted", "info"); loadMembers(); loadStats();
+    showToast("Member deleted", "info"); await logActivity("member", "Removed a member"); loadMembers(); loadStats();
   } catch(e) { showToast("Error deleting member", "error"); }
 }
 
@@ -1932,4 +1937,73 @@ async function deleteDoc(collection, docId, reloadFn) {
     showToast("Deleted","info");
     if (reloadFn) reloadFn();
   } catch(e) { showToast("Error deleting","error"); }
+}
+
+// ─── ACTIVITY LOG ─────────────────────────────────
+async function logActivity(action, details) {
+  if (!currentUser || !db) return;
+  try {
+    await db.collection("activity_logs").add({
+      action,
+      details,
+      adminEmail: currentUser.email,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) { /* silent fail */ }
+}
+
+async function loadActivityLog() {
+  const container = document.getElementById("activity-log-list");
+  if (!container) return;
+  container.innerHTML = `<div class="hint-text" style="padding:20px">Loading...</div>`;
+  const filter = document.getElementById("activity-filter") ? document.getElementById("activity-filter").value : "";
+  try {
+    const snap = await db.collection("activity_logs").orderBy("timestamp", "desc").limit(100).get();
+    let docs = snap.docs;
+    if (filter) docs = docs.filter(d => d.data().action === filter);
+    if (docs.length === 0) {
+      container.innerHTML = `<div class="hint-text" style="text-align:center;padding:40px">No activity recorded yet.</div>`;
+      return;
+    }
+    const icons = {
+      "event":"📅","gallery":"📷","achievement":"🏆","member":"🧑‍🤝‍🧑",
+      "faculty":"👨‍🏫","announcement":"📢","resource":"📚","project":"💡",
+      "alumni":"🎓","blog":"✍️","certificate":"🛡️","placement":"💼",
+      "sponsor":"🤝","admin":"👥","quiz":"⚡","login":"🔐"
+    };
+    container.innerHTML = docs.map(doc => {
+      const d = doc.data();
+      const ts = d.timestamp ? d.timestamp.toDate() : new Date();
+      const date = ts.toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" });
+      const time = ts.toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit" });
+      const icon = icons[d.action] || "📝";
+      return `
+        <div class="activity-item">
+          <div class="activity-icon">${icon}</div>
+          <div class="activity-body">
+            <div class="activity-detail">${d.details}</div>
+            <div class="activity-meta">
+              <span class="activity-badge">${d.action}</span>
+              <span>${d.adminEmail}</span>
+              <span>${date} at ${time}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+  } catch (e) {
+    container.innerHTML = `<div class="hint-text" style="color:red;padding:20px">Failed to load activity log.</div>`;
+  }
+}
+
+async function clearActivityLog() {
+  if (!isPermanentAdmin) return showToast("Only permanent admin can clear logs.", "error");
+  if (!confirm("Delete all activity logs? This cannot be undone.")) return;
+  try {
+    const snap = await db.collection("activity_logs").get();
+    const batch = db.batch();
+    snap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    showToast("Activity log cleared.", "info");
+    loadActivityLog();
+  } catch(e) { showToast("Error clearing log.", "error"); }
 }
