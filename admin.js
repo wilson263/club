@@ -296,7 +296,7 @@ function showPanel(name) {
   if (name === "placements")      loadAdminPlacements();
   if (name === "blog")            loadAdminBlog();
   if (name === "newsletter")      loadAdminNewsletter();
-  if (name === "live-quiz")       checkQuizStatus();
+  if (name === "live-quiz")       initQuizPanel();
   if (name === "feedback-inbox")  loadAdminFeedback();
   if (name === "attendance-mgr")  loadAdminAttendance();
   if (name === "certificates")    loadAdminCertificates();
@@ -1633,291 +1633,411 @@ async function loadAdminNewsletter() {
 }
 
 // ── LIVE QUIZ ────────────────────────────────────────────
-// ── QUIZ SESSION MANAGEMENT ─────────────────────────────────────────────────
-let quizSessionId = null;
-let quizQuestions = [];
-let quizQueueIndex = 0;
-let quizFlagsUnsub = null;
-let quizPartUnsub = null;
+// ── QUIZ SYSTEM ─────────────────────────────────────────────────────────────
+let QSid = null; // active quiz session ID
+let QQuestions = []; // local question queue cache
+let QAutoTimer = null; // auto-advance timer handle
+let QPartUnsub = null; // participant listener unsub
+let QFlagUnsub = null; // flag listener unsub
+
+async function initQuizPanel() {
+  // Check if there's already an active/open session
+  try {
+    const snap = await db.collection('quiz_sessions')
+      .where('status','in',['setup','open','active'])
+      .orderBy('createdAt','desc').limit(1).get();
+    if (!snap.empty) {
+      QSid = snap.docs[0].id;
+      const d = snap.docs[0].data();
+      QQuestions = [];
+      // Load questions from Firestore
+      const qsnap = await db.collection('quiz_questions').where('sessionId','==',QSid).orderBy('order','asc').get();
+      qsnap.docs.forEach(doc => QQuestions.push({id:doc.id,...doc.data()}));
+      showQuizSessionUI(d.title, d.status);
+    }
+  } catch(e) { console.error('initQuizPanel', e); }
+}
+
+function showQuizSessionUI(title, status) {
+  document.getElementById('qz-create-area').style.display = 'none';
+  document.getElementById('qz-session-banner').style.display = 'block';
+  document.getElementById('qz-session-title').textContent = title;
+  document.getElementById('qz-addq-card').style.display = 'block';
+  document.getElementById('qz-q-count').textContent = QQuestions.length;
+  renderQuestionList();
+  const statusMap = {setup:'Setup (not open)',open:'Open — Members can join',active:'LIVE — Quiz Running',ended:'Ended'};
+  const statusColors = {setup:'#f5c842',open:'#27ae60',active:'#e63946',ended:'#aaa'};
+  const sl = document.getElementById('qz-status-label');
+  sl.textContent = statusMap[status] || status;
+  sl.style.color = statusColors[status] || '#fff';
+  if (status === 'open' || status === 'active') {
+    document.getElementById('qz-host-card').style.display = 'block';
+    startWaitingRoomListener();
+  }
+  if (status === 'active') {
+    document.getElementById('qz-scores-card').style.display = 'block';
+    loadLiveScores();
+    startFlagListener();
+  }
+}
 
 async function createQuizSession() {
   if (!checkAuth()) return;
   const title = document.getElementById('qz-title').value.trim();
-  if (!title) { showToast('Enter a quiz title.', 'error'); return; }
+  const gap = parseInt(document.getElementById('qz-gap').value) || 5;
+  const defTimer = parseInt(document.getElementById('qz-def-timer').value) || 30;
+  if (!title) { showToast('Enter a quiz title.','error'); return; }
+  if (QSid) { showToast('A session already exists. Delete it first.','error'); return; }
   try {
-    const docRef = await db.collection('quiz_sessions').add({
-      title, status: 'setup',
-      currentQuestionIndex: 0, totalQuestions: 0,
-      createdBy: currentUser.email,
+    const ref = await db.collection('quiz_sessions').add({
+      title, status:'setup', questionGap: gap, defaultTimer: defTimer,
+      totalQuestions:0, currentQuestionIndex:0,
+      createdBy: currentUser ? currentUser.email : 'admin',
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    quizSessionId = docRef.id;
-    quizQuestions = [];
-    quizQueueIndex = 0;
-    document.getElementById('qz-session-title').textContent = title;
-    document.getElementById('qz-create-section').style.display = 'none';
-    document.getElementById('qz-active-section').style.display = 'block';
-    document.getElementById('qz-session-badge').style.display = 'inline-flex';
-    document.getElementById('qz-participants-card').style.display = 'block';
-    renderQuestionQueue();
-    startQuizParticipantListener();
-    startQuizFlagListener();
-    await logActivity('quiz', 'Created quiz session: ' + title);
-    showToast('Quiz session created! Add questions and launch.', 'success');
-  } catch(e) { handleFirebaseError(e, 'createQuizSession'); }
+    QSid = ref.id; QQuestions = [];
+    document.getElementById('qz-q-timer').value = defTimer;
+    showQuizSessionUI(title, 'setup');
+    await logActivity('quiz','Created quiz session: '+title);
+    showToast('Session created! Add your questions now.','success');
+  } catch(e) { handleFirebaseError(e,'createQuizSession'); }
+}
+
+async function openQuizRegistration() {
+  if (!QSid) { showToast('Create a session first.','error'); return; }
+  if (!QQuestions.length) { showToast('Add at least one question before opening.','error'); return; }
+  if (!confirm('Open quiz to registered members? They can now join the waiting room.')) return;
+  try {
+    // Update totalQuestions on all questions
+    const batch = db.batch();
+    QQuestions.forEach(q => batch.update(db.collection('quiz_questions').doc(q.id),{totalQuestions:QQuestions.length}));
+    batch.update(db.collection('quiz_sessions').doc(QSid),{status:'open',totalQuestions:QQuestions.length});
+    await batch.commit();
+    document.getElementById('qz-status-label').textContent = 'Open — Members can join';
+    document.getElementById('qz-status-label').style.color = '#27ae60';
+    document.getElementById('qz-host-card').style.display = 'block';
+    startWaitingRoomListener();
+    startFlagListener();
+    await logActivity('quiz','Opened quiz for registration: '+(QQuestions.length)+' questions');
+    showToast('Quiz is open! Members can now join the waiting room.','success');
+  } catch(e) { handleFirebaseError(e,'openQuizRegistration'); }
 }
 
 async function addQuizQuestion() {
-  if (!quizSessionId) { showToast('Create a session first.', 'error'); return; }
+  if (!QSid) { showToast('Create a session first.','error'); return; }
   const q = document.getElementById('qz-question').value.trim();
   const a = document.getElementById('qz-opt-a').value.trim();
   const b = document.getElementById('qz-opt-b').value.trim();
   const c = document.getElementById('qz-opt-c').value.trim();
   const d = document.getElementById('qz-opt-d').value.trim();
   const correct = parseInt(document.getElementById('qz-correct').value);
-  const timer = parseInt(document.getElementById('qz-timer').value) || 30;
-  if (!q || !a || !b) { showToast('Question, Option A and B are required.', 'error'); return; }
-  const options = [a, b, ...(c ? [c] : []), ...(d ? [d] : [])];
-  if (correct >= options.length) { showToast('Correct answer option does not exist.', 'error'); return; }
-
-  const order = quizQuestions.length + 1;
+  const timer = parseInt(document.getElementById('qz-q-timer').value) || 30;
+  if (!q||!a||!b) { showToast('Question, Option A and B are required.','error'); return; }
+  const options = [a,b,...(c?[c]:[]),...(d?[d]:[])];
+  if (correct>=options.length) { showToast('Correct option doesn\'t exist.','error'); return; }
+  const order = QQuestions.length + 1;
   try {
-    const docRef = await db.collection('quiz_questions').add({
-      sessionId: quizSessionId, order, question: q,
-      options, correctIndex: correct, timer, status: 'waiting',
-      totalQuestions: order, addedAt: firebase.firestore.FieldValue.serverTimestamp()
+    const ref = await db.collection('quiz_questions').add({
+      sessionId:QSid, order, question:q, options, correctIndex:correct,
+      timer, status:'waiting', totalQuestions:order,
+      addedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    quizQuestions.push({ id: docRef.id, order, question: q, options, correctIndex: correct, timer, status: 'waiting' });
-    // Update totalQuestions on all existing questions and session
-    const batch = db.batch();
-    quizQuestions.forEach(qq => {
-      batch.update(db.collection('quiz_questions').doc(qq.id), { totalQuestions: quizQuestions.length });
-    });
-    batch.update(db.collection('quiz_sessions').doc(quizSessionId), { totalQuestions: quizQuestions.length });
-    await batch.commit();
-    ['qz-question','qz-opt-a','qz-opt-b','qz-opt-c','qz-opt-d'].forEach(id => { document.getElementById(id).value = ''; });
-    document.getElementById('qz-timer').value = '30';
-    renderQuestionQueue();
-    showToast('Question ' + order + ' added to queue!', 'success');
-  } catch(e) { handleFirebaseError(e, 'addQuizQuestion'); }
+    QQuestions.push({id:ref.id,order,question:q,options,correctIndex:correct,timer,status:'waiting'});
+    await db.collection('quiz_sessions').doc(QSid).update({totalQuestions:QQuestions.length});
+    ['qz-question','qz-opt-a','qz-opt-b','qz-opt-c','qz-opt-d'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('qz-q-count').textContent = QQuestions.length;
+    renderQuestionList();
+    showToast('Question '+order+' added!','success');
+  } catch(e) { handleFirebaseError(e,'addQuizQuestion'); }
 }
 
-function renderQuestionQueue() {
-  const list = document.getElementById('qz-question-list');
-  document.getElementById('qz-q-count').textContent = quizQuestions.length;
-  if (!quizQuestions.length) { list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No questions added yet.</div>'; return; }
-  list.innerHTML = quizQuestions.map((q, i) => {
-    const statusColor = q.status === 'active' ? '#27ae60' : q.status === 'ended' ? '#aaa' : '#f5c842';
-    const statusLabel = q.status === 'active' ? '&#9679; LIVE' : q.status === 'ended' ? '&#10003; Done' : '&#9201; Waiting';
-    return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px">'
-      + '<div style="width:28px;height:28px;border-radius:8px;background:rgba(230,57,70,0.15);color:#e63946;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (i+1) + '</div>'
-      + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + q.question + '</div>'
-      + '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + q.options.length + ' options &middot; ' + q.timer + 's timer &middot; Correct: ' + ['A','B','C','D'][q.correctIndex] + '</div></div>'
-      + '<div style="font-size:11px;font-weight:700;color:' + statusColor + '">' + statusLabel + '</div>'
-      + (q.status === 'waiting' ? '<button onclick="deleteQuizQuestion('' + q.id + '',' + i + ')" style="background:none;border:none;color:#e63946;cursor:pointer;font-size:16px;padding:4px">&#128465;</button>' : '')
-      + '</div>';
-  }).join('');
-}
-
-async function deleteQuizQuestion(qid, idx) {
+async function deleteQuizQuestionItem(qid, idx) {
   if (!confirm('Remove this question?')) return;
   try {
     await db.collection('quiz_questions').doc(qid).delete();
-    quizQuestions.splice(idx, 1);
-    quizQuestions.forEach((q, i) => { q.order = i + 1; db.collection('quiz_questions').doc(q.id).update({ order: i + 1, totalQuestions: quizQuestions.length }); });
-    if (quizSessionId) db.collection('quiz_sessions').doc(quizSessionId).update({ totalQuestions: quizQuestions.length });
-    renderQuestionQueue();
-    showToast('Question removed.', 'info');
-  } catch(e) { showToast('Error removing question.', 'error'); }
+    QQuestions.splice(idx,1);
+    const batch = db.batch();
+    QQuestions.forEach((q,i)=>{ q.order=i+1; batch.update(db.collection('quiz_questions').doc(q.id),{order:i+1,totalQuestions:QQuestions.length}); });
+    if (QSid) batch.update(db.collection('quiz_sessions').doc(QSid),{totalQuestions:QQuestions.length});
+    await batch.commit();
+    document.getElementById('qz-q-count').textContent = QQuestions.length;
+    renderQuestionList();
+    showToast('Question removed.','info');
+  } catch(e) { showToast('Error removing question.','error'); }
 }
 
-async function launchNextQuestion() {
-  if (!quizSessionId) { showToast('No active session.', 'error'); return; }
-  const waiting = quizQuestions.filter(q => q.status === 'waiting');
-  if (!waiting.length) { showToast('No more questions in the queue. End the quiz.', 'info'); return; }
-  // End any currently active question first
-  await endCurrentQuestion(true);
-  const next = waiting[0];
-  try {
-    await db.collection('quiz_questions').doc(next.id).update({ status: 'active', launchedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await db.collection('quiz_sessions').doc(quizSessionId).update({ status: 'active', currentQuestionIndex: next.order });
-    next.status = 'active';
-    renderQuestionQueue();
-    document.getElementById('qz-current-status').textContent = 'LIVE: Q' + next.order + ' — ' + next.question.substr(0, 60) + (next.question.length > 60 ? '...' : '');
-    await logActivity('quiz', 'Launched question ' + next.order + ': ' + next.question.substr(0, 50));
-    showToast('Question ' + next.order + ' is now LIVE!', 'success');
-  } catch(e) { handleFirebaseError(e, 'launchNextQuestion'); }
+function renderQuestionList() {
+  const list = document.getElementById('qz-question-list');
+  if (!QQuestions.length) { list.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No questions yet.</div>'; return; }
+  const statusIcon = {waiting:'&#9201;',active:'&#9679;',ended:'&#10003;'};
+  const statusColor = {waiting:'#f5c842',active:'#27ae60',ended:'#aaa'};
+  list.innerHTML = QQuestions.map((q,i)=>{
+    const canDelete = q.status==='waiting';
+    return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px">'
+      +'<div style="width:26px;height:26px;border-radius:7px;background:rgba(230,57,70,0.12);color:#e63946;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+q.order+'</div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+q.question+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+q.options.length+' opts &middot; '+q.timer+'s &middot; Correct: '+['A','B','C','D'][q.correctIndex]+'</div>'
+      +'</div>'
+      +'<span style="font-size:11px;font-weight:700;color:'+(statusColor[q.status]||'#fff')+'">'+(statusIcon[q.status]||'')+'</span>'
+      +(canDelete?'<button onclick="deleteQuizQuestionItem(\''+q.id+'\','+i+')" style="background:none;border:none;color:#e63946;cursor:pointer;font-size:15px;padding:3px;flex-shrink:0">&#128465;</button>':'')
+      +'</div>';
+  }).join('');
 }
 
-async function endCurrentQuestion(silent) {
-  if (!quizSessionId) return;
-  const active = quizQuestions.find(q => q.status === 'active');
-  if (!active) return;
-  try {
-    await db.collection('quiz_questions').doc(active.id).update({ status: 'ended', endedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    active.status = 'ended';
-    renderQuestionQueue();
-    document.getElementById('qz-current-status').textContent = 'Q' + active.order + ' ended. Launch next or end quiz.';
-    if (!silent) showToast('Question ended.', 'info');
-  } catch(e) { if (!silent) showToast('Error ending question.', 'error'); }
-}
-
-async function endQuizSession() {
-  if (!quizSessionId) { showToast('No active session.', 'error'); return; }
-  if (!confirm('End the entire quiz? All participants will see results.')) return;
-  try {
-    await endCurrentQuestion(true);
-    await db.collection('quiz_sessions').doc(quizSessionId).update({ status: 'ended', endedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    if (quizFlagsUnsub) quizFlagsUnsub();
-    if (quizPartUnsub) quizPartUnsub();
-    document.getElementById('qz-session-badge').style.display = 'none';
-    document.getElementById('qz-current-status').textContent = 'Quiz ended.';
-    await logActivity('quiz', 'Ended quiz session: ' + document.getElementById('qz-session-title').textContent);
-    showToast('Quiz ended! Participants see their results.', 'success');
-    // Reset for next session
-    setTimeout(() => {
-      quizSessionId = null; quizQuestions = []; quizQueueIndex = 0;
-      document.getElementById('qz-create-section').style.display = 'block';
-      document.getElementById('qz-active-section').style.display = 'none';
-      document.getElementById('qz-title').value = '';
-    }, 3000);
-  } catch(e) { handleFirebaseError(e, 'endQuizSession'); }
-}
-
-function startQuizParticipantListener() {
-  if (!quizSessionId) return;
-  if (quizPartUnsub) quizPartUnsub();
-  quizPartUnsub = db.collection('quiz_participants').where('sessionId','==',quizSessionId)
+// ── WAITING ROOM LISTENER ────────────────────────────────────────────────────
+function startWaitingRoomListener() {
+  if (!QSid || QPartUnsub) return;
+  QPartUnsub = db.collection('quiz_participants').where('sessionId','==',QSid)
     .onSnapshot(snap => {
-      const count = snap.size;
-      document.getElementById('qz-p-count').textContent = count;
-      const list = document.getElementById('qz-participants-list');
-      if (!count) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No participants yet.</div>'; return; }
-      const sorted = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b)=>(b.score||0)-(a.score||0));
-      list.innerHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
-        + '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1)">'
-        + '<th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600">#</th>'
-        + '<th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600">Name</th>'
-        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Score</th>'
-        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Tab Switches</th>'
-        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Status</th>'
-        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Actions</th>'
-        + '</tr></thead><tbody>'
-        + sorted.map((p, i) => {
-            const statusColor = p.status === 'banned' ? '#e63946' : p.status === 'warned' ? '#f5c842' : '#27ae60';
-            const tabColor = (p.tabSwitches || 0) > 2 ? '#e63946' : (p.tabSwitches || 0) > 0 ? '#f5c842' : '#27ae60';
-            return '<tr style="border-bottom:1px solid rgba(255,255,255,0.05)">'
-              + '<td style="padding:10px 12px;color:var(--muted)">' + (i+1) + '</td>'
-              + '<td style="padding:10px 12px;color:#fff;font-weight:600">' + (p.name||'Unknown') + '</td>'
-              + '<td style="padding:10px 12px;text-align:center;color:#e63946;font-weight:800">' + (p.score||0) + '</td>'
-              + '<td style="padding:10px 12px;text-align:center;color:' + tabColor + ';font-weight:700">' + (p.tabSwitches||0) + '</td>'
-              + '<td style="padding:10px 12px;text-align:center"><span style="color:' + statusColor + ';font-size:11px;font-weight:700;text-transform:uppercase">' + (p.status||'active') + '</span></td>'
-              + '<td style="padding:10px 12px;text-align:center;display:flex;gap:6px;justify-content:center">'
-              + (p.status !== 'warned' && p.status !== 'banned' ? '<button onclick="warnParticipant('' + p.id + '','' + (p.name||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:5px 10px;background:rgba(245,200,66,0.15);border:1px solid rgba(245,200,66,0.3);border-radius:6px;color:#f5c842;cursor:pointer">&#9888; Warn</button>' : '')
-              + (p.status !== 'banned' ? '<button onclick="banParticipant('' + p.id + '','' + (p.name||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:5px 10px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);border-radius:6px;color:#e63946;cursor:pointer">&#128683; Remove</button>' : '<span style="font-size:11px;color:var(--muted)">Removed</span>')
-              + '</td></tr>';
-          }).join('')
-        + '</tbody></table></div>';
+      const waiting = snap.docs.filter(d=>d.data().status==='waiting');
+      const admitted = snap.docs.filter(d=>['admitted','active'].includes(d.data().status));
+      document.getElementById('qz-waiting-count').textContent = waiting.length;
+      document.getElementById('qz-admitted-count').textContent = admitted.length;
+      renderWaitingList(waiting.map(d=>({id:d.id,...d.data()})));
+      renderAdmittedList(admitted.map(d=>({id:d.id,...d.data()})));
     });
 }
 
-async function refreshQuizParticipants() {
-  startQuizParticipantListener();
+function renderWaitingList(participants) {
+  const el = document.getElementById('qz-waiting-list');
+  if (!participants.length) { el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">No one waiting yet. Share the quiz link.</div>'; return; }
+  el.innerHTML = participants.map(p=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">'
+    +'<div style="font-size:18px">&#128100;</div>'
+    +'<div style="flex:1;font-size:13px;font-weight:600;color:#fff">'+p.name+'</div>'
+    +'<button onclick="admitParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:12px;padding:6px 12px;background:rgba(39,174,96,0.15);border:1px solid rgba(39,174,96,0.3);border-radius:8px;color:#27ae60;cursor:pointer;font-family:inherit">&#9989; Admit</button>'
+    +'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:12px;padding:6px 12px;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.25);border-radius:8px;color:#e63946;cursor:pointer;font-family:inherit">&#10060; Deny</button>'
+    +'</div>'
+  ).join('');
+}
+
+function renderAdmittedList(participants) {
+  const el = document.getElementById('qz-admitted-list');
+  if (!participants.length) { el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px">No one admitted yet.</div>'; return; }
+  el.innerHTML = participants.map(p=>'<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(39,174,96,0.05);border:1px solid rgba(39,174,96,0.15);border-radius:10px">'
+    +'<div style="font-size:18px">&#9989;</div>'
+    +'<div style="flex:1;font-size:13px;font-weight:600;color:#fff">'+p.name+'</div>'
+    +'<div style="font-size:11px;color:#27ae60;font-weight:700">Score: '+(p.score||0)+'</div>'
+    +'<div style="font-size:11px;color:'+(( p.tabSwitches||0)>0?'#e63946':'var(--muted)')+';font-weight:700">Tabs: '+(p.tabSwitches||0)+'</div>'
+    +'<button onclick="warnParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer;font-family:inherit">&#9888;</button>'
+    +'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer;font-family:inherit">&#128683;</button>'
+    +'</div>'
+  ).join('');
+}
+
+async function admitAll() {
+  if (!QSid) return;
+  try {
+    const snap = await db.collection('quiz_participants').where('sessionId','==',QSid).where('status','==','waiting').get();
+    const batch = db.batch();
+    snap.docs.forEach(d=>batch.update(d.ref,{status:'admitted'}));
+    await batch.commit();
+    showToast('All waiting participants admitted!','success');
+    await logActivity('quiz','Admitted all '+snap.size+' waiting participants');
+  } catch(e) { showToast('Error admitting all.','error'); }
+}
+
+async function admitParticipant(pid, name) {
+  try {
+    await db.collection('quiz_participants').doc(pid).update({status:'admitted'});
+    showToast(name+' admitted.','success');
+  } catch(e) { showToast('Error.','error'); }
 }
 
 async function warnParticipant(pid, name) {
-  if (!confirm('Issue a warning to ' + name + '? They will see a warning screen.')) return;
+  if (!confirm('Send a warning to '+name+'?')) return;
   try {
-    await db.collection('quiz_participants').doc(pid).update({ status: 'warned' });
-    await logActivity('quiz', 'Warned participant: ' + name);
-    showToast('Warning sent to ' + name, 'info');
-  } catch(e) { showToast('Error sending warning.', 'error'); }
+    await db.collection('quiz_participants').doc(pid).update({status:'warned'});
+    await logActivity('quiz','Warned: '+name);
+    showToast('Warning sent to '+name,'info');
+  } catch(e) { showToast('Error.','error'); }
 }
 
 async function banParticipant(pid, name) {
-  if (!confirm('Remove ' + name + ' from the quiz? They will see a banned screen.')) return;
+  if (!confirm('Remove '+name+' from the quiz?')) return;
   try {
-    await db.collection('quiz_participants').doc(pid).update({ status: 'banned' });
-    await logActivity('quiz', 'Banned/removed participant: ' + name);
-    showToast(name + ' removed from quiz.', 'info');
-  } catch(e) { showToast('Error removing participant.', 'error'); }
+    await db.collection('quiz_participants').doc(pid).update({status:'banned'});
+    await logActivity('quiz','Removed: '+name);
+    showToast(name+' removed.','info');
+  } catch(e) { showToast('Error.','error'); }
 }
 
-function startQuizFlagListener() {
-  if (!quizSessionId) return;
-  if (quizFlagsUnsub) quizFlagsUnsub();
-  quizFlagsUnsub = db.collection('quiz_flags').where('sessionId','==',quizSessionId)
-    .orderBy('flaggedAt','desc').limit(50)
-    .onSnapshot(snap => {
-      const unseen = snap.docs.filter(d => !d.data().seen).length;
+// ── AUTO QUIZ START ──────────────────────────────────────────────────────────
+async function startQuizAuto() {
+  if (!QSid) { showToast('No session.','error'); return; }
+  const waiting = QQuestions.filter(q=>q.status==='waiting');
+  if (!waiting.length) { showToast('No questions in queue.','error'); return; }
+  if (!confirm('Start the quiz now? Questions will auto-advance. Do not close this tab until the quiz ends.')) return;
+
+  try {
+    await db.collection('quiz_sessions').doc(QSid).update({status:'active',startedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    document.getElementById('qz-status-label').textContent='LIVE — Quiz Running';
+    document.getElementById('qz-status-label').style.color='#e63946';
+    document.getElementById('qz-scores-card').style.display='block';
+    await logActivity('quiz','Quiz started — '+waiting.length+' questions auto-running');
+    showToast('Quiz started! Questions running automatically.','success');
+    runNextQuestion(waiting, 0);
+  } catch(e) { handleFirebaseError(e,'startQuizAuto'); }
+}
+
+async function runNextQuestion(questions, index) {
+  if (index >= questions.length) {
+    // All done
+    await db.collection('quiz_sessions').doc(QSid).update({status:'ended',endedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    document.getElementById('qz-auto-status').textContent='All questions done! Results shown to participants.';
+    document.getElementById('qz-status-label').textContent='Ended';
+    document.getElementById('qz-status-label').style.color='#aaa';
+    await logActivity('quiz','Quiz auto-completed');
+    showToast('Quiz complete! All results shown.','success');
+    loadLiveScores();
+    return;
+  }
+  const q = questions[index];
+  const gap = parseInt(document.getElementById('qz-gap') && document.getElementById('qz-gap').value || 5);
+  try {
+    // End previous
+    if (index > 0) {
+      await db.collection('quiz_questions').doc(questions[index-1].id).update({status:'ended',endedAt:firebase.firestore.FieldValue.serverTimestamp()});
+      QQuestions.find(x=>x.id===questions[index-1].id) && (QQuestions.find(x=>x.id===questions[index-1].id).status='ended');
+    }
+    // Launch current
+    await db.collection('quiz_questions').doc(q.id).update({status:'active',launchedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    q.status='active';
+    QQuestions.find(x=>x.id===q.id) && (QQuestions.find(x=>x.id===q.id).status='active');
+    renderQuestionList();
+    document.getElementById('qz-auto-status').textContent='Q'+(index+1)+'/'+questions.length+': '+q.question.substr(0,60)+' ('+q.timer+'s)';
+    loadLiveScores();
+    // Wait for timer + gap, then next
+    const waitMs = (q.timer + gap) * 1000;
+    QAutoTimer = setTimeout(()=>runNextQuestion(questions, index+1), waitMs);
+  } catch(e) { console.error('runNextQuestion error',e); }
+}
+
+async function endQuizSession() {
+  if (!QSid) return;
+  if (!confirm('End the quiz now and show results to all participants?')) return;
+  clearTimeout(QAutoTimer);
+  try {
+    // End any active question
+    const activeQ = QQuestions.find(q=>q.status==='active');
+    if (activeQ) await db.collection('quiz_questions').doc(activeQ.id).update({status:'ended',endedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('quiz_sessions').doc(QSid).update({status:'ended',endedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    document.getElementById('qz-auto-status').textContent='Quiz ended by admin.';
+    document.getElementById('qz-status-label').textContent='Ended';
+    if (QPartUnsub) { QPartUnsub(); QPartUnsub=null; }
+    if (QFlagUnsub) { QFlagUnsub(); QFlagUnsub=null; }
+    await logActivity('quiz','Ended quiz session manually');
+    showToast('Quiz ended. Results shown to participants.','success');
+    loadLiveScores();
+    // Reset for next session after 5s
+    setTimeout(()=>{
+      QSid=null; QQuestions=[];
+      document.getElementById('qz-create-area').style.display='block';
+      document.getElementById('qz-session-banner').style.display='none';
+      document.getElementById('qz-addq-card').style.display='none';
+      document.getElementById('qz-host-card').style.display='none';
+      document.getElementById('qz-scores-card').style.display='none';
+      document.getElementById('qz-title').value='';
+    },5000);
+  } catch(e) { handleFirebaseError(e,'endQuizSession'); }
+}
+
+async function deleteQuizSession() {
+  if (!QSid) return;
+  if (!confirm('Delete this entire quiz session and all its questions?')) return;
+  try {
+    clearTimeout(QAutoTimer);
+    if (QPartUnsub){QPartUnsub();QPartUnsub=null;}
+    if (QFlagUnsub){QFlagUnsub();QFlagUnsub=null;}
+    const batch = db.batch();
+    batch.delete(db.collection('quiz_sessions').doc(QSid));
+    QQuestions.forEach(q=>batch.delete(db.collection('quiz_questions').doc(q.id)));
+    await batch.commit();
+    QSid=null; QQuestions=[];
+    document.getElementById('qz-create-area').style.display='block';
+    document.getElementById('qz-session-banner').style.display='none';
+    document.getElementById('qz-addq-card').style.display='none';
+    document.getElementById('qz-host-card').style.display='none';
+    document.getElementById('qz-scores-card').style.display='none';
+    document.getElementById('qz-title').value='';
+    document.getElementById('qz-q-count').textContent='0';
+    await logActivity('quiz','Deleted quiz session');
+    showToast('Session deleted.','info');
+  } catch(e) { showToast('Error deleting session.','error'); }
+}
+
+// ── SCORES ───────────────────────────────────────────────────────────────────
+async function loadLiveScores() {
+  if (!QSid) return;
+  try {
+    const snap = await db.collection('quiz_participants').where('sessionId','==',QSid).where('status','!=','banned').get();
+    const el = document.getElementById('qz-scores-list');
+    if (snap.empty) { el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">No participants yet.</div>'; return; }
+    const sorted = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.score||0)-(a.score||0));
+    el.innerHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
+      +'<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1)">'
+      +'<th style="padding:8px 12px;text-align:left;color:var(--muted)">#</th>'
+      +'<th style="padding:8px 12px;text-align:left;color:var(--muted)">Name</th>'
+      +'<th style="padding:8px 12px;text-align:center;color:var(--muted)">Score</th>'
+      +'<th style="padding:8px 12px;text-align:center;color:var(--muted)">Tab Sw.</th>'
+      +'<th style="padding:8px 12px;text-align:center;color:var(--muted)">Status</th>'
+      +'<th style="padding:8px 12px;text-align:center;color:var(--muted)">Actions</th>'
+      +'</tr></thead><tbody>'
+      +sorted.map((p,i)=>{
+        const sc=statusColor(p.status); const tc=(p.tabSwitches||0)>1?'#e63946':(p.tabSwitches||0)>0?'#f5c842':'#27ae60';
+        return '<tr style="border-bottom:1px solid rgba(255,255,255,0.05)">'
+          +'<td style="padding:8px 12px;color:var(--muted)">'+(i===0?'&#127947;':i===1?'&#129352;':i===2?'&#129353;':(i+1))+'</td>'
+          +'<td style="padding:8px 12px;color:#fff;font-weight:600">'+p.name+'</td>'
+          +'<td style="padding:8px 12px;text-align:center;color:#e63946;font-weight:800">'+(p.score||0)+'</td>'
+          +'<td style="padding:8px 12px;text-align:center;color:'+tc+';font-weight:700">'+(p.tabSwitches||0)+'</td>'
+          +'<td style="padding:8px 12px;text-align:center"><span style="color:'+sc+';font-size:11px;font-weight:700;text-transform:uppercase">'+(p.status||'active')+'</span></td>'
+          +'<td style="padding:8px 12px;text-align:center;display:flex;gap:5px;justify-content:center">'
+          +(p.status!=='warned'&&p.status!=='banned'?'<button onclick="warnParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer">&#9888;</button>':'')
+          +(p.status!=='banned'?'<button onclick="banParticipant(\''+p.id+'\',\''+p.name.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:4px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer">&#128683;</button>':'<span style="font-size:11px;color:var(--muted)">Removed</span>')
+          +'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+  } catch(e) { console.error('loadLiveScores',e); }
+}
+
+function statusColor(s){ return s==='banned'?'#e63946':s==='warned'?'#f5c842':s==='admitted'||s==='active'?'#27ae60':'#aaa'; }
+
+// ── FLAGS ────────────────────────────────────────────────────────────────────
+function startFlagListener() {
+  if (!QSid || QFlagUnsub) return;
+  QFlagUnsub = db.collection('quiz_flags').where('sessionId','==',QSid)
+    .orderBy('flaggedAt','desc').limit(60)
+    .onSnapshot(snap=>{
+      const unseen = snap.docs.filter(d=>!d.data().seen).length;
       document.getElementById('qz-flag-count').textContent = unseen;
-      const list = document.getElementById('qz-flags-list');
-      if (snap.empty) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No flags yet. Good behavior!</div>'; return; }
-      const typeIcon = { tab_switch: '&#128260;', window_blur: '&#128065;', devtools: '&#128421;', page_close: '&#128682;' };
-      const typeColor = { tab_switch: '#f5c842', window_blur: '#f5c842', devtools: '#e63946', page_close: '#e63946' };
-      list.innerHTML = snap.docs.map(doc => {
-        const d = doc.data();
-        const ts = d.flaggedAt ? d.flaggedAt.toDate() : new Date();
-        const time = ts.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        const icon = typeIcon[d.type] || '&#9888;';
-        const color = typeColor[d.type] || '#f5c842';
-        return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06)">'
-          + '<div style="font-size:18px;flex-shrink:0">' + icon + '</div>'
-          + '<div style="flex:1"><div style="font-size:13px;color:#fff">' + (d.message||'Flag') + '</div>'
-          + '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + time + ' &middot; <span style="color:' + color + ';font-weight:700;text-transform:uppercase">' + (d.type||'unknown') + '</span></div></div>'
-          + '<div style="display:flex;gap:6px">'
-          + '<button onclick="warnParticipant('' + (d.participantId||'') + '','' + (d.participantName||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:4px 9px;background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer">Warn</button>'
-          + '<button onclick="banParticipant('' + (d.participantId||'') + '','' + (d.participantName||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:4px 9px;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer">Remove</button>'
-          + '<button onclick="markFlagSeen('' + doc.id + '',this)" style="font-size:11px;padding:4px 9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--muted);cursor:pointer">&#10003; OK</button>'
-          + '</div></div>';
+      const el = document.getElementById('qz-flags-list');
+      if (snap.empty){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">No flags. </div>';return;}
+      const icons={tab_switch:'&#128260;',window_blur:'&#128065;',devtools:'&#128421;',auto_ban:'&#128683;',page_close:'&#128682;'};
+      const colors={tab_switch:'#f5c842',window_blur:'#f5c842',devtools:'#e63946',auto_ban:'#e63946',page_close:'#e63946'};
+      el.innerHTML=snap.docs.map(doc=>{
+        const d=doc.data(),ts=d.flaggedAt?d.flaggedAt.toDate():new Date();
+        const time=ts.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        return '<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)'+(d.seen?';opacity:.4':'') +'">'
+          +'<div style="font-size:16px;flex-shrink:0">'+(icons[d.type]||'&#9888;')+'</div>'
+          +'<div style="flex:1"><div style="font-size:13px;color:#fff">'+(d.message||'Flag')+'</div>'
+          +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+time+' &middot; <span style="color:'+(colors[d.type]||'#f5c842')+';font-weight:700;text-transform:uppercase">'+(d.type||'')+'</span></div></div>'
+          +'<div style="display:flex;gap:5px;flex-shrink:0">'
+          +'<button onclick="warnParticipant(\''+d.participantId+'\',\''+d.participantName.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:3px 8px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:6px;color:#f5c842;cursor:pointer">Warn</button>'
+          +'<button onclick="banParticipant(\''+d.participantId+'\',\''+d.participantName.replace(/\'/g,"\\'")+'')" style="font-size:11px;padding:3px 8px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.2);border-radius:6px;color:#e63946;cursor:pointer">Remove</button>'
+          +(d.seen?'':'<button onclick="markFlagSeen(\''+doc.id+'\',this)" style="font-size:11px;padding:3px 7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--muted);cursor:pointer">&#10003;</button>')
+          +'</div></div>';
       }).join('');
     });
 }
 
-async function markFlagSeen(flagId, btn) {
-  try { await db.collection('quiz_flags').doc(flagId).update({ seen: true }); btn.closest('div[style*="border-bottom"]').style.opacity = '0.4'; } catch(e) {}
+async function loadQuizFlags() { startFlagListener(); }
+
+async function markFlagSeen(fid,btn){
+  try{await db.collection('quiz_flags').doc(fid).update({seen:true});btn.closest('div[style*="border-bottom"]').style.opacity='0.4';}catch(e){}
 }
 
-async function refreshQuizFlags() { startQuizFlagListener(); }
+// Aliases for backward compatibility
+async function checkQuizStatus(){}
 
-async function refreshQuizResponses() {
-  if (!quizSessionId) { showToast('No active session.', 'info'); return; }
-  try {
-    const [respSnap, partSnap] = await Promise.all([
-      db.collection('quiz_responses').where('sessionId','==',quizSessionId).orderBy('answeredAt','desc').get(),
-      db.collection('quiz_participants').where('sessionId','==',quizSessionId).get()
-    ]);
-    const list = document.getElementById('qz-responses-list');
-    if (respSnap.empty) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No responses yet.</div>'; return; }
-    const byQ = {};
-    respSnap.docs.forEach(d => { const r = d.data(); if (!byQ[r.questionOrder]) byQ[r.questionOrder] = []; byQ[r.questionOrder].push(r); });
-    list.innerHTML = Object.keys(byQ).sort((a,b)=>a-b).map(qOrder => {
-      const responses = byQ[qOrder];
-      const correct = responses.filter(r => r.isCorrect).length;
-      const total = responses.length;
-      const avgTime = responses.filter(r => !r.noAnswer).reduce((s,r) => s + (r.timeTaken||0), 0) / Math.max(responses.filter(r=>!r.noAnswer).length, 1);
-      return '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px">'
-        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-        + '<div style="font-size:13px;font-weight:700;color:#fff">Question ' + qOrder + '</div>'
-        + '<div style="display:flex;gap:16px">'
-        + '<span style="font-size:12px;color:#27ae60;font-weight:700">&#9989; ' + correct + '/' + total + ' correct</span>'
-        + '<span style="font-size:12px;color:var(--muted)">Avg time: ' + avgTime.toFixed(1) + 's</span>'
-        + '</div></div>'
-        + responses.map(r => '<div style="font-size:12px;color:' + (r.noAnswer ? '#aaa' : r.isCorrect ? '#27ae60' : '#e63946') + ';padding:3px 0">'
-          + (r.isCorrect ? '&#9989;' : r.noAnswer ? '&#9203;' : '&#10060;') + ' ' + (r.participantName||'?')
-          + ' &mdash; ' + (r.noAnswer ? 'No answer' : 'Option ' + ['A','B','C','D'][r.selectedIndex] || '?')
-          + ' &mdash; ' + (r.timeTaken||0) + 's</div>').join('')
-        + '</div>';
-    }).join('');
-  } catch(e) { showToast('Error loading responses.', 'error'); }
-}
-
-// Keep old function names as aliases for backward compatibility
-async function checkQuizStatus() {
-  if (quizSessionId) {
-    document.getElementById('qz-current-status').textContent = 'Session active.';
-  }
-}
 
 async function logActivity(action, details) {
   if (!currentUser || !db) return;
