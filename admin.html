@@ -11,8 +11,18 @@
 </head>
 <body>
 
+<!-- ═══════════════════════════ AUTH LOADING SPLASH -->
+<div id="auth-loading" style="position:fixed;inset:0;background:#0a0a12;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:20px">
+  <img src="images-1/clublogo.jpeg" alt="Neural Nexus" style="width:72px;height:72px;border-radius:50%;border:2px solid rgba(230,57,70,0.5)" onerror="this.style.display='none'">
+  <div style="font-family:'Inter',sans-serif;color:#e63946;font-size:15px;letter-spacing:1px">Restoring session…</div>
+  <div style="width:40px;height:3px;background:rgba(230,57,70,0.2);border-radius:2px;overflow:hidden">
+    <div style="height:100%;background:#e63946;border-radius:2px;animation:authbar 1.2s ease-in-out infinite"></div>
+  </div>
+  <style>@keyframes authbar{0%{width:0%;margin-left:0}50%{width:100%;margin-left:0}100%{width:0%;margin-left:100%}}</style>
+</div>
+
 <!-- ═══════════════════════════ LOGIN -->
-<div id="login-screen">
+<div id="login-screen" style="display:none">
   <div class="login-wrap">
     <div id="config-banner">
       ⚠️ <span>Firebase not configured. Open <code>admin.js</code> and paste your Firebase config to enable login. → <a href="https://console.firebase.google.com" target="_blank" style="color:inherit">console.firebase.google.com</a></span>
@@ -174,9 +184,6 @@
               </div>
               <div class="quick-btn" onclick="showPanel('faculty')">
                 <div class="quick-btn-icon">👨‍🏫</div>Manage Faculty
-              </div>
-              <div class="quick-btn" id="quick-add-admin-btn" onclick="openAddAdminModal()" style="display:none;border-color:rgba(230,57,70,0.35);background:rgba(230,57,70,0.07)">
-                <div class="quick-btn-icon">👥</div>Add Temp Admin
               </div>
             </div>
           </div>
@@ -532,30 +539,6 @@
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
       <button class="btn btn-ghost" onclick="closeFacultyModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveFaculty()">💾 Save</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════ ADD TEMP ADMIN MODAL -->
-<div class="modal-overlay" id="add-admin-modal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>➕ Add Temporary Admin</h3>
-      <button class="modal-close" onclick="closeAddAdminModal()">✕</button>
-    </div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Enter the email and password for the new temporary admin. They can log in and manage website content. Maximum 3 temporary admins allowed.</p>
-    <div class="f-group">
-      <label class="f-label">Email Address</label>
-      <input type="email" class="f-input" id="modal-admin-email" placeholder="admin@example.com">
-    </div>
-    <div class="f-group">
-      <label class="f-label">Password (6+ characters)</label>
-      <input type="password" class="f-input" id="modal-admin-password" placeholder="••••••••">
-    </div>
-    <div id="modal-admin-error" style="display:none;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#e63946;margin-bottom:12px"></div>
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
-      <button class="btn btn-ghost" onclick="closeAddAdminModal()">Cancel</button>
-      <button class="btn btn-green" id="modal-add-admin-btn" onclick="submitAddAdminModal()">➕ Add Admin</button>
     </div>
   </div>
 </div>
