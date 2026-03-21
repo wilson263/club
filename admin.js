@@ -428,12 +428,21 @@ async function addTempAdmin() {
     const tempCount = snap.docs.filter(d => !d.data().isPermanent).length;
     if (tempCount >= MAX_TEMP_ADMINS) { showToast("Max 3 temporary admins allowed", "error"); return; }
 
-    const secondaryApp  = firebase.initializeApp(firebaseConfig, "Secondary_" + Date.now());
-    const secondaryAuth = secondaryApp.auth();
-    const cred = await secondaryAuth.createUserWithEmailAndPassword(email, password);
-    const newUid = cred.user.uid;
-    await secondaryAuth.signOut();
-    secondaryApp.delete();
+    // Use Firebase REST API to create the new user without affecting the current session
+    const signUpUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseConfig.apiKey}`;
+    const res = await fetch(signUpUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, returnSecureToken: false })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const code = data.error && data.error.message;
+      if (code === "EMAIL_EXISTS") { showToast("Email already registered.", "error"); return; }
+      showToast("Error: " + (data.error ? data.error.message : "Unknown error"), "error");
+      return;
+    }
+    const newUid = data.localId;
 
     await db.collection("admins").doc(newUid).set({
       email, name: email.split("@")[0], isPermanent: false,
@@ -445,7 +454,7 @@ async function addTempAdmin() {
     document.getElementById("new-admin-password").value = "";
     loadAdmins();
   } catch(e) {
-    showToast(e.code === "auth/email-already-in-use" ? "Email already registered." : "Error: " + e.message, "error");
+    showToast("Error: " + e.message, "error");
   }
 }
 
