@@ -143,139 +143,272 @@
 
     .video-text p { font-size: 13px; color: rgba(255,255,255,0.7); letter-spacing: 3px; margin-top: 8px; font-weight: 600; }
 
-    /* Sidebar and content layout */
-    .main-area { display: flex; min-height: 400px; }
-
-    .sidebar {
-      width: 200px;
-      flex-shrink: 0;
-      background: rgba(0,0,0,0.3) !important;
-      border-right: 1px solid rgba(255,255,255,0.07) !important;
-      padding: 24px 12px !important;
+    /* ── EVENTS TABS ── */
+    .events-section {
+      background: #0a0a14;
+      padding: 0;
     }
 
-    label.side-btn {
-      display: block;
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 13px;
+    .events-tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid rgba(255,255,255,0.07);
+      background: #0d0d1e;
+    }
+
+    .events-tab-bar input[type="radio"] { display: none; }
+
+    .events-tab-bar label {
+      flex: 1;
+      text-align: center;
+      padding: 18px 24px;
+      font-size: 14px;
       font-weight: 700;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.45);
       cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
       transition: all 0.2s;
-      margin-bottom: 6px;
+      letter-spacing: 0.3px;
     }
 
-    label.side-btn:hover {
-      background: rgba(230,57,70,0.1);
-      color: white;
+    .events-tab-bar label:hover {
+      color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.03);
     }
 
-    input[name="main"]:checked + label.side-btn,
-    input[id="conducted"]:checked ~ .sidebar label[for="conducted"],
-    input[id="upcoming"]:checked ~ .sidebar label[for="upcoming"] {
-      background: rgba(230,57,70,0.2);
+    #tab-conducted:checked ~ .events-tab-bar label[for="tab-conducted"],
+    #tab-upcoming:checked  ~ .events-tab-bar label[for="tab-upcoming"] {
       color: #e63946;
+      border-bottom-color: #e63946;
+      background: rgba(230,57,70,0.06);
     }
 
-    /* override gallery.css sidebar label active state */
-    input#conducted:checked ~ .sidebar label[for="conducted"],
-    input#upcoming:checked ~ .sidebar label[for="upcoming"] {
-      background: rgba(230,57,70,0.2) !important;
-      color: #e63946 !important;
+    .tab-panels { background: #0a0a14; }
+
+    .tab-panel { display: none; padding: 40px 28px; }
+
+    #tab-conducted:checked ~ .tab-panels .panel-conducted { display: block; }
+    #tab-upcoming:checked  ~ .tab-panels .panel-upcoming  { display: block; }
+
+    /* ── CONDUCTED EVENTS — BIG CARDS ── */
+    .conducted-heading {
+      font-size: 28px;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
     }
 
-    /* content area */
-    .content-area { flex: 1; padding: 24px; min-width: 0; }
-
-    .content { display: none; }
-
-    input#conducted:checked ~ .content-area .conducted-content { display: block; }
-    input#upcoming:checked  ~ .content-area .upcoming-content  { display: block; }
-
-    /* event list */
-    .event-list {
-      margin-bottom: 18px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      padding-bottom: 14px;
+    .conducted-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 36px;
     }
 
-    .event-list h3 { font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.6); }
-
-    /* Details panels */
-    .details { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; overflow: hidden; }
-
-    .quizzimage { display: flex; flex-wrap: wrap; gap: 0; }
-
-    .gallery {
-      width: 180px;
-      flex-shrink: 0;
+    .event-big-card {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      border: 1px solid rgba(230,57,70,0.18);
+      background: linear-gradient(135deg, #141428 0%, #1c0e14 100%);
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
 
-    .gallery img {
+    .event-big-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(230,57,70,0.2);
+    }
+
+    .event-big-card .ebc-image {
       width: 100%;
-      height: 180px;
+      height: 280px;
       object-fit: cover;
       display: block;
+      position: relative;
     }
 
-    .dateback {
-      flex: 1;
+    .event-big-card .ebc-image-bg {
+      height: 280px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .event-big-card .ebc-image-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.75) 100%);
+    }
+
+    .ebc-badge {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #e63946;
+      color: white;
+      border-radius: 12px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      z-index: 2;
+      box-shadow: 0 4px 16px rgba(230,57,70,0.5);
+    }
+
+    .ebc-body {
+      padding: 28px 28px 24px;
+    }
+
+    .ebc-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .ebc-meta {
       display: flex;
+      flex-wrap: wrap;
       gap: 16px;
-      padding: 18px;
-      align-items: flex-start;
+      margin-bottom: 14px;
     }
 
-    .date {
+    .ebc-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      font-weight: 500;
+    }
+
+    .ebc-meta-item span.ebc-icon {
+      font-size: 15px;
+    }
+
+    .ebc-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.75;
+      margin-bottom: 20px;
+    }
+
+    .ebc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #e63946, #b52733);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 24px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      box-shadow: 0 4px 16px rgba(230,57,70,0.4);
+    }
+
+    .ebc-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* Dynamic Firebase event cards (same big style) */
+    .event-card-dynamic {
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(135deg, #141428 0%, #1c0e14 100%);
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .event-card-dynamic:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(230,57,70,0.15);
+    }
+
+    .event-img {
+      height: 260px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    .event-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);
+    }
+
+    .event-info-dynamic {
+      padding: 24px 28px;
+      display: block;
+    }
+
+    .date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       background: #e63946;
       border-radius: 10px;
-      padding: 8px 12px;
-      text-align: center;
+      padding: 6px 14px;
       color: white;
       font-weight: 800;
       font-size: 13px;
-      flex-shrink: 0;
+      margin-bottom: 14px;
     }
 
-    .line { width: 1px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
+    .date-badge p { margin: 0; }
 
-    .venue ul { color: rgba(255,255,255,0.7); font-size: 13px; list-style: none; line-height: 1.8; }
-    .venue button {
-      margin-top: 12px;
-      background: #e63946; color: white;
-      border: none; border-radius: 8px;
-      padding: 8px 18px; font-size: 13px; font-weight: 700;
-      cursor: pointer; transition: opacity 0.2s;
-    }
-    .venue button:hover { opacity: 0.85; }
-
-    .matter { color: rgba(255,255,255,0.6) !important; font-size: 13px !important; }
-
-    .location { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.5) !important; }
-
-    /* Upcoming content */
-    .upcoming-content h4 {
-      font-size: 18px; font-weight: 800; color: white;
+    .event-details-dynamic h3 {
+      font-size: 20px;
+      color: white;
+      font-weight: 900;
       margin-bottom: 8px;
+      letter-spacing: -0.3px;
     }
-    .upcoming-content p { color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.7; }
 
-    /* Dynamic event cards */
-    .event-card-dynamic {
-      background: rgba(255,255,255,0.04);
+    .event-details-dynamic p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 6px;
+    }
+
+    /* ── UPCOMING ── */
+    .upcoming-card {
+      background: linear-gradient(135deg, #141428, #1c0e14);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px; overflow: hidden;
-      margin-top: 16px; transition: transform 0.2s;
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 20px;
     }
 
-    .event-card-dynamic:hover { transform: translateY(-2px); }
-    .event-img { height: 180px; background-size: cover; background-position: center; }
-    .event-info-dynamic { display: flex; gap: 14px; padding: 16px; align-items: flex-start; }
-    .date-badge { background: #e63946; border-radius: 8px; padding: 8px 12px; text-align: center; color: white; font-weight: 800; font-size: 13px; flex-shrink: 0; min-width: 48px; }
-    .event-details-dynamic h3 { font-size: 16px; color: white; font-weight: 700; margin-bottom: 6px; }
-    .event-details-dynamic p  { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+    .upcoming-card h4 {
+      font-size: 20px; font-weight: 900; color: white; margin-bottom: 10px;
+    }
+
+    .upcoming-card p { color: rgba(255,255,255,0.6); font-size: 14px; line-height: 1.8; }
+
+    /* Kept for CSS fallback compatibility */
+    .main-area { display: block; }
+    .sidebar { display: none; }
+    .content-area { padding: 0; }
+    .content { display: none; }
+    .event-list { display: none; }
+    .details { display: none; }
+    .matter { color: rgba(255,255,255,0.6) !important; }
+    .location { color: rgba(255,255,255,0.5) !important; }
 
     /* Sublogo group fix */
     .sublogo-group {
@@ -546,43 +679,36 @@
         </div>
       </div>
 
-      <!-- EVENTS AREA -->
-      <div class="main-area">
-        <input type="radio" name="main" id="conducted" checked style="display:none">
-        <input type="radio" name="main" id="upcoming"  style="display:none">
+      <!-- ══ EVENTS TABS ══ -->
+      <div class="events-section">
+        <input type="radio" name="evttab" id="tab-conducted" checked style="display:none">
+        <input type="radio" name="evttab" id="tab-upcoming"  style="display:none">
 
-        <!-- Sidebar -->
-        <div class="sidebar">
-          <label for="conducted" class="side-btn">📋 Conducted Events</label>
-          <label for="upcoming"  class="side-btn">🔔 Upcoming Events</label>
+        <div class="events-tab-bar">
+          <label for="tab-conducted">📋 Conducted Events</label>
+          <label for="tab-upcoming">🔔 Upcoming Events</label>
         </div>
 
-        <!-- Content -->
-        <div class="content-area">
+        <div class="tab-panels">
 
-          <!-- CONDUCTED -->
-          <div class="content conducted-content">
-            <div class="event-list">
-              <h3>· Quiz Competition</h3>
-            </div>
-            <div class="details">
-              <div class="quizzimage">
-                <div class="gallery">
-                  <img src="images-1/quizz logo.jpeg" alt="Quiz">
+          <!-- CONDUCTED PANEL -->
+          <div class="tab-panel panel-conducted">
+            <div class="conducted-heading">Conducted Events</div>
+            <div class="conducted-sub">✦ All past events &amp; activities ✦</div>
+
+            <!-- Quiz Competition — Big Card -->
+            <div class="event-big-card">
+              <div class="ebc-image-bg" style="background-image:url(images-1/quizz\ logo.jpeg)"></div>
+              <div class="ebc-badge">📋 Conducted</div>
+              <div class="ebc-body">
+                <div class="ebc-title">Neural Nexus Quiz Competition</div>
+                <div class="ebc-meta">
+                  <div class="ebc-meta-item"><span class="ebc-icon">📅</span> December 18, 2024</div>
+                  <div class="ebc-meta-item"><span class="ebc-icon">📍</span> CSE Seminar Hall</div>
+                  <div class="ebc-meta-item"><span class="ebc-icon">🏷️</span> AI &amp; DS Club</div>
                 </div>
-                <div class="dateback">
-                  <div class="date"><p>DEC</p><p>18</p></div>
-                  <div class="line"></div>
-                  <div class="venue">
-                    <ul style="font-weight:700;color:white">NEURAL NEXUS QUIZ</ul>
-                    <ul class="matter">Quiz competition by AI&amp;DS Club</ul>
-                    <div class="location">
-                      <span>📍</span>
-                      <ul class="matter">CSE Seminar Hall</ul>
-                    </div>
-                    <a href="quiz.html"><button>📄 Details</button></a>
-                  </div>
-                </div>
+                <div class="ebc-desc">An exciting quiz competition organised by the Neural Nexus AI &amp; Data Science Club to test members' knowledge and spark competitive spirit.</div>
+                <a href="quiz.html" class="ebc-btn">📄 View Details</a>
               </div>
             </div>
 
@@ -590,20 +716,23 @@
             <div id="conducted-events-list"></div>
           </div>
 
-          <!-- UPCOMING -->
-          <div class="content upcoming-content">
-            <div class="event-list"><h3>· One Day Guest Lecture</h3></div>
-            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:24px">
-              <h4 style="font-size:18px;font-weight:800;color:white;margin-bottom:10px">Guest Lecture 2025</h4>
-              <p style="color:rgba(255,255,255,0.6);font-size:14px;line-height:1.8">An upcoming guest lecture on cutting-edge AI &amp; Data Science topics. Details to be announced soon.</p>
+          <!-- UPCOMING PANEL -->
+          <div class="tab-panel panel-upcoming">
+            <div class="conducted-heading">Upcoming Events</div>
+            <div class="conducted-sub">✦ Stay tuned for what's next ✦</div>
+
+            <div class="upcoming-card">
+              <h4>Guest Lecture 2025</h4>
+              <p>An upcoming guest lecture on cutting-edge AI &amp; Data Science topics. Details to be announced soon. Follow us on Instagram to stay updated!</p>
             </div>
 
             <!-- Firebase dynamic upcoming events -->
             <div id="upcoming-events-list"></div>
           </div>
 
-        </div><!-- /content-area -->
-      </div><!-- /main-area -->
+        </div><!-- /tab-panels -->
+      </div><!-- /events-section -->
+
     </div><!-- /whitebox -->
 
     <!-- ══ PHOTO GALLERY ══ -->
@@ -645,25 +774,31 @@
     <!-- ══ FOOTER ══ -->
     <div class="last">
       <div class="last-1">
-        <div class="all" style="display:flex;align-items:flex-start;flex-wrap:wrap;gap:20px">
-          <div class="logo-1" style="width:56px;height:56px;background-image:url(images-1/logo.jpeg);background-size:cover;flex-shrink:0"></div>
-          <div class="clgname-1">
-            <p class="name-1" style="font-size:28px;font-weight:900">Sri Indu</p>
-            <p class="institute-1" style="font-size:12px">Institute of Engineering &amp; Technology</p>
-            <p class="ugc-1" style="font-size:11px">UGC Autonomous Institution</p>
-            <p class="rec-1" style="font-size:10px">Recognized under 2(f) of UGC Act 1956</p>
+        <div class="footer-top-row" style="display:flex;align-items:flex-start;flex-wrap:wrap;gap:24px;row-gap:28px">
+          <!-- College branding -->
+          <div style="display:flex;align-items:flex-start;gap:14px;flex:1;min-width:200px">
+            <div class="logo-1" style="width:56px;height:56px;background-image:url(images-1/logo.jpeg);background-size:cover;flex-shrink:0;border-radius:50%;border:2px solid #e63946"></div>
+            <div class="clgname-1">
+              <p class="name-1" style="font-size:26px;font-weight:900">Sri Indu</p>
+              <p class="institute-1" style="font-size:12px">Institute of Engineering &amp; Technology</p>
+              <p class="ugc-1" style="font-size:11px">UGC Autonomous Institution</p>
+              <p class="rec-1" style="font-size:10px">Recognized under 2(f) of UGC Act 1956</p>
+            </div>
           </div>
-          <div class="list">
+          <!-- College Contact Info -->
+          <div class="list" style="flex:1;min-width:220px">
             <p class="info">College Contact Info</p>
-            <ul class="address">📍 Sheriguda, Rangareddy, Telangana — 501510</ul>
-            <ul class="address">📞 93947187999, 8096951507</ul>
-            <ul class="address">✉️ acct.siiet@gmail.com</ul>
-            <ul class="address"><a href="https://sriindu.ac.in/" target="_blank" style="color:inherit">🌐 sriindu.ac.in</a></ul>
+            <ul class="address" style="list-style:none;padding:0">📍 Sheriguda, Rangareddy, Telangana — 501510</ul>
+            <ul class="address" style="list-style:none;padding:0">📞 93947187999, 8096951507</ul>
+            <ul class="address" style="list-style:none;padding:0">✉️ acct.siiet@gmail.com</ul>
+            <ul class="address" style="list-style:none;padding:0"><a href="https://sriindu.ac.in/" target="_blank" style="color:inherit">🌐 sriindu.ac.in</a></ul>
           </div>
-        </div>
-        <div class="details-2" style="margin-top:24px;border-top:1px solid rgba(255,255,255,0.06);padding-top:20px">
-          <p class="details-1">📞 Contact us · 9014196561</p>
-          <p class="details-1">✉️ neuralnexus.siiet@gmail.com</p>
+          <!-- Club Contact -->
+          <div style="flex:1;min-width:200px">
+            <p class="info">Club Contact</p>
+            <p class="details-1" style="padding:0">📞 Contact us · 9014196561</p>
+            <p class="details-1" style="padding:0">✉️ neuralnexus.siiet@gmail.com</p>
+          </div>
         </div>
       </div>
       <div class="social-5" style="display:flex;align-items:center;padding:14px 24px">
