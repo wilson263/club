@@ -81,12 +81,12 @@ async function doLogin() {
 
   try {
     const __cred = await auth.signInWithEmailAndPassword(email, password);
+      // SUCCESS: directly show dashboard, don't rely on onAuthStateChanged
       currentUser = __cred.user;
       isPermanentAdmin = __cred.user.email === PERMANENT_ADMIN_EMAIL;
       if (isPermanentAdmin) localStorage.setItem("nn_role_" + __cred.user.uid, "true");
-      updateSidebarForRole(__cred.user);
-      showDashboard();
-      return;
+      showDashboard(); // show first so any errors below don't block access
+      try { updateSidebarForRole(__cred.user); } catch(e) {}
   } catch (err) {
     if ((err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") &&
         email === PERMANENT_ADMIN_EMAIL && password === PERMANENT_ADMIN_PASSWORD) {
@@ -100,6 +100,7 @@ async function doLogin() {
       }
     }
     let msg = "Invalid email or password.";
+    if (err.code === "auth/unauthorized-domain") msg = "Sign-in is blocked for this domain. Please add this domain to Firebase Auth settings.";
     if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential") msg = "No admin account found with this email.";
     if (err.code === "auth/wrong-password")   msg = "Incorrect password.";
     if (err.code === "auth/too-many-requests") msg = "Too many attempts. Try again later.";
