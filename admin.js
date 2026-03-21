@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAkYeTlfnicPo1JczB4rZZj61UnHFbvqVE",
   authDomain: "neuralnexus-be2c7.firebaseapp.com",
   projectId: "neuralnexus-be2c7",
-  storageBucket: "neuralnexus-be2c7.firebasestorage.app",
+  storageBucket: "neuralnexus-be2c7.appspot.com",
   messagingSenderId: "1094362929898",
   appId: "1:1094362929898:web:2c48716b8e23bbe05bd593",
   measurementId: "G-NCXVDWM2GP"
@@ -342,25 +342,34 @@ async function uploadHomeImages(files) {
   const wrapper = document.getElementById("home-progress-wrapper");
   const fill    = document.getElementById("home-progress-fill");
   wrapper.style.display = "block";
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const ref  = storage.ref(`home_images/${Date.now()}_${file.name}`);
-    const task = ref.put(file);
-    await new Promise((resolve, reject) => {
-      task.on("state_changed",
-        snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
-        reject,
-        async () => {
-          const url = await ref.getDownloadURL();
-          await db.collection("home_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
-          resolve();
-        }
-      );
-    });
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ref  = storage.ref(`home_images/${Date.now()}_${file.name}`);
+      const task = ref.put(file);
+      await new Promise((resolve, reject) => {
+        task.on("state_changed",
+          snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
+          err => reject(err),
+          async () => {
+            try {
+              const url = await ref.getDownloadURL();
+              await db.collection("home_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
+              resolve();
+            } catch(e) { reject(e); }
+          }
+        );
+      });
+    }
+    showToast(`${files.length} image(s) uploaded!`, "success");
+    loadHomeImages();
+  } catch(e) {
+    console.error("Home image upload error:", e);
+    showToast("Upload failed: " + (e.message || "Unknown error. Check storage rules."), "error");
+  } finally {
+    wrapper.style.display = "none"; fill.style.width = "0%";
+    document.getElementById("home-file-input").value = "";
   }
-  wrapper.style.display = "none"; fill.style.width = "0%";
-  showToast(`${files.length} image(s) uploaded!`, "success");
-  loadHomeImages();
 }
 
 async function loadHomeImages() {
@@ -495,25 +504,34 @@ async function uploadGalleryImages(files) {
   const wrapper = document.getElementById("gallery-progress-wrapper");
   const fill    = document.getElementById("gallery-progress-fill");
   wrapper.style.display = "block";
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    const ref  = storage.ref(`gallery_images/${Date.now()}_${file.name}`);
-    const task = ref.put(file);
-    await new Promise((resolve, reject) => {
-      task.on("state_changed",
-        snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
-        reject,
-        async () => {
-          const url = await ref.getDownloadURL();
-          await db.collection("gallery_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
-          resolve();
-        }
-      );
-    });
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const ref  = storage.ref(`gallery_images/${Date.now()}_${file.name}`);
+      const task = ref.put(file);
+      await new Promise((resolve, reject) => {
+        task.on("state_changed",
+          snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
+          err => reject(err),
+          async () => {
+            try {
+              const url = await ref.getDownloadURL();
+              await db.collection("gallery_images").add({ url, uploadedBy: currentUser.email, uploadedAt: firebase.firestore.FieldValue.serverTimestamp() });
+              resolve();
+            } catch(e) { reject(e); }
+          }
+        );
+      });
+    }
+    showToast(`${files.length} photo(s) uploaded!`, "success");
+    loadGalleryImages();
+  } catch(e) {
+    console.error("Gallery image upload error:", e);
+    showToast("Upload failed: " + (e.message || "Unknown error. Check storage rules."), "error");
+  } finally {
+    wrapper.style.display = "none"; fill.style.width = "0%";
+    document.getElementById("gallery-file-input").value = "";
   }
-  wrapper.style.display = "none"; fill.style.width = "0%";
-  showToast(`${files.length} photo(s) uploaded!`, "success");
-  loadGalleryImages();
 }
 
 async function loadGalleryImages() {
