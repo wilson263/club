@@ -451,7 +451,7 @@
       <h2 class="section-title">Key Achievements</h2>
     </div>
 
-    <div class="achievements-grid">
+    <div class="achievements-grid" id="dynamic-ach-grid">
 
       <div class="achievement-card">
         <div class="card-icon gold">🏆</div>
@@ -592,6 +592,43 @@
 </div>
 
 <a href="admin.html" class="admin-fab">🔐 Admin</a>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-content.js"></script>
+<script>
+(async function loadAchievements() {
+  const grid = document.getElementById("dynamic-ach-grid");
+  if (!grid) return;
+
+  try {
+    const snap = await firebase.firestore().collection("achievements").orderBy("addedAt","desc").get();
+    if (!snap.empty) {
+      // Replace hardcoded cards with Firebase data
+      grid.innerHTML = "";
+      snap.forEach(doc => {
+        const d = doc.data();
+        const colorClass = ["gold","silver","bronze","blue","green","purple"][Math.floor(Math.random()*6)];
+        grid.innerHTML += `
+          <div class="achievement-card">
+            <div class="card-icon ${colorClass}">${d.emoji || "🏆"}</div>
+            <div class="card-category">${d.category || "Achievement"}</div>
+            <div class="card-title">${d.title || ""}</div>
+            <div class="card-desc">${d.description || ""}</div>
+            <div class="card-footer">
+              <span class="card-date">📅 ${d.year || ""}</span>
+              ${d.badge ? `<span class="card-badge badge-winner">${d.badge}</span>` : ""}
+            </div>
+          </div>
+        `;
+      });
+    }
+    // Update stats
+    document.querySelector(".stat-num:nth-of-type(2)");
+  } catch(e) { console.warn("Achievements: Firebase not loaded", e.message); }
+})();
+</script>
 
 </body>
 </html>
