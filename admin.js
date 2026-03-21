@@ -1633,313 +1633,292 @@ async function loadAdminNewsletter() {
 }
 
 // ── LIVE QUIZ ────────────────────────────────────────────
-async function checkQuizStatus() {
-  const el = document.getElementById("quiz-status");
-  if (!el) return;
-  try {
-    const snap = await db.collection("quiz_sessions").where("active","==",true).get();
-    el.textContent = snap.empty ? "No active quiz session." : "⚡ LIVE: "+snap.docs[0].data().question;
-    el.style.color = snap.empty ? "var(--muted)" : "#e63946";
-  } catch(e) { el.textContent = "Error checking quiz status."; console.error("checkQuizStatus error:", e); }
-}
-async function startQuizSession() {
-  if (!checkAuth()) return;
-  const q = document.getElementById("qz-question").value.trim();
-  const opts = document.getElementById("qz-options").value.trim().split("\n").map(o=>o.trim()).filter(Boolean);
-  const correct = parseInt(document.getElementById("qz-correct").value)-1;
-  const timer = parseInt(document.getElementById("qz-timer").value)||30;
-  if (!q || opts.length < 2) { showToast("Question and at least 2 options required","error"); return; }
-  try {
-    await db.collection("quiz_sessions").where("active","==",true).get().then(snap=>Promise.all(snap.docs.map(d=>d.ref.update({active:false}))));
-    await db.collection("quiz_sessions").add({ question: q, options: opts, correctIndex: correct, timer, active: true, questionNumber: Date.now(), startedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast("Quiz is now LIVE!","success"); checkQuizStatus();
-  } catch(e) { handleFirebaseError(e, "startQuizSession"); }
-}
-async function stopQuizSession() {
-  if (!checkAuth()) return;
-  try {
-    const snap = await db.collection("quiz_sessions").where("active","==",true).get();
-    await Promise.all(snap.docs.map(d=>d.ref.update({active:false})));
-    showToast("Quiz ended","info"); checkQuizStatus();
-  } catch(e) { handleFirebaseError(e, "stopQuizSession"); }
-}
+// ── QUIZ SESSION MANAGEMENT ─────────────────────────────────────────────────
+let quizSessionId = null;
+let quizQuestions = [];
+let quizQueueIndex = 0;
+let quizFlagsUnsub = null;
+let quizPartUnsub = null;
 
-// ── FEEDBACK ────────────────────────────────────────────
-async function loadAdminFeedback() {
-  const el = document.getElementById("feedback-admin-list");
-  if (!el) return;
-  try {
-    const snap = await db.collection("feedback").orderBy("submittedAt","desc").get();
-    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">⭐</div><p>No feedback yet.</p></div>'; return; }
-    el.innerHTML = snap.docs.map(d => {
-      const a = d.data();
-      const stars = "★".repeat(a.rating||0)+"☆".repeat(5-(a.rating||0));
-      const dt = a.submittedAt?.toDate ? a.submittedAt.toDate().toLocaleDateString("en-IN") : "—";
-      return `<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div><strong style="color:#fff">${a.name||"Anonymous"}</strong> <span style="color:#FFD700;letter-spacing:1px">${stars}</span><br>
-          <span style="color:#e63946;font-size:12px">${a.eventTitle||""}</span> <span style="color:var(--muted);font-size:11px">· ${dt}</span></div>
-          <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteDoc('feedback','${d.id}',loadAdminFeedback)">🗑</button>
-        </div>
-        ${a.comment ? `<p style="color:rgba(255,255,255,0.6);font-size:13px;margin:8px 0 0">${a.comment}</p>` : ""}
-      </div>`;
-    }).join("");
-  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
-}
-
-// ── ATTENDANCE ───────────────────────────────────────────
-async function loadAdminAttendance() {
-  const el = document.getElementById("attendance-admin-list");
-  if (!el) return;
-  try {
-    const snap = await db.collection("attendance_sessions").orderBy("createdAt","desc").get();
-    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">✅</div><p>No sessions yet.</p></div>'; return; }
-    let html = "";
-    for (const d of snap.docs) {
-      const a = d.data();
-      const rSnap = await db.collection("attendance_records").where("sessionId","==",d.id).get();
-      html += `<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><strong style="color:#fff">${a.title||"Session"}</strong>
-          <span style="margin-left:10px;padding:2px 10px;background:${a.active?"rgba(39,174,96,0.15)":"rgba(255,255,255,0.06)"};border-radius:10px;font-size:11px;color:${a.active?"#27ae60":"#aaa"}">${a.active?"ACTIVE":"Closed"}</span><br>
-          <code style="font-size:14px;color:#e63946;letter-spacing:2px;font-weight:700">${a.code||"—"}</code>
-          <span style="color:var(--muted);font-size:12px;margin-left:8px">· ${a.date||""} · ${rSnap.size} attendees</span></div>
-          <div style="display:flex;gap:6px">
-            ${a.active ? `<button class="btn" style="padding:5px 12px;font-size:12px;background:rgba(230,57,70,0.15);color:#e63946;border:1px solid rgba(230,57,70,0.3)" onclick="toggleAttSession('${d.id}',false,loadAdminAttendance)">⏹ Close</button>` : `<button class="btn btn-primary" style="padding:5px 12px;font-size:12px" onclick="toggleAttSession('${d.id}',true,loadAdminAttendance)">▶ Re-open</button>`}
-            <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('attendance_sessions','${d.id}',loadAdminAttendance)">🗑</button>
-          </div>
-        </div>
-      </div>`;
-    }
-    el.innerHTML = html;
-  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
-}
-async function toggleAttSession(id, active, cb) {
-  try {
-    await db.collection("attendance_sessions").doc(id).update({ active });
-    showToast(active?"Session re-opened":"Session closed","info"); if(cb) cb();
-  } catch(e) { showToast("Error updating session: " + e.message, "error"); console.error("toggleAttSession error:", e); }
-}
-async function createAttendanceSession() {
+async function createQuizSession() {
   if (!checkAuth()) return;
-  const title = document.getElementById("att-title").value.trim();
-  const code = document.getElementById("att-code-inp").value.trim().toUpperCase();
-  const date = document.getElementById("att-date").value;
-  if (!title || !code) { showToast("Title and code are required","error"); return; }
+  const title = document.getElementById('qz-title').value.trim();
+  if (!title) { showToast('Enter a quiz title.', 'error'); return; }
   try {
-    await db.collection("attendance_sessions").add({ title, code, date, active: true, createdBy: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast("Session created! Show code: "+code,"success");
-    ["att-title","att-code-inp","att-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-    loadAdminAttendance();
-  } catch(e) { handleFirebaseError(e, "createAttendanceSession"); }
-}
-
-// ── CERTIFICATES ─────────────────────────────────────────
-async function loadAdminCertificates() {
-  const el = document.getElementById("certificates-admin-list");
-  if (!el) return;
-  try {
-    const snap = await db.collection("certificates").orderBy("issuedAt","desc").get();
-    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🛡️</div><p>No certificates issued yet.</p></div>'; return; }
-    el.innerHTML = `<table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Code</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Issued To</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Event</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Date</th><th></th></tr>` +
-    snap.docs.map(d => {
-      const a = d.data();
-      return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05)"><td style="padding:10px 12px"><code style="color:#e63946;font-size:12px">${a.code||"—"}</code></td><td style="padding:10px 12px;color:#fff;font-size:13px">${a.issuedTo||"—"}</td><td style="padding:10px 12px;color:var(--muted);font-size:12px">${a.event||"—"}</td><td style="padding:10px 12px;color:var(--muted);font-size:12px">${a.date||"—"}</td><td style="padding:10px 12px"><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteDoc('certificates','${d.id}',loadAdminCertificates)">🗑</button></td></tr>`;
-    }).join("") + "</table>";
-  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
-}
-async function issueCertificate() {
-  if (!checkAuth()) return;
-  const issuedTo = document.getElementById("cert-to").value.trim();
-  const event = document.getElementById("cert-event").value.trim();
-  const date = document.getElementById("cert-date").value;
-  if (!issuedTo || !event) { showToast("Name and event are required","error"); return; }
-  const customCode = document.getElementById("cert-code-inp").value.trim().toUpperCase();
-  const code = customCode || "NN-"+(new Date().getFullYear())+"-"+Math.random().toString(36).substr(2,4).toUpperCase();
-  try {
-    await db.collection("certificates").add({ code, issuedTo, event, date, issuedBy: currentUser.email, issuedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast("Certificate issued! Code: "+code,"success");
-    ["cert-to","cert-event","cert-date","cert-code-inp"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-    loadAdminCertificates();
-  } catch(e) { handleFirebaseError(e, "issueCertificate"); }
-}
-
-// ── PRESS ────────────────────────────────────────────────
-async function loadAdminPress() {
-  const el = document.getElementById("press-admin-list");
-  if (!el) return;
-  try {
-    const snap = await db.collection("press").get();
-    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📰</div><p>No coverage yet.</p></div>'; return; }
-    const pressDocs = snap.docs.slice().sort((a,b) => (b.data().date||"").localeCompare(a.data().date||""));
-    el.innerHTML = pressDocs.map(d => {
-      const a = d.data();
-      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <div><strong style="color:#fff">${a.title||"Untitled"}</strong><br>
-        <span style="color:var(--muted);font-size:12px">${a.source||""} · ${a.date||""}</span></div>
-        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('press','${d.id}',loadAdminPress)">🗑</button>
-      </div>`;
-    }).join("");
-  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
-}
-async function savePress() {
-  if (!checkAuth()) return;
-  const title = document.getElementById("pr-title").value.trim();
-  if (!title) { showToast("Headline is required","error"); return; }
-  try {
-    await db.collection("press").add({ title, source: document.getElementById("pr-source").value.trim(), date: document.getElementById("pr-date").value, url: document.getElementById("pr-url").value.trim(), icon: document.getElementById("pr-icon").value.trim()||"📰", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast("Coverage added!","success");
-    ["pr-title","pr-source","pr-date","pr-url","pr-icon"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-    loadAdminPress();
-  } catch(e) { handleFirebaseError(e, "savePress"); }
-}
-
-// ── OPEN SOURCE ──────────────────────────────────────────
-async function loadAdminOSS() {
-  const el = document.getElementById("oss-admin-list");
-  if (!el) return;
-  try {
-    const snap = await db.collection("opensource").orderBy("addedAt","desc").get();
-    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">⚙️</div><p>No repos yet.</p></div>'; return; }
-    el.innerHTML = snap.docs.map(d => {
-      const a = d.data();
-      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <div><strong style="color:#fff">${a.title||"—"}</strong> ${a.language?`<span style="font-size:11px;color:#e63946">[${a.language}]</span>`:""}<br>
-        <span style="color:var(--muted);font-size:12px">${a.description||""} ${a.stars?"· ⭐"+a.stars:""}</span></div>
-        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('opensource','${d.id}',loadAdminOSS)">🗑</button>
-      </div>`;
-    }).join("");
-  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
-}
-async function saveOSS() {
-  if (!checkAuth()) return;
-  const title = document.getElementById("oss-title").value.trim();
-  if (!title) { showToast("Repo name is required","error"); return; }
-  try {
-    await db.collection("opensource").add({ title, description: document.getElementById("oss-desc").value.trim(), language: document.getElementById("oss-lang").value.trim(), stars: parseInt(document.getElementById("oss-stars").value)||0, link: document.getElementById("oss-link").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast("Repository added!","success");
-    ["oss-title","oss-desc","oss-lang","oss-stars","oss-link"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-    loadAdminOSS();
-  } catch(e) { handleFirebaseError(e, "saveOSS"); }
-}
-
-// ── MINUTES ──────────────────────────────────────────────
-async function loadAdminMinutes() {
-  const el = document.getElementById("minutes-admin-list");
-  if (!el) return;
-  try {
-    const snap = await db.collection("minutes").get();
-    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📋</div><p>No minutes uploaded yet.</p></div>'; return; }
-    const minutesDocs = snap.docs.slice().sort((a,b) => (b.data().date||"").localeCompare(a.data().date||""));
-    el.innerHTML = minutesDocs.map(d => {
-      const a = d.data();
-      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <div><strong style="color:#fff">${a.title||"Minutes"}</strong> ${a.meetingType?`<span style="font-size:11px;background:rgba(230,57,70,0.15);color:#e63946;padding:2px 8px;border-radius:8px">${a.meetingType}</span>`:""}<br>
-        <span style="color:var(--muted);font-size:12px">${a.date||""}</span></div>
-        <div style="display:flex;gap:6px">
-          ${a.fileUrl?`<a href="${a.fileUrl}" target="_blank" class="btn" style="padding:5px 12px;font-size:12px;background:rgba(41,128,185,0.15);color:#5dade2;border:1px solid rgba(41,128,185,0.3)">⬇ View</a>`:""}
-          <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('minutes','${d.id}',loadAdminMinutes)">🗑</button>
-        </div>
-      </div>`;
-    }).join("");
-  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
-}
-async function saveMinutes() {
-  if (!checkAuth()) return;
-  const title = document.getElementById("mn-title").value.trim();
-  const fileUrl = document.getElementById("mn-url").value.trim();
-  const date = document.getElementById("mn-date").value;
-  if (!title || !fileUrl) { showToast("Title and file URL are required","error"); return; }
-  try {
-    await db.collection("minutes").add({ title, date, meetingType: document.getElementById("mn-type").value.trim(), fileUrl, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast("Minutes uploaded!","success");
-    ["mn-title","mn-date","mn-type","mn-url"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-    loadAdminMinutes();
-  } catch(e) { handleFirebaseError(e, "saveMinutes"); }
-}
-
-// ── SPONSORS ─────────────────────────────────────────────
-async function loadAdminSponsors() {
-  const el = document.getElementById("sponsors-admin-list");
-  if (!el) return;
-  try {
-    const snap = await db.collection("sponsors").get();
-    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🤝</div><p>No sponsors yet.</p></div>'; return; }
-    const tierOrder = { gold: 0, silver: 1, bronze: 2, supporter: 3 };
-    const sponsorDocs = snap.docs.slice().sort((a,b) => (tierOrder[a.data().tier]??9) - (tierOrder[b.data().tier]??9));
-    el.innerHTML = sponsorDocs.map(d => {
-      const a = d.data();
-      const colors = { gold:"#FFD700", silver:"#C0C0C0", bronze:"#CD7F32", supporter:"#5dade2" };
-      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
-        <div><span style="font-size:22px;margin-right:10px">${a.logo||"🏢"}</span><strong style="color:#fff">${a.name||"—"}</strong>
-        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;color:${colors[a.tier]||"#aaa"};background:rgba(255,255,255,0.05)">${(a.tier||"").toUpperCase()}</span></div>
-        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('sponsors','${d.id}',loadAdminSponsors)">🗑</button>
-      </div>`;
-    }).join("");
-  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
-}
-async function saveSponsor() {
-  if (!checkAuth()) return;
-  const name = document.getElementById("sp-name").value.trim();
-  if (!name) { showToast("Company name is required","error"); return; }
-  try {
-    await db.collection("sponsors").add({ name, tier: document.getElementById("sp-tier").value, website: document.getElementById("sp-website").value.trim(), logo: document.getElementById("sp-logo").value.trim()||"🏢", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast("Sponsor added!","success");
-    ["sp-name","sp-website","sp-logo"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
-    loadAdminSponsors();
-  } catch(e) { handleFirebaseError(e, "saveSponsor"); }
-}
-
-// ── NEWSLETTER BROADCAST ──────────────────────────────────
-async function broadcastToSubscribers(type, title, details) {
-  if (typeof emailjs === "undefined") {
-    console.warn("EmailJS not configured — skipping newsletter broadcast.");
-    return;
-  }
-  try {
-    const snap = await db.collection("newsletter").get();
-    if (snap.empty) return;
-    const typeLabel = type === "event" ? "📅 New Event" : "📢 New Announcement";
-    let sent = 0;
-    const promises = snap.docs.map(doc => {
-      const data = doc.data();
-      if (!data.email) return Promise.resolve();
-      return emailjs.send(
-        window.EMAILJS_SERVICE_ID || "service_neuralnexus",
-        window.EMAILJS_CONFIRM_TEMPLATE || "template_confirm",
-        {
-          to_email: data.email,
-          to_name: data.email.split("@")[0],
-          update_type: typeLabel,
-          update_title: title,
-          update_details: details,
-          event_title: title,
-          club_name: "Neural Nexus — AI & DS Club",
-          club_email: "neuralnexusclub@gmail.com",
-          club_phone: "9014196561",
-          site_url: "https://neuralnexusgroup.in",
-          register_url: type === "event" ? "https://neuralnexusgroup.in/register.html" : ""
-        }
-      ).then(() => { sent++; }).catch(err => console.warn("Newsletter send error for " + data.email + ":", err));
+    const docRef = await db.collection('quiz_sessions').add({
+      title, status: 'setup',
+      currentQuestionIndex: 0, totalQuestions: 0,
+      createdBy: currentUser.email,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    await Promise.allSettled(promises);
-    if (sent > 0) showToast(`Newsletter sent to ${sent} subscriber(s)!`, "success");
-  } catch(e) {
-    console.warn("broadcastToSubscribers error:", e);
+    quizSessionId = docRef.id;
+    quizQuestions = [];
+    quizQueueIndex = 0;
+    document.getElementById('qz-session-title').textContent = title;
+    document.getElementById('qz-create-section').style.display = 'none';
+    document.getElementById('qz-active-section').style.display = 'block';
+    document.getElementById('qz-session-badge').style.display = 'inline-flex';
+    document.getElementById('qz-participants-card').style.display = 'block';
+    renderQuestionQueue();
+    startQuizParticipantListener();
+    startQuizFlagListener();
+    await logActivity('quiz', 'Created quiz session: ' + title);
+    showToast('Quiz session created! Add questions and launch.', 'success');
+  } catch(e) { handleFirebaseError(e, 'createQuizSession'); }
+}
+
+async function addQuizQuestion() {
+  if (!quizSessionId) { showToast('Create a session first.', 'error'); return; }
+  const q = document.getElementById('qz-question').value.trim();
+  const a = document.getElementById('qz-opt-a').value.trim();
+  const b = document.getElementById('qz-opt-b').value.trim();
+  const c = document.getElementById('qz-opt-c').value.trim();
+  const d = document.getElementById('qz-opt-d').value.trim();
+  const correct = parseInt(document.getElementById('qz-correct').value);
+  const timer = parseInt(document.getElementById('qz-timer').value) || 30;
+  if (!q || !a || !b) { showToast('Question, Option A and B are required.', 'error'); return; }
+  const options = [a, b, ...(c ? [c] : []), ...(d ? [d] : [])];
+  if (correct >= options.length) { showToast('Correct answer option does not exist.', 'error'); return; }
+
+  const order = quizQuestions.length + 1;
+  try {
+    const docRef = await db.collection('quiz_questions').add({
+      sessionId: quizSessionId, order, question: q,
+      options, correctIndex: correct, timer, status: 'waiting',
+      totalQuestions: order, addedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    quizQuestions.push({ id: docRef.id, order, question: q, options, correctIndex: correct, timer, status: 'waiting' });
+    // Update totalQuestions on all existing questions and session
+    const batch = db.batch();
+    quizQuestions.forEach(qq => {
+      batch.update(db.collection('quiz_questions').doc(qq.id), { totalQuestions: quizQuestions.length });
+    });
+    batch.update(db.collection('quiz_sessions').doc(quizSessionId), { totalQuestions: quizQuestions.length });
+    await batch.commit();
+    ['qz-question','qz-opt-a','qz-opt-b','qz-opt-c','qz-opt-d'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('qz-timer').value = '30';
+    renderQuestionQueue();
+    showToast('Question ' + order + ' added to queue!', 'success');
+  } catch(e) { handleFirebaseError(e, 'addQuizQuestion'); }
+}
+
+function renderQuestionQueue() {
+  const list = document.getElementById('qz-question-list');
+  document.getElementById('qz-q-count').textContent = quizQuestions.length;
+  if (!quizQuestions.length) { list.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px">No questions added yet.</div>'; return; }
+  list.innerHTML = quizQuestions.map((q, i) => {
+    const statusColor = q.status === 'active' ? '#27ae60' : q.status === 'ended' ? '#aaa' : '#f5c842';
+    const statusLabel = q.status === 'active' ? '&#9679; LIVE' : q.status === 'ended' ? '&#10003; Done' : '&#9201; Waiting';
+    return '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px 16px;display:flex;align-items:center;gap:12px">'
+      + '<div style="width:28px;height:28px;border-radius:8px;background:rgba(230,57,70,0.15);color:#e63946;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">' + (i+1) + '</div>'
+      + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + q.question + '</div>'
+      + '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + q.options.length + ' options &middot; ' + q.timer + 's timer &middot; Correct: ' + ['A','B','C','D'][q.correctIndex] + '</div></div>'
+      + '<div style="font-size:11px;font-weight:700;color:' + statusColor + '">' + statusLabel + '</div>'
+      + (q.status === 'waiting' ? '<button onclick="deleteQuizQuestion('' + q.id + '',' + i + ')" style="background:none;border:none;color:#e63946;cursor:pointer;font-size:16px;padding:4px">&#128465;</button>' : '')
+      + '</div>';
+  }).join('');
+}
+
+async function deleteQuizQuestion(qid, idx) {
+  if (!confirm('Remove this question?')) return;
+  try {
+    await db.collection('quiz_questions').doc(qid).delete();
+    quizQuestions.splice(idx, 1);
+    quizQuestions.forEach((q, i) => { q.order = i + 1; db.collection('quiz_questions').doc(q.id).update({ order: i + 1, totalQuestions: quizQuestions.length }); });
+    if (quizSessionId) db.collection('quiz_sessions').doc(quizSessionId).update({ totalQuestions: quizQuestions.length });
+    renderQuestionQueue();
+    showToast('Question removed.', 'info');
+  } catch(e) { showToast('Error removing question.', 'error'); }
+}
+
+async function launchNextQuestion() {
+  if (!quizSessionId) { showToast('No active session.', 'error'); return; }
+  const waiting = quizQuestions.filter(q => q.status === 'waiting');
+  if (!waiting.length) { showToast('No more questions in the queue. End the quiz.', 'info'); return; }
+  // End any currently active question first
+  await endCurrentQuestion(true);
+  const next = waiting[0];
+  try {
+    await db.collection('quiz_questions').doc(next.id).update({ status: 'active', launchedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('quiz_sessions').doc(quizSessionId).update({ status: 'active', currentQuestionIndex: next.order });
+    next.status = 'active';
+    renderQuestionQueue();
+    document.getElementById('qz-current-status').textContent = 'LIVE: Q' + next.order + ' — ' + next.question.substr(0, 60) + (next.question.length > 60 ? '...' : '');
+    await logActivity('quiz', 'Launched question ' + next.order + ': ' + next.question.substr(0, 50));
+    showToast('Question ' + next.order + ' is now LIVE!', 'success');
+  } catch(e) { handleFirebaseError(e, 'launchNextQuestion'); }
+}
+
+async function endCurrentQuestion(silent) {
+  if (!quizSessionId) return;
+  const active = quizQuestions.find(q => q.status === 'active');
+  if (!active) return;
+  try {
+    await db.collection('quiz_questions').doc(active.id).update({ status: 'ended', endedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    active.status = 'ended';
+    renderQuestionQueue();
+    document.getElementById('qz-current-status').textContent = 'Q' + active.order + ' ended. Launch next or end quiz.';
+    if (!silent) showToast('Question ended.', 'info');
+  } catch(e) { if (!silent) showToast('Error ending question.', 'error'); }
+}
+
+async function endQuizSession() {
+  if (!quizSessionId) { showToast('No active session.', 'error'); return; }
+  if (!confirm('End the entire quiz? All participants will see results.')) return;
+  try {
+    await endCurrentQuestion(true);
+    await db.collection('quiz_sessions').doc(quizSessionId).update({ status: 'ended', endedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    if (quizFlagsUnsub) quizFlagsUnsub();
+    if (quizPartUnsub) quizPartUnsub();
+    document.getElementById('qz-session-badge').style.display = 'none';
+    document.getElementById('qz-current-status').textContent = 'Quiz ended.';
+    await logActivity('quiz', 'Ended quiz session: ' + document.getElementById('qz-session-title').textContent);
+    showToast('Quiz ended! Participants see their results.', 'success');
+    // Reset for next session
+    setTimeout(() => {
+      quizSessionId = null; quizQuestions = []; quizQueueIndex = 0;
+      document.getElementById('qz-create-section').style.display = 'block';
+      document.getElementById('qz-active-section').style.display = 'none';
+      document.getElementById('qz-title').value = '';
+    }, 3000);
+  } catch(e) { handleFirebaseError(e, 'endQuizSession'); }
+}
+
+function startQuizParticipantListener() {
+  if (!quizSessionId) return;
+  if (quizPartUnsub) quizPartUnsub();
+  quizPartUnsub = db.collection('quiz_participants').where('sessionId','==',quizSessionId)
+    .onSnapshot(snap => {
+      const count = snap.size;
+      document.getElementById('qz-p-count').textContent = count;
+      const list = document.getElementById('qz-participants-list');
+      if (!count) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No participants yet.</div>'; return; }
+      const sorted = snap.docs.map(d => ({id:d.id,...d.data()})).sort((a,b)=>(b.score||0)-(a.score||0));
+      list.innerHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">'
+        + '<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.1)">'
+        + '<th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600">#</th>'
+        + '<th style="padding:10px 12px;text-align:left;color:var(--muted);font-weight:600">Name</th>'
+        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Score</th>'
+        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Tab Switches</th>'
+        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Status</th>'
+        + '<th style="padding:10px 12px;text-align:center;color:var(--muted);font-weight:600">Actions</th>'
+        + '</tr></thead><tbody>'
+        + sorted.map((p, i) => {
+            const statusColor = p.status === 'banned' ? '#e63946' : p.status === 'warned' ? '#f5c842' : '#27ae60';
+            const tabColor = (p.tabSwitches || 0) > 2 ? '#e63946' : (p.tabSwitches || 0) > 0 ? '#f5c842' : '#27ae60';
+            return '<tr style="border-bottom:1px solid rgba(255,255,255,0.05)">'
+              + '<td style="padding:10px 12px;color:var(--muted)">' + (i+1) + '</td>'
+              + '<td style="padding:10px 12px;color:#fff;font-weight:600">' + (p.name||'Unknown') + '</td>'
+              + '<td style="padding:10px 12px;text-align:center;color:#e63946;font-weight:800">' + (p.score||0) + '</td>'
+              + '<td style="padding:10px 12px;text-align:center;color:' + tabColor + ';font-weight:700">' + (p.tabSwitches||0) + '</td>'
+              + '<td style="padding:10px 12px;text-align:center"><span style="color:' + statusColor + ';font-size:11px;font-weight:700;text-transform:uppercase">' + (p.status||'active') + '</span></td>'
+              + '<td style="padding:10px 12px;text-align:center;display:flex;gap:6px;justify-content:center">'
+              + (p.status !== 'warned' && p.status !== 'banned' ? '<button onclick="warnParticipant('' + p.id + '','' + (p.name||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:5px 10px;background:rgba(245,200,66,0.15);border:1px solid rgba(245,200,66,0.3);border-radius:6px;color:#f5c842;cursor:pointer">&#9888; Warn</button>' : '')
+              + (p.status !== 'banned' ? '<button onclick="banParticipant('' + p.id + '','' + (p.name||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:5px 10px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);border-radius:6px;color:#e63946;cursor:pointer">&#128683; Remove</button>' : '<span style="font-size:11px;color:var(--muted)">Removed</span>')
+              + '</td></tr>';
+          }).join('')
+        + '</tbody></table></div>';
+    });
+}
+
+async function refreshQuizParticipants() {
+  startQuizParticipantListener();
+}
+
+async function warnParticipant(pid, name) {
+  if (!confirm('Issue a warning to ' + name + '? They will see a warning screen.')) return;
+  try {
+    await db.collection('quiz_participants').doc(pid).update({ status: 'warned' });
+    await logActivity('quiz', 'Warned participant: ' + name);
+    showToast('Warning sent to ' + name, 'info');
+  } catch(e) { showToast('Error sending warning.', 'error'); }
+}
+
+async function banParticipant(pid, name) {
+  if (!confirm('Remove ' + name + ' from the quiz? They will see a banned screen.')) return;
+  try {
+    await db.collection('quiz_participants').doc(pid).update({ status: 'banned' });
+    await logActivity('quiz', 'Banned/removed participant: ' + name);
+    showToast(name + ' removed from quiz.', 'info');
+  } catch(e) { showToast('Error removing participant.', 'error'); }
+}
+
+function startQuizFlagListener() {
+  if (!quizSessionId) return;
+  if (quizFlagsUnsub) quizFlagsUnsub();
+  quizFlagsUnsub = db.collection('quiz_flags').where('sessionId','==',quizSessionId)
+    .orderBy('flaggedAt','desc').limit(50)
+    .onSnapshot(snap => {
+      const unseen = snap.docs.filter(d => !d.data().seen).length;
+      document.getElementById('qz-flag-count').textContent = unseen;
+      const list = document.getElementById('qz-flags-list');
+      if (snap.empty) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No flags yet. Good behavior!</div>'; return; }
+      const typeIcon = { tab_switch: '&#128260;', window_blur: '&#128065;', devtools: '&#128421;', page_close: '&#128682;' };
+      const typeColor = { tab_switch: '#f5c842', window_blur: '#f5c842', devtools: '#e63946', page_close: '#e63946' };
+      list.innerHTML = snap.docs.map(doc => {
+        const d = doc.data();
+        const ts = d.flaggedAt ? d.flaggedAt.toDate() : new Date();
+        const time = ts.toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        const icon = typeIcon[d.type] || '&#9888;';
+        const color = typeColor[d.type] || '#f5c842';
+        return '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06)">'
+          + '<div style="font-size:18px;flex-shrink:0">' + icon + '</div>'
+          + '<div style="flex:1"><div style="font-size:13px;color:#fff">' + (d.message||'Flag') + '</div>'
+          + '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + time + ' &middot; <span style="color:' + color + ';font-weight:700;text-transform:uppercase">' + (d.type||'unknown') + '</span></div></div>'
+          + '<div style="display:flex;gap:6px">'
+          + '<button onclick="warnParticipant('' + (d.participantId||'') + '','' + (d.participantName||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:4px 9px;background:rgba(245,200,66,0.12);border:1px solid rgba(245,200,66,0.25);border-radius:6px;color:#f5c842;cursor:pointer">Warn</button>'
+          + '<button onclick="banParticipant('' + (d.participantId||'') + '','' + (d.participantName||'').replace(/'/g,"\'") + '')" style="font-size:11px;padding:4px 9px;background:rgba(230,57,70,0.12);border:1px solid rgba(230,57,70,0.25);border-radius:6px;color:#e63946;cursor:pointer">Remove</button>'
+          + '<button onclick="markFlagSeen('' + doc.id + '',this)" style="font-size:11px;padding:4px 9px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:var(--muted);cursor:pointer">&#10003; OK</button>'
+          + '</div></div>';
+      }).join('');
+    });
+}
+
+async function markFlagSeen(flagId, btn) {
+  try { await db.collection('quiz_flags').doc(flagId).update({ seen: true }); btn.closest('div[style*="border-bottom"]').style.opacity = '0.4'; } catch(e) {}
+}
+
+async function refreshQuizFlags() { startQuizFlagListener(); }
+
+async function refreshQuizResponses() {
+  if (!quizSessionId) { showToast('No active session.', 'info'); return; }
+  try {
+    const [respSnap, partSnap] = await Promise.all([
+      db.collection('quiz_responses').where('sessionId','==',quizSessionId).orderBy('answeredAt','desc').get(),
+      db.collection('quiz_participants').where('sessionId','==',quizSessionId).get()
+    ]);
+    const list = document.getElementById('qz-responses-list');
+    if (respSnap.empty) { list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No responses yet.</div>'; return; }
+    const byQ = {};
+    respSnap.docs.forEach(d => { const r = d.data(); if (!byQ[r.questionOrder]) byQ[r.questionOrder] = []; byQ[r.questionOrder].push(r); });
+    list.innerHTML = Object.keys(byQ).sort((a,b)=>a-b).map(qOrder => {
+      const responses = byQ[qOrder];
+      const correct = responses.filter(r => r.isCorrect).length;
+      const total = responses.length;
+      const avgTime = responses.filter(r => !r.noAnswer).reduce((s,r) => s + (r.timeTaken||0), 0) / Math.max(responses.filter(r=>!r.noAnswer).length, 1);
+      return '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+        + '<div style="font-size:13px;font-weight:700;color:#fff">Question ' + qOrder + '</div>'
+        + '<div style="display:flex;gap:16px">'
+        + '<span style="font-size:12px;color:#27ae60;font-weight:700">&#9989; ' + correct + '/' + total + ' correct</span>'
+        + '<span style="font-size:12px;color:var(--muted)">Avg time: ' + avgTime.toFixed(1) + 's</span>'
+        + '</div></div>'
+        + responses.map(r => '<div style="font-size:12px;color:' + (r.noAnswer ? '#aaa' : r.isCorrect ? '#27ae60' : '#e63946') + ';padding:3px 0">'
+          + (r.isCorrect ? '&#9989;' : r.noAnswer ? '&#9203;' : '&#10060;') + ' ' + (r.participantName||'?')
+          + ' &mdash; ' + (r.noAnswer ? 'No answer' : 'Option ' + ['A','B','C','D'][r.selectedIndex] || '?')
+          + ' &mdash; ' + (r.timeTaken||0) + 's</div>').join('')
+        + '</div>';
+    }).join('');
+  } catch(e) { showToast('Error loading responses.', 'error'); }
+}
+
+// Keep old function names as aliases for backward compatibility
+async function checkQuizStatus() {
+  if (quizSessionId) {
+    document.getElementById('qz-current-status').textContent = 'Session active.';
   }
 }
 
-// ── SHARED DELETE HELPER ──────────────────────────────────
-async function deleteDoc(collection, docId, reloadFn) {
-  if (!confirm("Delete this item?")) return;
-  try {
-    await db.collection(collection).doc(docId).delete();
-    showToast("Deleted","info");
-    if (reloadFn) reloadFn();
-  } catch(e) { showToast("Error deleting","error"); }
-}
-
-// ─── ACTIVITY LOG ─────────────────────────────────
 async function logActivity(action, details) {
   if (!currentUser || !db) return;
   try {
