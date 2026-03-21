@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Live Quiz — Neural Nexus | SIIET</title>
+  <link rel="icon" type="image/jpeg" href="images-1/clublogo.jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="home.css" rel="stylesheet">
+  <style>
+    *{font-family:'Inter',Arial,sans-serif}html{scroll-behavior:smooth}
+    body{background:#080810!important;background-image:none!important}
+    .container{background:transparent!important;border:none!important;backdrop-filter:none!important;border-radius:0!important}
+    .navbar{background:#080810!important;border-bottom:1px solid rgba(230,57,70,0.2)!important;height:72px!important;border-radius:0!important;position:sticky!important;top:0!important;z-index:999!important}
+    .logo{background-image:url(images-1/logo.jpeg);border:2px solid #e63946;box-shadow:0 0 16px rgba(230,57,70,0.35);margin-top:10px!important}
+    .name{color:#e63946!important;font-size:34px!important}.institute,.ugc,.rec{color:#ccc!important}
+    .sublogo-group{display:flex!important;align-items:center!important;gap:6px!important;position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important}
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4{filter:brightness(1.2)!important;position:static!important;width:42px!important;height:42px!important;border-radius:50%!important;border:2px solid rgba(230,57,70,0.4)!important;flex-shrink:0!important}
+    header{background:linear-gradient(135deg,#0d0d1a 0%,#1a0808 100%)!important}
+    .page-hero{padding:60px 24px 40px;text-align:center;background:linear-gradient(135deg,#0a0a1a,#1a0810);border-bottom:1px solid rgba(230,57,70,0.15)}
+    .page-hero h1{font-size:42px;font-weight:900;color:#fff;margin:0 0 12px}.page-hero h1 span{color:#e63946}
+    .page-hero p{font-size:16px;color:rgba(255,255,255,0.5);max-width:600px;margin:0 auto}
+    .quiz-wrap{max-width:660px;margin:0 auto;padding:60px 24px}
+    .waiting-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:48px;text-align:center}
+    .pulse{animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+    .q-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:32px;display:none}
+    .q-num{font-size:12px;font-weight:700;color:#e63946;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+    .q-text{font-size:20px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:24px}
+    .options{display:grid;gap:10px}
+    .opt{padding:14px 18px;background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:all 0.2s;font-family:'Inter',sans-serif}
+    .opt:hover{border-color:#e63946;background:rgba(230,57,70,0.1)}
+    .opt.correct{border-color:#27ae60;background:rgba(39,174,96,0.15);color:#27ae60}
+    .opt.wrong{border-color:#e63946;background:rgba(230,57,70,0.15);color:#e63946}
+    .opt:disabled{cursor:default}
+    .timer{font-size:42px;font-weight:900;color:#e63946;margin-bottom:8px}
+    .page-footer{background:#040408;color:rgba(255,255,255,0.4);text-align:center;padding:16px;font-size:12px;border-top:1px solid rgba(255,255,255,0.05)}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname"><p class="name">Sri Indu</p><p class="institute">Institute of Engineering &amp; Technology</p><p class="ugc">UGC Autonomous Institution</p><p class="rec">Recognized under 2(f) of UGC Act 1956</p></div>
+    <div class="sublogo-group"><div class="sublogo-4"></div><div class="sublogo-1"></div><div class="sublogo-2"></div><div class="sublogo-3"></div></div>
+  </div>
+  <header>
+    <a href="home.html" class="homebut">⌂</a>
+    <nav class="nav"><a href="dashboard.html">🧭</a><a href="register.html">📝</a><a href="contact.html">💬</a></nav>
+  </header>
+  <div class="page-hero">
+    <h1>⚡ Live <span>Quiz</span></h1>
+    <p>Participate in live event quizzes and polls hosted by Neural Nexus. Questions appear when the host activates them.</p>
+  </div>
+  <div class="quiz-wrap">
+    <div class="waiting-card" id="waiting-state">
+      <div style="font-size:64px;margin-bottom:20px" class="pulse">⏳</div>
+      <h2 style="color:#fff;font-size:22px;margin:0 0 12px">Waiting for host...</h2>
+      <p style="color:rgba(255,255,255,0.5);font-size:14px;margin:0 0 20px">No active quiz right now. When the host starts a question it will appear here automatically.</p>
+      <div id="live-dot" style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;background:rgba(255,255,255,0.05);border-radius:20px">
+        <span style="width:8px;height:8px;border-radius:50%;background:#e63946;display:inline-block" class="pulse"></span>
+        <span style="font-size:13px;color:rgba(255,255,255,0.5)">Listening for questions...</span>
+      </div>
+    </div>
+    <div class="q-card" id="q-card">
+      <div class="q-num" id="q-num">Question 1</div>
+      <div class="timer" id="q-timer">30</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div id="q-feedback" style="display:none;margin-top:16px;padding:14px;border-radius:12px;font-size:14px;font-weight:700;text-align:center"></div>
+    </div>
+  </div>
+  <div class="page-footer">© 2025 Neural Nexus Group — AI &amp; DS Club, SIIET. All rights reserved.</div>
+</div>
+<a href="dashboard.html" class="admin-fab" style="background:linear-gradient(135deg,#1a1a3e,#2d1b69)">🧭 Dashboard</a>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-content.js"></script>
+<script>
+let timerInterval = null;
+let answered = false;
+function startQuizListener() {
+  if(!db) return;
+  db.collection("quiz_sessions").where("active","==",true).onSnapshot(snap=>{
+    if(snap.empty){
+      document.getElementById("waiting-state").style.display="block";
+      document.getElementById("q-card").style.display="none";
+      clearInterval(timerInterval); answered=false;
+    } else {
+      const d = snap.docs[0].data();
+      document.getElementById("waiting-state").style.display="none";
+      document.getElementById("q-card").style.display="block";
+      document.getElementById("q-num").textContent = "Question "+( d.questionNumber||1);
+      document.getElementById("q-text").textContent = d.question||"";
+      document.getElementById("q-feedback").style.display="none";
+      answered=false;
+      const opts = document.getElementById("q-options");
+      opts.innerHTML="";
+      (d.options||[]).forEach((o,i)=>{
+        const btn=document.createElement("button");
+        btn.className="opt"; btn.textContent=o;
+        btn.onclick=()=>{
+          if(answered) return; answered=true;
+          document.querySelectorAll(".opt").forEach(b=>b.disabled=true);
+          const correct = d.correctIndex;
+          document.querySelectorAll(".opt").forEach((b,idx)=>b.classList.add(idx===correct?"correct":idx===i&&i!==correct?"wrong":""));
+          const fb=document.getElementById("q-feedback");
+          fb.style.display="block";
+          if(i===correct){fb.style.background="rgba(39,174,96,0.15)";fb.style.color="#27ae60";fb.textContent="✅ Correct! Well done.";}
+          else{fb.style.background="rgba(230,57,70,0.15)";fb.style.color="#e63946";fb.textContent="❌ Wrong! The correct answer: "+(d.options[correct]||"");}
+        };
+        opts.appendChild(btn);
+      });
+      clearInterval(timerInterval);
+      let t=d.timer||30;
+      document.getElementById("q-timer").textContent=t;
+      timerInterval=setInterval(()=>{
+        t--;document.getElementById("q-timer").textContent=t;
+        if(t<=0){clearInterval(timerInterval);document.querySelectorAll(".opt").forEach(b=>b.disabled=true);}
+      },1000);
+    }
+  });
+}
+window.addEventListener("load",startQuizListener);
+</script>
+</body>
+</html>

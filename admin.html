@@ -97,6 +97,51 @@
           <span class="nav-icon">📝</span> Registrations
         </div>
 
+        <div class="nav-section-label">Community</div>
+        <div class="nav-item" data-panel="alumni" onclick="showPanel('alumni')">
+          <span class="nav-icon">🎓</span> Alumni
+        </div>
+        <div class="nav-item" data-panel="leaderboard" onclick="showPanel('leaderboard')">
+          <span class="nav-icon">🏅</span> Leaderboard
+        </div>
+        <div class="nav-item" data-panel="placements" onclick="showPanel('placements')">
+          <span class="nav-icon">💼</span> Placements
+        </div>
+        <div class="nav-item" data-panel="blog" onclick="showPanel('blog')">
+          <span class="nav-icon">✍️</span> Blog
+        </div>
+        <div class="nav-item" data-panel="newsletter" onclick="showPanel('newsletter')">
+          <span class="nav-icon">📧</span> Newsletter
+        </div>
+
+        <div class="nav-section-label">Live Events</div>
+        <div class="nav-item" data-panel="live-quiz" onclick="showPanel('live-quiz')">
+          <span class="nav-icon">⚡</span> Live Quiz
+        </div>
+        <div class="nav-item" data-panel="feedback-inbox" onclick="showPanel('feedback-inbox')">
+          <span class="nav-icon">⭐</span> Event Feedback
+        </div>
+        <div class="nav-item" data-panel="attendance-mgr" onclick="showPanel('attendance-mgr')">
+          <span class="nav-icon">✅</span> Attendance
+        </div>
+        <div class="nav-item" data-panel="certificates" onclick="showPanel('certificates')">
+          <span class="nav-icon">🛡️</span> Certificates
+        </div>
+
+        <div class="nav-section-label">Club Info</div>
+        <div class="nav-item" data-panel="press" onclick="showPanel('press')">
+          <span class="nav-icon">📰</span> Press &amp; Media
+        </div>
+        <div class="nav-item" data-panel="opensource" onclick="showPanel('opensource')">
+          <span class="nav-icon">⚙️</span> Open Source
+        </div>
+        <div class="nav-item" data-panel="minutes" onclick="showPanel('minutes')">
+          <span class="nav-icon">📋</span> Meeting Minutes
+        </div>
+        <div class="nav-item" data-panel="sponsors" onclick="showPanel('sponsors')">
+          <span class="nav-icon">🤝</span> Sponsors
+        </div>
+
         <div class="nav-section-label" id="admin-mgmt-label">Management</div>
         <div class="nav-item" id="admin-mgmt-btn" data-panel="admins" onclick="showPanel('admins')">
           <span class="nav-icon">👥</span> Admins
@@ -514,6 +559,210 @@
               <div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>
             </div>
           </div>
+        </div>
+
+
+        <!-- ── ALUMNI ── -->
+        <div class="panel" id="panel-alumni">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🎓</span> Alumni Network</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Full Name *</label><input class="f-input" id="al-name" placeholder="e.g. Priya Sharma"></div>
+              <div class="f-group"><label class="f-label">Batch Year *</label><input class="f-input" id="al-batch" placeholder="e.g. 2022"></div>
+              <div class="f-group"><label class="f-label">Company</label><input class="f-input" id="al-company" placeholder="e.g. TCS"></div>
+              <div class="f-group"><label class="f-label">Role</label><input class="f-input" id="al-role" placeholder="e.g. Data Analyst"></div>
+            </div>
+            <div class="f-group"><label class="f-label">LinkedIn URL</label><input class="f-input" id="al-linkedin" placeholder="https://linkedin.com/in/..."></div>
+            <button class="btn btn-primary" onclick="saveAlumni()">➕ Add Alumni</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="alumni-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── LEADERBOARD ── -->
+        <div class="panel" id="panel-leaderboard">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🏅</span> Leaderboard</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Member Name *</label><input class="f-input" id="lb-name" placeholder="Full name"></div>
+              <div class="f-group"><label class="f-label">Department</label><input class="f-input" id="lb-dept" placeholder="e.g. AI&DS — 3rd Year"></div>
+              <div class="f-group"><label class="f-label">Points *</label><input class="f-input" type="number" id="lb-points" placeholder="e.g. 150"></div>
+              <div class="f-group"><label class="f-label">Badges (comma separated)</label><input class="f-input" id="lb-badges" placeholder="🔬,🏆,💡"></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveLeaderboard()">➕ Add / Update</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="lb-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── PLACEMENTS ── -->
+        <div class="panel" id="panel-placements">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">💼</span> Placement Highlights</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Member Name *</label><input class="f-input" id="pl-name" placeholder="Full name"></div>
+              <div class="f-group"><label class="f-label">Company *</label><input class="f-input" id="pl-company" placeholder="e.g. Infosys"></div>
+              <div class="f-group"><label class="f-label">Role</label><input class="f-input" id="pl-role" placeholder="e.g. Software Engineer"></div>
+              <div class="f-group"><label class="f-label">Year</label><input class="f-input" id="pl-year" placeholder="e.g. 2024"></div>
+              <div class="f-group"><label class="f-label">Package (LPA)</label><input class="f-input" id="pl-package" placeholder="e.g. 4.5"></div>
+              <div class="f-group"><label class="f-label">Company Emoji</label><input class="f-input" id="pl-emoji" placeholder="🏢"></div>
+            </div>
+            <button class="btn btn-primary" onclick="savePlacement()">➕ Add Placement</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="placements-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── BLOG ── -->
+        <div class="panel" id="panel-blog">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">✍️</span> Tech Blog</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Article Title *</label><input class="f-input" id="bl-title" placeholder="e.g. Intro to Neural Networks"></div>
+              <div class="f-group"><label class="f-label">Author</label><input class="f-input" id="bl-author" placeholder="Your name"></div>
+              <div class="f-group"><label class="f-label">Category</label><input class="f-input" id="bl-cat" placeholder="e.g. Machine Learning"></div>
+              <div class="f-group"><label class="f-label">Date</label><input class="f-input" id="bl-date" type="date"></div>
+              <div class="f-group"><label class="f-label">External URL (Medium/Hashnode)</label><input class="f-input" id="bl-url" placeholder="https://..."></div>
+              <div class="f-group"><label class="f-label">Cover Image URL</label><input class="f-input" id="bl-cover" placeholder="https://..."></div>
+            </div>
+            <div class="f-group"><label class="f-label">Excerpt / Short Summary</label><textarea class="f-input" id="bl-excerpt" rows="3" placeholder="Brief description of the article"></textarea></div>
+            <button class="btn btn-primary" onclick="saveBlog()">➕ Publish Article</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="blog-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── NEWSLETTER ── -->
+        <div class="panel" id="panel-newsletter">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📧</span> Newsletter Subscribers</div>
+            <p class="hint-text">People who subscribed to club updates. You can export this list to send newsletters.</p>
+            <div id="newsletter-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- ── LIVE QUIZ ── -->
+        <div class="panel" id="panel-live-quiz">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">⚡</span> Live Quiz — Host Control</div>
+            <p class="hint-text">Start a live question. Students on <a href="live-quiz.html" target="_blank" style="color:#e63946">live-quiz.html</a> will see it instantly. Only one active session at a time.</p>
+            <div class="f-group"><label class="f-label">Question *</label><textarea class="f-input" id="qz-question" rows="3" placeholder="e.g. Which algorithm is used for classification?"></textarea></div>
+            <div class="f-group"><label class="f-label">Options (one per line, max 4) *</label><textarea class="f-input" id="qz-options" rows="4" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"></textarea></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="f-group"><label class="f-label">Correct Option # (1-4) *</label><input class="f-input" type="number" id="qz-correct" min="1" max="4" placeholder="e.g. 2"></div>
+              <div class="f-group"><label class="f-label">Timer (seconds)</label><input class="f-input" type="number" id="qz-timer" value="30" min="10" max="120"></div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-primary" onclick="startQuizSession()">⚡ Go Live!</button>
+              <button class="btn btn-danger" onclick="stopQuizSession()">⏹ End Session</button>
+            </div>
+            <div id="quiz-status" style="margin-top:12px;font-size:13px;color:var(--muted)"></div>
+          </div>
+        </div>
+
+        <!-- ── FEEDBACK INBOX ── -->
+        <div class="panel" id="panel-feedback-inbox">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">⭐</span> Event Feedback Inbox</div>
+            <p class="hint-text">Read-only view of feedback submitted by students after events.</p>
+            <div id="feedback-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div>
+          </div>
+        </div>
+
+        <!-- ── ATTENDANCE ── -->
+        <div class="panel" id="panel-attendance-mgr">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">✅</span> Attendance Sessions</div>
+            <p class="hint-text">Create a session code. Show it on the projector so students can mark attendance on <a href="attendance.html" target="_blank" style="color:#e63946">attendance.html</a>.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Session Title *</label><input class="f-input" id="att-title" placeholder="e.g. ML Workshop"></div>
+              <div class="f-group"><label class="f-label">Code (6 chars) *</label><input class="f-input" id="att-code-inp" placeholder="e.g. ML2025" maxlength="6" style="text-transform:uppercase;letter-spacing:2px"></div>
+              <div class="f-group"><label class="f-label">Date</label><input class="f-input" type="date" id="att-date"></div>
+            </div>
+            <button class="btn btn-primary" onclick="createAttendanceSession()">✅ Create Session</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="attendance-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── CERTIFICATES ── -->
+        <div class="panel" id="panel-certificates">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🛡️</span> Certificates</div>
+            <p class="hint-text">Issue certificates with unique codes. Recipients verify on <a href="verify.html" target="_blank" style="color:#e63946">verify.html</a>.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Issued To (Name) *</label><input class="f-input" id="cert-to" placeholder="e.g. Rahul Kumar"></div>
+              <div class="f-group"><label class="f-label">Event / Course *</label><input class="f-input" id="cert-event" placeholder="e.g. AI Workshop 2025"></div>
+              <div class="f-group"><label class="f-label">Date *</label><input class="f-input" type="date" id="cert-date"></div>
+              <div class="f-group"><label class="f-label">Custom Code (leave blank to auto-generate)</label><input class="f-input" id="cert-code-inp" placeholder="e.g. NN-2025-0001" style="text-transform:uppercase;letter-spacing:1px"></div>
+            </div>
+            <button class="btn btn-primary" onclick="issueCertificate()">🛡️ Issue Certificate</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="certificates-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── PRESS ── -->
+        <div class="panel" id="panel-press">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📰</span> Press &amp; Media</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Headline *</label><input class="f-input" id="pr-title" placeholder="e.g. Neural Nexus wins State Hackathon"></div>
+              <div class="f-group"><label class="f-label">Source</label><input class="f-input" id="pr-source" placeholder="e.g. Deccan Chronicle"></div>
+              <div class="f-group"><label class="f-label">Date</label><input class="f-input" type="date" id="pr-date"></div>
+              <div class="f-group"><label class="f-label">Icon Emoji</label><input class="f-input" id="pr-icon" placeholder="📰" maxlength="4"></div>
+            </div>
+            <div class="f-group"><label class="f-label">Article URL</label><input class="f-input" id="pr-url" placeholder="https://..."></div>
+            <button class="btn btn-primary" onclick="savePress()">➕ Add Coverage</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="press-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── OPEN SOURCE ── -->
+        <div class="panel" id="panel-opensource">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">⚙️</span> Open Source Contributions</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Repo Name *</label><input class="f-input" id="oss-title" placeholder="e.g. nn-sentiment-tool"></div>
+              <div class="f-group"><label class="f-label">Language</label><input class="f-input" id="oss-lang" placeholder="e.g. Python"></div>
+              <div class="f-group"><label class="f-label">Stars</label><input class="f-input" type="number" id="oss-stars" placeholder="e.g. 12"></div>
+              <div class="f-group"><label class="f-label">GitHub URL</label><input class="f-input" id="oss-link" placeholder="https://github.com/..."></div>
+            </div>
+            <div class="f-group"><label class="f-label">Description</label><textarea class="f-input" id="oss-desc" rows="2" placeholder="What does this project do?"></textarea></div>
+            <button class="btn btn-primary" onclick="saveOSS()">➕ Add Repository</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="oss-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── MEETING MINUTES ── -->
+        <div class="panel" id="panel-minutes">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">📋</span> Meeting Minutes</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Title *</label><input class="f-input" id="mn-title" placeholder="e.g. General Body Meeting — March 2025"></div>
+              <div class="f-group"><label class="f-label">Date *</label><input class="f-input" type="date" id="mn-date"></div>
+              <div class="f-group"><label class="f-label">Meeting Type</label><input class="f-input" id="mn-type" placeholder="e.g. General Body, EC, Extraordinary"></div>
+              <div class="f-group"><label class="f-label">PDF/File URL *</label><input class="f-input" id="mn-url" placeholder="https://drive.google.com/..."></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveMinutes()">➕ Upload Minutes</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="minutes-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+        <!-- ── SPONSORS ── -->
+        <div class="panel" id="panel-sponsors">
+          <div class="card">
+            <div class="card-title"><span class="ct-icon">🤝</span> Sponsors</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+              <div class="f-group"><label class="f-label">Company Name *</label><input class="f-input" id="sp-name" placeholder="e.g. TechCorp India"></div>
+              <div class="f-group"><label class="f-label">Tier</label>
+                <select class="f-input" id="sp-tier">
+                  <option value="gold">Gold</option>
+                  <option value="silver">Silver</option>
+                  <option value="bronze">Bronze</option>
+                  <option value="supporter">Supporter</option>
+                </select>
+              </div>
+              <div class="f-group"><label class="f-label">Website URL</label><input class="f-input" id="sp-website" placeholder="https://..."></div>
+              <div class="f-group"><label class="f-label">Logo Emoji</label><input class="f-input" id="sp-logo" placeholder="🏢" maxlength="4"></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSponsor()">➕ Add Sponsor</button>
+          </div>
+          <div class="card" style="margin-top:16px"><div id="sponsors-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
         </div>
 
       </div><!-- /content-area -->

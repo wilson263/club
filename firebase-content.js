@@ -273,8 +273,9 @@ async function loadPublicProjects() {
 }
 
 // ── Load upcoming events + handle registration ──
-async function loadUpcomingEventsForRegistration() {
-  const select = document.getElementById("reg-event-select");
+async function loadUpcomingEventsForRegistration(selectId) {
+  const id = selectId || "reg-event-select";
+  const select = document.getElementById(id);
   if (!select || !db) return;
   try {
     const snap = await db.collection("events").where("type", "==", "upcoming").orderBy("addedAt", "desc").get();
@@ -327,4 +328,213 @@ function showRegMsg(type, msg) {
   el.style.display = "block";
   el.style.color = type === "success" ? "#27ae60" : "#e63946";
   setTimeout(() => { el.style.display = "none"; }, 6000);
+}
+
+// ══════════════════════════════════════════
+// NEW FEATURES — Public Functions
+// ══════════════════════════════════════════
+
+// ── Alumni ──────────────────────────────────────────
+async function loadPublicAlumni() {
+  const c = document.getElementById("alumni-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("alumni").orderBy("addedAt","desc").get();
+    if (snap.empty) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">🎓</div><p>Alumni profiles coming soon!</p></div>'; return; }
+    c.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      c.innerHTML += `<div class="alumni-card">
+        <div class="alumni-avatar">${d.photo ? `<img src="${d.photo}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : "🎓"}</div>
+        <div class="alumni-name">${d.name||"—"}</div>
+        <div class="alumni-batch">Batch ${d.batch||"—"}</div>
+        <div class="alumni-role">${d.role||""} ${d.company ? "at "+d.company : ""}</div>
+        ${d.linkedin ? `<a href="${d.linkedin}" target="_blank" rel="noopener" class="alumni-link">🔗 LinkedIn</a>` : ""}
+      </div>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Could not load alumni.</div>'; }
+}
+
+// ── Leaderboard ─────────────────────────────────────
+async function loadLeaderboard() {
+  const c = document.getElementById("lb-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("leaderboard").orderBy("points","desc").limit(30).get();
+    if (snap.empty) { c.innerHTML = '<div style="text-align:center;padding:60px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">🏅</div><p>Leaderboard coming soon!</p></div>'; return; }
+    c.innerHTML = "";
+    let rank = 0;
+    snap.forEach(doc => {
+      rank++;
+      const d = doc.data();
+      const badges = (d.badges||[]).map(b=>`<span class="badge">${b}</span>`).join("");
+      const rankClass = rank<=3 ? "rank-"+rank : "";
+      c.innerHTML += `<div class="lb-row">
+        <div class="lb-rank ${rankClass}">${rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":rank}</div>
+        <div class="lb-avatar">😊</div>
+        <div style="flex:1"><div class="lb-name">${d.name||"—"}</div><div class="lb-dept">${d.dept||""}</div></div>
+        ${badges ? `<div class="lb-badges">${badges}</div>` : ""}
+        <div><div class="lb-points">${d.points||0}</div><div class="lb-pts-label">pts</div></div>
+      </div>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">Could not load leaderboard.</div>'; }
+}
+
+// ── Blog ────────────────────────────────────────────
+async function loadPublicBlog() {
+  const c = document.getElementById("blog-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("blog").orderBy("addedAt","desc").get();
+    if (snap.empty) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">✍️</div><p>No articles yet. Check back soon!</p></div>'; return; }
+    c.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      const url = d.url||"#";
+      c.innerHTML += `<a href="${url}" target="${url!="#"?"_blank":"_self"}" rel="noopener" class="blog-card" style="text-decoration:none;color:inherit">
+        <div class="blog-cover" style="${d.coverImage?"background-image:url("+d.coverImage+");background-size:cover;background-position:center":""}">
+          ${!d.coverImage?"✍️":""}
+        </div>
+        <div class="blog-body">
+          <div class="blog-cat">${d.category||"Tech"}</div>
+          <div class="blog-title">${d.title||"Untitled"}</div>
+          <div class="blog-excerpt">${d.excerpt||d.content?.substring(0,120)||""}</div>
+          <div class="blog-meta"><span>${d.author||"Anonymous"}</span><span>${d.date||""}</span></div>
+        </div>
+      </a>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Could not load articles.</div>'; }
+}
+
+// ── Press ────────────────────────────────────────────
+async function loadPublicPress() {
+  const c = document.getElementById("press-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("press").orderBy("date","desc").get();
+    if (snap.empty) { c.innerHTML = '<div style="text-align:center;padding:60px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">📰</div><p>No media coverage yet.</p></div>'; return; }
+    c.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      c.innerHTML += `<a href="${d.url||"#"}" target="_blank" rel="noopener" class="press-item">
+        <div class="press-icon">${d.icon||"📰"}</div>
+        <div style="flex:1">
+          <div class="press-source">${d.source||"Media"}</div>
+          <div class="press-title">${d.title||"Untitled"}</div>
+          <div class="press-date">${d.date||""}</div>
+        </div>
+        <div class="press-arrow">→</div>
+      </a>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">Could not load press coverage.</div>'; }
+}
+
+// ── Open Source ──────────────────────────────────────
+async function loadPublicOSS() {
+  const c = document.getElementById("oss-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("opensource").orderBy("addedAt","desc").get();
+    if (snap.empty) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">⚙️</div><p>Open source projects coming soon!</p></div>'; return; }
+    c.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      c.innerHTML += `<div class="repo-card">
+        <div class="repo-header"><span class="repo-icon">📦</span><span class="repo-name">${d.title||"Untitled"}</span></div>
+        <div class="repo-desc">${d.description||""}</div>
+        <div class="repo-meta">
+          ${d.language?`<span class="lang-badge">${d.language}</span>`:""}
+          ${d.stars?`<span class="stars">⭐ ${d.stars}</span>`:""}
+          ${d.link?`<a href="${d.link}" target="_blank" rel="noopener" class="repo-link">View →</a>`:""}
+        </div>
+      </div>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Could not load repositories.</div>'; }
+}
+
+// ── Placements ───────────────────────────────────────
+async function loadPublicPlacements() {
+  const c = document.getElementById("placements-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("placements").orderBy("year","desc").get();
+    if (snap.empty) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">💼</div><p>Placement records coming soon!</p></div>'; return; }
+    c.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      c.innerHTML += `<div class="p-card">
+        <div class="p-company">${d.companyEmoji||"🏢"}</div>
+        <div class="p-name">${d.name||"—"}</div>
+        <div class="p-role">${d.role||""}</div>
+        <div class="p-company-name">${d.company||""}</div>
+        <div class="p-year">${d.year||""}</div>
+        ${d.package?`<span class="p-package">₹${d.package} LPA</span>`:""}
+      </div>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#aaa">Could not load placements.</div>'; }
+}
+
+// ── Meeting Minutes ──────────────────────────────────
+async function loadPublicMinutes() {
+  const c = document.getElementById("minutes-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("minutes").orderBy("date","desc").get();
+    if (snap.empty) { c.innerHTML = '<div style="text-align:center;padding:60px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">📋</div><p>No meeting minutes uploaded yet.</p></div>'; return; }
+    c.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      const typeTag = d.meetingType ? `<span class="m-tag">${d.meetingType}</span>` : "";
+      c.innerHTML += `<a href="${d.fileUrl||"#"}" target="_blank" rel="noopener" class="minutes-item">
+        <div class="m-icon">📋</div>
+        <div style="flex:1"><div class="m-title">${d.title||"Meeting Minutes"}${typeTag}</div><div class="m-meta">${d.date||""}</div></div>
+        <span class="m-dl">⬇ Download</span>
+      </a>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">Could not load meeting minutes.</div>'; }
+}
+
+// ── Sponsors ─────────────────────────────────────────
+async function loadPublicSponsors() {
+  const c = document.getElementById("sponsors-container");
+  if (!c || !db) return;
+  try {
+    const snap = await db.collection("sponsors").orderBy("tier").get();
+    if (snap.empty) { c.innerHTML = '<div style="text-align:center;padding:40px 0;color:#aaa"><div style="font-size:40px;margin-bottom:12px">🤝</div><p>Sponsor information coming soon!</p></div>'; return; }
+    const byTier = {};
+    snap.forEach(doc => { const d=doc.data(); if(!byTier[d.tier]) byTier[d.tier]=[]; byTier[d.tier].push(d); });
+    c.innerHTML = "";
+    const tiers = { gold:"🥇 Gold Sponsors", silver:"🥈 Silver Sponsors", bronze:"🥉 Bronze Sponsors", supporter:"💙 Supporters" };
+    Object.keys(tiers).forEach(t => {
+      if (!byTier[t] || !byTier[t].length) return;
+      c.innerHTML += `<div class="tier-label">${tiers[t]}</div><div class="sponsor-grid">`;
+      byTier[t].forEach(s => {
+        c.innerHTML += `<a href="${s.website||"#"}" target="_blank" rel="noopener" class="sp-card">
+          <div class="sp-logo">${s.logo||"🏢"}</div>
+          <div class="sp-name">${s.name||"—"}</div>
+          <span class="sp-tier ${t}">${t.toUpperCase()}</span>
+        </a>`;
+      });
+      c.innerHTML += `</div>`;
+    });
+  } catch(e) { c.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">Could not load sponsors.</div>'; }
+}
+
+// ── Newsletter Subscription ───────────────────────────────
+async function subscribeNewsletter(event) {
+  if (event) event.preventDefault();
+  if (!db) return;
+  const email = (document.getElementById("nl-email") || {}).value || "";
+  const msg = document.getElementById("nl-msg");
+  if (!email.trim()) return;
+  try {
+    const existing = await db.collection("newsletter").where("email","==",email.trim().toLowerCase()).get();
+    if (!existing.empty) {
+      if (msg) { msg.style.display="block"; msg.style.color="#FFD700"; msg.style.background="rgba(255,215,0,0.05)"; msg.textContent="⚡ You're already subscribed!"; }
+      return;
+    }
+    await db.collection("newsletter").add({ email: email.trim().toLowerCase(), subscribedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    if (msg) { msg.style.display="block"; msg.style.color="#27ae60"; msg.style.background="rgba(39,174,96,0.08)"; msg.textContent="✅ Subscribed! You'll receive club updates."; }
+    const el = document.getElementById("nl-email"); if (el) el.value = "";
+  } catch(e) { if (msg) { msg.style.display="block"; msg.style.color="#e63946"; msg.textContent="Error. Please try again."; } }
 }

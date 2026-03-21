@@ -249,7 +249,20 @@ const panelTitles = {
   resources: "Resources Library",
   projects: "Project Showcase",
   contacts: "Enquiry Inbox",
-  registrations: "Event Registrations"
+  registrations: "Event Registrations",
+  alumni: "Alumni Network",
+  leaderboard: "Leaderboard",
+  placements: "Placement Highlights",
+  blog: "Tech Blog",
+  newsletter: "Newsletter Subscribers",
+  "live-quiz": "Live Quiz — Host Control",
+  "feedback-inbox": "Event Feedback Inbox",
+  "attendance-mgr": "Attendance Sessions",
+  certificates: "Certificates",
+  press: "Press & Media",
+  opensource: "Open Source Contributions",
+  minutes: "Meeting Minutes",
+  sponsors: "Sponsors"
 };
 
 function showPanel(name) {
@@ -270,11 +283,24 @@ function showPanel(name) {
   if (name === "faculty")       loadFaculty();
   if (name === "admins")        loadAdmins();
   if (name === "overview")      loadStats();
-  if (name === "announcements") loadAnnouncements();
-  if (name === "resources")     loadResources();
-  if (name === "projects")      loadProjects();
-  if (name === "contacts")      loadContacts();
-  if (name === "registrations") { loadRegistrationEvents(); loadRegistrations(); }
+  if (name === "announcements")   loadAnnouncements();
+  if (name === "resources")       loadResources();
+  if (name === "projects")        loadProjects();
+  if (name === "contacts")        loadContacts();
+  if (name === "registrations")   { loadRegistrationEvents(); loadRegistrations(); }
+  if (name === "alumni")          loadAdminAlumni();
+  if (name === "leaderboard")     loadAdminLeaderboard();
+  if (name === "placements")      loadAdminPlacements();
+  if (name === "blog")            loadAdminBlog();
+  if (name === "newsletter")      loadAdminNewsletter();
+  if (name === "live-quiz")       checkQuizStatus();
+  if (name === "feedback-inbox")  loadAdminFeedback();
+  if (name === "attendance-mgr")  loadAdminAttendance();
+  if (name === "certificates")    loadAdminCertificates();
+  if (name === "press")           loadAdminPress();
+  if (name === "opensource")      loadAdminOSS();
+  if (name === "minutes")         loadAdminMinutes();
+  if (name === "sponsors")        loadAdminSponsors();
 }
 
 // ─── STATS ────────────────────────────────────────
@@ -1358,3 +1384,375 @@ document.addEventListener("keydown", e => {
     doLogin();
   }
 });
+
+// ══════════════════════════════════════════════════════
+// NEW FEATURES — Admin CRUD Functions
+// ══════════════════════════════════════════════════════
+
+// Helper: simple list renderer
+function renderAdminList(containerId, items, renderFn) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!items.length) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📭</div><p>Nothing here yet.</p></div>'; return; }
+  el.innerHTML = items.map(renderFn).join("");
+}
+
+// ── ALUMNI ──────────────────────────────────────────────
+async function loadAdminAlumni() {
+  const el = document.getElementById("alumni-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("alumni").orderBy("addedAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🎓</div><p>No alumni added yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div><strong style="color:#fff">${a.name}</strong> <span style="color:#e63946;font-size:12px">Batch ${a.batch||"—"}</span><br>
+        <span style="color:var(--muted);font-size:13px">${a.role||""} ${a.company?"at "+a.company:""}</span></div>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('alumni','${d.id}',loadAdminAlumni)">🗑</button>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function saveAlumni() {
+  const name = document.getElementById("al-name").value.trim();
+  const batch = document.getElementById("al-batch").value.trim();
+  if (!name || !batch) { showToast("Name and batch year are required","error"); return; }
+  await db.collection("alumni").add({ name, batch, company: document.getElementById("al-company").value.trim(), role: document.getElementById("al-role").value.trim(), linkedin: document.getElementById("al-linkedin").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Alumni added!","success");
+  ["al-name","al-batch","al-company","al-role","al-linkedin"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminAlumni();
+}
+
+// ── LEADERBOARD ─────────────────────────────────────────
+async function loadAdminLeaderboard() {
+  const el = document.getElementById("lb-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("leaderboard").orderBy("points","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🏅</div><p>No entries yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map((d,i) => {
+      const a = d.data();
+      return `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <strong style="color:#e63946;min-width:26px">#${i+1}</strong>
+        <div style="flex:1"><strong style="color:#fff">${a.name}</strong><br><span style="color:var(--muted);font-size:12px">${a.dept||""} · ${a.points} pts</span></div>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('leaderboard','${d.id}',loadAdminLeaderboard)">🗑</button>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function saveLeaderboard() {
+  const name = document.getElementById("lb-name").value.trim();
+  const pts = parseInt(document.getElementById("lb-points").value)||0;
+  if (!name) { showToast("Name is required","error"); return; }
+  const badges = (document.getElementById("lb-badges").value||"").split(",").map(b=>b.trim()).filter(Boolean);
+  await db.collection("leaderboard").add({ name, dept: document.getElementById("lb-dept").value.trim(), points: pts, badges, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Entry added!","success");
+  ["lb-name","lb-dept","lb-points","lb-badges"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminLeaderboard();
+}
+
+// ── PLACEMENTS ──────────────────────────────────────────
+async function loadAdminPlacements() {
+  const el = document.getElementById("placements-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("placements").orderBy("addedAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">💼</div><p>No placements yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div><strong style="color:#fff">${a.name}</strong> <span style="color:var(--muted);font-size:12px">${a.year||""}</span><br>
+        <span style="color:#27ae60;font-size:13px">${a.role||""} @ ${a.company||""} ${a.package?"· ₹"+a.package+" LPA":""}</span></div>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('placements','${d.id}',loadAdminPlacements)">🗑</button>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function savePlacement() {
+  const name = document.getElementById("pl-name").value.trim();
+  const company = document.getElementById("pl-company").value.trim();
+  if (!name || !company) { showToast("Name and company are required","error"); return; }
+  await db.collection("placements").add({ name, company, role: document.getElementById("pl-role").value.trim(), year: document.getElementById("pl-year").value.trim(), package: document.getElementById("pl-package").value.trim(), companyEmoji: document.getElementById("pl-emoji").value.trim()||"🏢", addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Placement added!","success");
+  ["pl-name","pl-company","pl-role","pl-year","pl-package","pl-emoji"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminPlacements();
+}
+
+// ── BLOG ────────────────────────────────────────────────
+async function loadAdminBlog() {
+  const el = document.getElementById("blog-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("blog").orderBy("addedAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">✍️</div><p>No articles yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div><strong style="color:#fff">${a.title||"Untitled"}</strong><br>
+        <span style="color:var(--muted);font-size:12px">${a.author||"—"} · ${a.category||""} · ${a.date||""}</span></div>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('blog','${d.id}',loadAdminBlog)">🗑</button>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function saveBlog() {
+  const title = document.getElementById("bl-title").value.trim();
+  if (!title) { showToast("Title is required","error"); return; }
+  await db.collection("blog").add({ title, author: document.getElementById("bl-author").value.trim(), category: document.getElementById("bl-cat").value.trim(), date: document.getElementById("bl-date").value, url: document.getElementById("bl-url").value.trim(), coverImage: document.getElementById("bl-cover").value.trim(), excerpt: document.getElementById("bl-excerpt").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Article published!","success");
+  ["bl-title","bl-author","bl-cat","bl-url","bl-cover","bl-excerpt","bl-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminBlog();
+}
+
+// ── NEWSLETTER ──────────────────────────────────────────
+async function loadAdminNewsletter() {
+  const el = document.getElementById("newsletter-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("newsletter").orderBy("subscribedAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📧</div><p>No subscribers yet.</p></div>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px;font-weight:700">#</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px;font-weight:700">Email</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px;font-weight:700">Subscribed</th><th></th></tr>` +
+    snap.docs.map((d,i) => {
+      const a = d.data();
+      const dt = a.subscribedAt?.toDate ? a.subscribedAt.toDate().toLocaleDateString("en-IN") : "—";
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05)"><td style="padding:10px 12px;color:var(--muted);font-size:13px">${i+1}</td><td style="padding:10px 12px;color:#fff;font-size:13px">${a.email||"—"}</td><td style="padding:10px 12px;color:var(--muted);font-size:12px">${dt}</td><td style="padding:10px 12px"><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteDoc('newsletter','${d.id}',loadAdminNewsletter)">🗑</button></td></tr>`;
+    }).join("") + "</table>";
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+
+// ── LIVE QUIZ ────────────────────────────────────────────
+async function checkQuizStatus() {
+  const el = document.getElementById("quiz-status");
+  if (!el) return;
+  const snap = await db.collection("quiz_sessions").where("active","==",true).get();
+  el.textContent = snap.empty ? "No active quiz session." : "⚡ LIVE: "+snap.docs[0].data().question;
+  el.style.color = snap.empty ? "var(--muted)" : "#e63946";
+}
+async function startQuizSession() {
+  const q = document.getElementById("qz-question").value.trim();
+  const opts = document.getElementById("qz-options").value.trim().split("\n").map(o=>o.trim()).filter(Boolean);
+  const correct = parseInt(document.getElementById("qz-correct").value)-1;
+  const timer = parseInt(document.getElementById("qz-timer").value)||30;
+  if (!q || opts.length < 2) { showToast("Question and at least 2 options required","error"); return; }
+  await db.collection("quiz_sessions").where("active","==",true).get().then(snap=>Promise.all(snap.docs.map(d=>d.ref.update({active:false}))));
+  await db.collection("quiz_sessions").add({ question: q, options: opts, correctIndex: correct, timer, active: true, questionNumber: Date.now(), startedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Quiz is now LIVE!","success"); checkQuizStatus();
+}
+async function stopQuizSession() {
+  const snap = await db.collection("quiz_sessions").where("active","==",true).get();
+  await Promise.all(snap.docs.map(d=>d.ref.update({active:false})));
+  showToast("Quiz ended","info"); checkQuizStatus();
+}
+
+// ── FEEDBACK ────────────────────────────────────────────
+async function loadAdminFeedback() {
+  const el = document.getElementById("feedback-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("feedback").orderBy("submittedAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">⭐</div><p>No feedback yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      const stars = "★".repeat(a.rating||0)+"☆".repeat(5-(a.rating||0));
+      const dt = a.submittedAt?.toDate ? a.submittedAt.toDate().toLocaleDateString("en-IN") : "—";
+      return `<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><strong style="color:#fff">${a.name||"Anonymous"}</strong> <span style="color:#FFD700;letter-spacing:1px">${stars}</span><br>
+          <span style="color:#e63946;font-size:12px">${a.eventTitle||""}</span> <span style="color:var(--muted);font-size:11px">· ${dt}</span></div>
+          <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteDoc('feedback','${d.id}',loadAdminFeedback)">🗑</button>
+        </div>
+        ${a.comment ? `<p style="color:rgba(255,255,255,0.6);font-size:13px;margin:8px 0 0">${a.comment}</p>` : ""}
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+
+// ── ATTENDANCE ───────────────────────────────────────────
+async function loadAdminAttendance() {
+  const el = document.getElementById("attendance-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("attendance_sessions").orderBy("createdAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">✅</div><p>No sessions yet.</p></div>'; return; }
+    let html = "";
+    for (const d of snap.docs) {
+      const a = d.data();
+      const rSnap = await db.collection("attendance_records").where("sessionId","==",d.id).get();
+      html += `<div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><strong style="color:#fff">${a.title||"Session"}</strong>
+          <span style="margin-left:10px;padding:2px 10px;background:${a.active?"rgba(39,174,96,0.15)":"rgba(255,255,255,0.06)"};border-radius:10px;font-size:11px;color:${a.active?"#27ae60":"#aaa"}">${a.active?"ACTIVE":"Closed"}</span><br>
+          <code style="font-size:14px;color:#e63946;letter-spacing:2px;font-weight:700">${a.code||"—"}</code>
+          <span style="color:var(--muted);font-size:12px;margin-left:8px">· ${a.date||""} · ${rSnap.size} attendees</span></div>
+          <div style="display:flex;gap:6px">
+            ${a.active ? `<button class="btn" style="padding:5px 12px;font-size:12px;background:rgba(230,57,70,0.15);color:#e63946;border:1px solid rgba(230,57,70,0.3)" onclick="toggleAttSession('${d.id}',false,loadAdminAttendance)">⏹ Close</button>` : `<button class="btn btn-primary" style="padding:5px 12px;font-size:12px" onclick="toggleAttSession('${d.id}',true,loadAdminAttendance)">▶ Re-open</button>`}
+            <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('attendance_sessions','${d.id}',loadAdminAttendance)">🗑</button>
+          </div>
+        </div>
+      </div>`;
+    }
+    el.innerHTML = html;
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function toggleAttSession(id, active, cb) {
+  await db.collection("attendance_sessions").doc(id).update({ active });
+  showToast(active?"Session re-opened":"Session closed","info"); if(cb) cb();
+}
+async function createAttendanceSession() {
+  const title = document.getElementById("att-title").value.trim();
+  const code = document.getElementById("att-code-inp").value.trim().toUpperCase();
+  const date = document.getElementById("att-date").value;
+  if (!title || !code) { showToast("Title and code are required","error"); return; }
+  await db.collection("attendance_sessions").add({ title, code, date, active: true, createdBy: currentUser.email, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Session created! Show code: "+code,"success");
+  ["att-title","att-code-inp","att-date"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminAttendance();
+}
+
+// ── CERTIFICATES ─────────────────────────────────────────
+async function loadAdminCertificates() {
+  const el = document.getElementById("certificates-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("certificates").orderBy("issuedAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🛡️</div><p>No certificates issued yet.</p></div>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid rgba(255,255,255,0.1)"><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Code</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Issued To</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Event</th><th style="text-align:left;padding:8px 12px;color:var(--muted);font-size:12px">Date</th><th></th></tr>` +
+    snap.docs.map(d => {
+      const a = d.data();
+      return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05)"><td style="padding:10px 12px"><code style="color:#e63946;font-size:12px">${a.code||"—"}</code></td><td style="padding:10px 12px;color:#fff;font-size:13px">${a.issuedTo||"—"}</td><td style="padding:10px 12px;color:var(--muted);font-size:12px">${a.event||"—"}</td><td style="padding:10px 12px;color:var(--muted);font-size:12px">${a.date||"—"}</td><td style="padding:10px 12px"><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteDoc('certificates','${d.id}',loadAdminCertificates)">🗑</button></td></tr>`;
+    }).join("") + "</table>";
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function issueCertificate() {
+  const issuedTo = document.getElementById("cert-to").value.trim();
+  const event = document.getElementById("cert-event").value.trim();
+  const date = document.getElementById("cert-date").value;
+  if (!issuedTo || !event) { showToast("Name and event are required","error"); return; }
+  const customCode = document.getElementById("cert-code-inp").value.trim().toUpperCase();
+  const code = customCode || "NN-"+(new Date().getFullYear())+"-"+Math.random().toString(36).substr(2,4).toUpperCase();
+  await db.collection("certificates").add({ code, issuedTo, event, date, issuedBy: currentUser.email, issuedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Certificate issued! Code: "+code,"success");
+  ["cert-to","cert-event","cert-date","cert-code-inp"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminCertificates();
+}
+
+// ── PRESS ────────────────────────────────────────────────
+async function loadAdminPress() {
+  const el = document.getElementById("press-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("press").orderBy("date","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📰</div><p>No coverage yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div><strong style="color:#fff">${a.title||"Untitled"}</strong><br>
+        <span style="color:var(--muted);font-size:12px">${a.source||""} · ${a.date||""}</span></div>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('press','${d.id}',loadAdminPress)">🗑</button>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function savePress() {
+  const title = document.getElementById("pr-title").value.trim();
+  if (!title) { showToast("Headline is required","error"); return; }
+  await db.collection("press").add({ title, source: document.getElementById("pr-source").value.trim(), date: document.getElementById("pr-date").value, url: document.getElementById("pr-url").value.trim(), icon: document.getElementById("pr-icon").value.trim()||"📰", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Coverage added!","success");
+  ["pr-title","pr-source","pr-date","pr-url","pr-icon"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminPress();
+}
+
+// ── OPEN SOURCE ──────────────────────────────────────────
+async function loadAdminOSS() {
+  const el = document.getElementById("oss-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("opensource").orderBy("addedAt","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">⚙️</div><p>No repos yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div><strong style="color:#fff">${a.title||"—"}</strong> ${a.language?`<span style="font-size:11px;color:#e63946">[${a.language}]</span>`:""}<br>
+        <span style="color:var(--muted);font-size:12px">${a.description||""} ${a.stars?"· ⭐"+a.stars:""}</span></div>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('opensource','${d.id}',loadAdminOSS)">🗑</button>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function saveOSS() {
+  const title = document.getElementById("oss-title").value.trim();
+  if (!title) { showToast("Repo name is required","error"); return; }
+  await db.collection("opensource").add({ title, description: document.getElementById("oss-desc").value.trim(), language: document.getElementById("oss-lang").value.trim(), stars: parseInt(document.getElementById("oss-stars").value)||0, link: document.getElementById("oss-link").value.trim(), addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Repository added!","success");
+  ["oss-title","oss-desc","oss-lang","oss-stars","oss-link"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminOSS();
+}
+
+// ── MINUTES ──────────────────────────────────────────────
+async function loadAdminMinutes() {
+  const el = document.getElementById("minutes-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("minutes").orderBy("date","desc").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">📋</div><p>No minutes uploaded yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div><strong style="color:#fff">${a.title||"Minutes"}</strong> ${a.meetingType?`<span style="font-size:11px;background:rgba(230,57,70,0.15);color:#e63946;padding:2px 8px;border-radius:8px">${a.meetingType}</span>`:""}<br>
+        <span style="color:var(--muted);font-size:12px">${a.date||""}</span></div>
+        <div style="display:flex;gap:6px">
+          ${a.fileUrl?`<a href="${a.fileUrl}" target="_blank" class="btn" style="padding:5px 12px;font-size:12px;background:rgba(41,128,185,0.15);color:#5dade2;border:1px solid rgba(41,128,185,0.3)">⬇ View</a>`:""}
+          <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('minutes','${d.id}',loadAdminMinutes)">🗑</button>
+        </div>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function saveMinutes() {
+  const title = document.getElementById("mn-title").value.trim();
+  const fileUrl = document.getElementById("mn-url").value.trim();
+  const date = document.getElementById("mn-date").value;
+  if (!title || !fileUrl) { showToast("Title and file URL are required","error"); return; }
+  await db.collection("minutes").add({ title, date, meetingType: document.getElementById("mn-type").value.trim(), fileUrl, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Minutes uploaded!","success");
+  ["mn-title","mn-date","mn-type","mn-url"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminMinutes();
+}
+
+// ── SPONSORS ─────────────────────────────────────────────
+async function loadAdminSponsors() {
+  const el = document.getElementById("sponsors-admin-list");
+  if (!el) return;
+  try {
+    const snap = await db.collection("sponsors").orderBy("tier").get();
+    if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="es-icon">🤝</div><p>No sponsors yet.</p></div>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const a = d.data();
+      const colors = { gold:"#FFD700", silver:"#C0C0C0", bronze:"#CD7F32", supporter:"#5dade2" };
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div><span style="font-size:22px;margin-right:10px">${a.logo||"🏢"}</span><strong style="color:#fff">${a.name||"—"}</strong>
+        <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px;color:${colors[a.tier]||"#aaa"};background:rgba(255,255,255,0.05)">${(a.tier||"").toUpperCase()}</span></div>
+        <button class="btn btn-danger" style="padding:5px 12px;font-size:12px" onclick="deleteDoc('sponsors','${d.id}',loadAdminSponsors)">🗑</button>
+      </div>`;
+    }).join("");
+  } catch(e) { el.innerHTML = '<div class="empty-state"><p>Error loading.</p></div>'; }
+}
+async function saveSponsor() {
+  const name = document.getElementById("sp-name").value.trim();
+  if (!name) { showToast("Company name is required","error"); return; }
+  await db.collection("sponsors").add({ name, tier: document.getElementById("sp-tier").value, website: document.getElementById("sp-website").value.trim(), logo: document.getElementById("sp-logo").value.trim()||"🏢", addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast("Sponsor added!","success");
+  ["sp-name","sp-website","sp-logo"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
+  loadAdminSponsors();
+}
+
+// ── SHARED DELETE HELPER ──────────────────────────────────
+async function deleteDoc(collection, docId, reloadFn) {
+  if (!confirm("Delete this item?")) return;
+  try {
+    await db.collection(collection).doc(docId).delete();
+    showToast("Deleted","info");
+    if (reloadFn) reloadFn();
+  } catch(e) { showToast("Error deleting","error"); }
+}

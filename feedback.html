@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Event Feedback — Neural Nexus | SIIET</title>
+  <link rel="icon" type="image/jpeg" href="images-1/clublogo.jpeg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="home.css" rel="stylesheet">
+  <style>
+    *{font-family:'Inter',Arial,sans-serif}html{scroll-behavior:smooth}
+    body{background:#080810!important;background-image:none!important}
+    .container{background:transparent!important;border:none!important;backdrop-filter:none!important;border-radius:0!important}
+    .navbar{background:#080810!important;border-bottom:1px solid rgba(230,57,70,0.2)!important;height:72px!important;border-radius:0!important;position:sticky!important;top:0!important;z-index:999!important}
+    .logo{background-image:url(images-1/logo.jpeg);border:2px solid #e63946;box-shadow:0 0 16px rgba(230,57,70,0.35);margin-top:10px!important}
+    .name{color:#e63946!important;font-size:34px!important}.institute,.ugc,.rec{color:#ccc!important}
+    .sublogo-group{display:flex!important;align-items:center!important;gap:6px!important;position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important}
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4{filter:brightness(1.2)!important;position:static!important;width:42px!important;height:42px!important;border-radius:50%!important;border:2px solid rgba(230,57,70,0.4)!important;flex-shrink:0!important}
+    header{background:linear-gradient(135deg,#0d0d1a 0%,#1a0808 100%)!important}
+    .page-hero{padding:60px 24px 40px;text-align:center;background:linear-gradient(135deg,#0a0a1a,#1a0810);border-bottom:1px solid rgba(230,57,70,0.15)}
+    .page-hero h1{font-size:42px;font-weight:900;color:#fff;margin:0 0 12px}.page-hero h1 span{color:#e63946}
+    .page-hero p{font-size:16px;color:rgba(255,255,255,0.5);max-width:600px;margin:0 auto}
+    .f-wrap{max-width:580px;margin:0 auto;padding:60px 24px}
+    .f-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:36px}
+    .f-card h2{font-size:20px;font-weight:800;color:#fff;margin:0 0 24px}
+    .f-group{margin-bottom:18px}
+    .f-label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px}
+    .f-input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 16px;font-size:14px;color:#fff;outline:none;box-sizing:border-box;font-family:'Inter',sans-serif}
+    .f-input:focus{border-color:#e63946}
+    .star-row{display:flex;gap:10px;font-size:32px;cursor:pointer;margin-top:4px}
+    .star{color:rgba(255,255,255,0.2);transition:color 0.1s}.star.active{color:#FFD700}
+    .submit-btn{width:100%;padding:15px;background:linear-gradient(135deg,#e63946,#c62a36);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif}
+    #fb-msg{display:none;margin-top:16px;padding:12px 16px;border-radius:10px;font-size:14px;font-weight:600;background:rgba(255,255,255,0.05)}
+    .page-footer{background:#040408;color:rgba(255,255,255,0.4);text-align:center;padding:16px;font-size:12px;border-top:1px solid rgba(255,255,255,0.05)}
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname"><p class="name">Sri Indu</p><p class="institute">Institute of Engineering &amp; Technology</p><p class="ugc">UGC Autonomous Institution</p><p class="rec">Recognized under 2(f) of UGC Act 1956</p></div>
+    <div class="sublogo-group"><div class="sublogo-4"></div><div class="sublogo-1"></div><div class="sublogo-2"></div><div class="sublogo-3"></div></div>
+  </div>
+  <header>
+    <a href="home.html" class="homebut">⌂</a>
+    <nav class="nav"><a href="dashboard.html">🧭</a><a href="gallery.html">📅</a><a href="contact.html">💬</a></nav>
+  </header>
+  <div class="page-hero">
+    <h1>⭐ Event <span>Feedback</span></h1>
+    <p>Help us improve! Share your experience from recent events. Your feedback shapes the future of Neural Nexus.</p>
+  </div>
+  <div class="f-wrap">
+    <div class="f-card">
+      <h2>Submit Your Feedback</h2>
+      <form onsubmit="submitFeedback(event)">
+        <div class="f-group">
+          <label class="f-label">Select Event *</label>
+          <select class="f-input" id="fb-event" required style="appearance:none">
+            <option value="">Loading events...</option>
+          </select>
+        </div>
+        <div class="f-group">
+          <label class="f-label">Your Name</label>
+          <input type="text" class="f-input" id="fb-name" placeholder="Optional — leave blank to stay anonymous">
+        </div>
+        <div class="f-group">
+          <label class="f-label">Rating *</label>
+          <div class="star-row" id="star-row">
+            <span class="star" data-v="1">★</span><span class="star" data-v="2">★</span>
+            <span class="star" data-v="3">★</span><span class="star" data-v="4">★</span><span class="star" data-v="5">★</span>
+          </div>
+          <input type="hidden" id="fb-rating" value="0">
+        </div>
+        <div class="f-group">
+          <label class="f-label">Your Comments</label>
+          <textarea class="f-input" id="fb-comment" rows="4" placeholder="What did you like? What could be improved?" style="resize:vertical"></textarea>
+        </div>
+        <button type="submit" class="submit-btn">⭐ Submit Feedback</button>
+        <div id="fb-msg"></div>
+      </form>
+    </div>
+  </div>
+  <div class="page-footer">© 2025 Neural Nexus Group — AI &amp; DS Club, SIIET. All rights reserved.</div>
+</div>
+<a href="dashboard.html" class="admin-fab" style="background:linear-gradient(135deg,#1a1a3e,#2d1b69)">🧭 Dashboard</a>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-content.js"></script>
+<script>
+let selectedRating = 0;
+document.querySelectorAll(".star").forEach(s=>{
+  s.addEventListener("mouseover",()=>{ let v=+s.dataset.v; document.querySelectorAll(".star").forEach(x=>x.classList.toggle("active",+x.dataset.v<=v)); });
+  s.addEventListener("click",()=>{ selectedRating=+s.dataset.v; document.getElementById("fb-rating").value=selectedRating; });
+  document.getElementById("star-row").addEventListener("mouseleave",()=>{ document.querySelectorAll(".star").forEach(x=>x.classList.toggle("active",+x.dataset.v<=selectedRating)); });
+});
+async function submitFeedback(e) {
+  e.preventDefault();
+  if(!db) return;
+  const eventId = document.getElementById("fb-event").value;
+  const eventTitle = document.getElementById("fb-event").selectedOptions[0]?.text||"";
+  const name = document.getElementById("fb-name").value.trim()||"Anonymous";
+  const rating = selectedRating;
+  const comment = document.getElementById("fb-comment").value.trim();
+  const msg = document.getElementById("fb-msg");
+  if(!eventId){msg.style.display="block";msg.style.color="#e63946";msg.textContent="Please select an event.";return;}
+  if(!rating){msg.style.display="block";msg.style.color="#e63946";msg.textContent="Please give a star rating.";return;}
+  try {
+    await db.collection("feedback").add({eventId,eventTitle,name,rating,comment,submittedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    msg.style.display="block";msg.style.color="#27ae60";msg.textContent="✅ Thank you for your feedback!";
+    e.target.reset(); selectedRating=0; document.querySelectorAll(".star").forEach(x=>x.classList.remove("active"));
+  } catch(err){msg.style.display="block";msg.style.color="#e63946";msg.textContent="Error submitting. Please try again.";}
+}
+window.addEventListener("load", loadUpcomingEventsForRegistration.bind(null, "fb-event"));
+</script>
+</body>
+</html>
