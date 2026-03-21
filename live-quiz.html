@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="home.css" rel="stylesheet">
   <style>
-    *{font-family:'Inter',Arial,sans-serif;box-sizing:border-box}html{scroll-behavior:smooth}
+    *{font-family:'Inter',sans-serif;box-sizing:border-box;-webkit-user-select:none;user-select:none}
     body{background:#080810!important;background-image:none!important;margin:0}
     .container{background:transparent!important;border:none!important;backdrop-filter:none!important;border-radius:0!important}
     .navbar{background:#080810!important;border-bottom:1px solid rgba(230,57,70,0.2)!important;height:72px!important;border-radius:0!important;position:sticky!important;top:0!important;z-index:999!important}
@@ -16,50 +16,66 @@
     .sublogo-group{display:flex!important;align-items:center!important;gap:6px!important;position:absolute!important;right:10px!important;top:50%!important;transform:translateY(-50%)!important}
     .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4{filter:brightness(1.2)!important;position:static!important;width:42px!important;height:42px!important;border-radius:50%!important;border:2px solid rgba(230,57,70,0.4)!important;flex-shrink:0!important}
     header{background:linear-gradient(135deg,#0d0d1a 0%,#1a0808 100%)!important}
-    :root{--red:#e63946;--green:#27ae60;--bg:#080810;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.1);--text:#fff;--muted:rgba(255,255,255,0.5)}
-    .qouter{max-width:700px;margin:0 auto;padding:28px 20px 80px}
+    :root{--red:#e63946;--green:#27ae60;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.1);--muted:rgba(255,255,255,0.5)}
+    .qouter{max-width:680px;margin:0 auto;padding:28px 20px 80px}
     .screen{display:none}.screen.active{display:block}
-    .join-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
-    .join-card h2{font-size:28px;font-weight:900;color:#fff;margin:0 0 8px}
-    .join-card p{color:var(--muted);font-size:14px;margin:0 0 28px}
-    .join-input{width:100%;padding:16px 20px;background:rgba(255,255,255,0.07);border:2px solid var(--border);border-radius:14px;color:#fff;font-size:18px;font-weight:700;text-align:center;outline:none;transition:border-color .2s;margin-bottom:14px}
-    .join-input:focus{border-color:var(--red)}
-    .join-btn{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;transition:opacity .2s}
-    .join-btn:hover{opacity:.85}
-    .rules-box{background:rgba(230,57,70,0.07);border:1px solid rgba(230,57,70,0.2);border-radius:14px;padding:20px;margin-top:22px;text-align:left}
-    .rules-box h4{color:var(--red);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px}
-    .rules-box li{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.5}
-    .wait-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:60px 36px;text-align:center;margin-top:28px}
-    .live-badge2{display:inline-flex;align-items:center;gap:7px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:50px;padding:7px 16px;font-size:12px;font-weight:700;color:var(--red);margin-bottom:20px}
-    .ldot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:blink 1.2s infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:50px;padding:5px 14px;font-size:12px;color:var(--muted);font-weight:600;margin-bottom:18px}
-    .pill .pdot{width:7px;height:7px;background:var(--green);border-radius:50%}
-    .prog-wrap{height:6px;background:rgba(255,255,255,0.08);border-radius:4px;margin-bottom:22px}
-    .prog-fill{height:100%;background:var(--red);border-radius:4px;transition:width .6s ease}
-    .qheader{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    .qnum-label{font-size:12px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:1px}
-    .tbig{font-size:40px;font-weight:900;color:var(--red);line-height:1}
+    /* Cards */
+    .card-box{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:44px 36px;text-align:center;margin-top:28px}
+    @media(max-width:480px){.card-box{padding:32px 20px}}
+    .big-icon{font-size:52px;margin-bottom:16px}
+    .card-title{font-size:26px;font-weight:900;color:#fff;margin:0 0 8px}
+    .card-sub{color:var(--muted);font-size:14px;margin:0 0 28px;line-height:1.6}
+    /* Inputs */
+    .inp{width:100%;padding:15px 20px;background:rgba(255,255,255,0.07);border:2px solid var(--border);border-radius:13px;color:#fff;font-size:16px;font-weight:700;outline:none;transition:border-color .2s;margin-bottom:12px;font-family:'Inter',sans-serif}
+    .inp:focus{border-color:var(--red)}
+    .inp::placeholder{color:rgba(255,255,255,0.25);font-weight:400}
+    .btn-red{width:100%;padding:16px;background:var(--red);color:#fff;border:none;border-radius:13px;font-size:16px;font-weight:800;cursor:pointer;transition:opacity .2s;font-family:'Inter',sans-serif}
+    .btn-red:hover{opacity:.85}
+    /* Error */
+    .errmsg{color:var(--red);font-size:13px;margin-bottom:12px;display:none;padding:10px 14px;background:rgba(230,57,70,0.1);border-radius:8px;text-align:left}
+    /* Rules */
+    .rules{background:rgba(230,57,70,0.07);border:1px solid rgba(230,57,70,0.2);border-radius:13px;padding:18px 20px;margin-top:20px;text-align:left}
+    .rules h4{color:var(--red);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin:0 0 10px}
+    .rules li{font-size:12px;color:var(--muted);margin-bottom:7px;line-height:1.5}
+    .rules li strong{color:#fff}
+    /* Badges */
+    .badge-live{display:inline-flex;align-items:center;gap:7px;background:rgba(230,57,70,0.1);border:1px solid rgba(230,57,70,0.3);border-radius:50px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--red);margin-bottom:20px}
+    .badge-wait{display:inline-flex;align-items:center;gap:7px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.3);border-radius:50px;padding:6px 16px;font-size:12px;font-weight:700;color:#f5c842;margin-bottom:20px}
+    .ldot{width:8px;height:8px;background:currentColor;border-radius:50%;animation:blink 1s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+    .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:50px;padding:5px 14px;font-size:12px;color:var(--muted);font-weight:600;margin-top:14px}
+    .pdot{width:7px;height:7px;background:var(--green);border-radius:50%}
+    /* Progress */
+    .prog-wrap{height:5px;background:rgba(255,255,255,0.07);border-radius:4px;margin-bottom:20px}
+    .prog-fill{height:100%;background:var(--red);border-radius:4px;transition:width .7s ease}
+    /* Question */
+    .qheader{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .qlabel{font-size:12px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:1px}
+    .timer-wrap{text-align:center}
+    .tbig{font-size:38px;font-weight:900;color:var(--red);line-height:1}
+    .tbig.urgent{color:#ff3030;animation:blink .4s infinite}
     .tlbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-    .tbig.urgent{color:#ff3333;animation:blink .5s infinite}
-    .qcard{background:var(--card);border:1px solid var(--border);border-radius:22px;padding:30px;margin-bottom:14px}
-    .qtext{font-size:20px;font-weight:800;color:#fff;line-height:1.5;margin-bottom:26px}
-    .opts{display:grid;gap:11px}
-    .opt{padding:15px 18px;background:rgba(255,255,255,0.05);border:2px solid var(--border);border-radius:13px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;text-align:left;transition:all .2s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:12px;width:100%}
-    .oletter{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+    .qcard{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:14px}
+    .qtext{font-size:20px;font-weight:800;color:#fff;line-height:1.5;margin-bottom:24px}
+    .opts{display:grid;gap:10px}
+    .opt{padding:14px 18px;background:rgba(255,255,255,0.05);border:2px solid var(--border);border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left;transition:all .18s;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:12px;width:100%}
+    .oletter{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
     .opt:not(:disabled):hover{border-color:var(--red);background:rgba(230,57,70,0.1)}
-    .opt.correct{border-color:var(--green);background:rgba(39,174,96,0.15)}.opt.correct .oletter{background:var(--green);color:#fff}
-    .opt.wrong{border-color:var(--red);background:rgba(230,57,70,0.15)}.opt.wrong .oletter{background:var(--red);color:#fff}
+    .opt.correct{border-color:var(--green);background:rgba(39,174,96,0.14)}.opt.correct .oletter{background:var(--green);color:#fff}
+    .opt.wrong{border-color:var(--red);background:rgba(230,57,70,0.14)}.opt.wrong .oletter{background:var(--red);color:#fff}
     .opt:disabled{cursor:default;opacity:.9}
-    .feedback{padding:15px 20px;border-radius:13px;font-size:15px;font-weight:700;display:none;text-align:center;margin-top:14px}
-    .locknotice{text-align:center;font-size:13px;color:var(--muted);padding:10px;display:none}
-    .wait-next{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:22px;text-align:center;display:none}
-    .result-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
-    .big-score{font-size:72px;font-weight:900;color:var(--red);line-height:1}
-    .banned-card{background:rgba(230,57,70,0.08);border:2px solid rgba(230,57,70,0.4);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
-    .warned-card{background:rgba(245,200,66,0.07);border:2px solid rgba(245,200,66,0.3);border-radius:24px;padding:48px 36px;text-align:center;margin-top:28px}
-    .page-footer{background:#040408;color:rgba(255,255,255,.4);text-align:center;padding:16px;font-size:12px;border-top:1px solid rgba(255,255,255,.05)}
-    .fs-btn{position:fixed;bottom:20px;right:20px;background:rgba(255,255,255,.08);border:1px solid var(--border);border-radius:10px;color:var(--muted);padding:9px 13px;font-size:12px;cursor:pointer;z-index:100;font-family:'Inter',sans-serif}
+    .feedback{padding:14px 18px;border-radius:12px;font-size:14px;font-weight:700;display:none;text-align:center;margin-top:12px}
+    .lock-note{text-align:center;font-size:12px;color:var(--muted);padding:10px;display:none}
+    .wait-next{background:rgba(39,174,96,0.07);border:1px solid rgba(39,174,96,0.2);border-radius:14px;padding:20px;text-align:center;display:none;margin-top:12px}
+    /* Score strip */
+    .score-strip{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:13px}
+    .big-score{font-size:64px;font-weight:900;color:var(--red);line-height:1}
+    /* Banned / Warned */
+    .warned-card{background:rgba(245,200,66,0.07);border:2px solid rgba(245,200,66,0.3);border-radius:22px;padding:44px 36px;text-align:center;margin-top:28px}
+    .banned-card{background:rgba(230,57,70,0.07);border:2px solid rgba(230,57,70,0.35);border-radius:22px;padding:44px 36px;text-align:center;margin-top:28px}
+    .back-link{display:inline-block;margin-top:24px;padding:13px 30px;background:var(--red);color:#fff;border-radius:50px;text-decoration:none;font-weight:700;font-size:14px}
+    .fs-btn{position:fixed;bottom:20px;right:20px;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:10px;color:var(--muted);padding:9px 13px;font-size:12px;cursor:pointer;z-index:100;font-family:'Inter',sans-serif}
+    .page-footer{background:#040408;color:rgba(255,255,255,.4);text-align:center;padding:14px;font-size:12px;border-top:1px solid rgba(255,255,255,.05)}
   </style>
 </head>
 <body>
@@ -70,256 +86,386 @@
     <div class="sublogo-group"><div class="sublogo-4"></div><div class="sublogo-1"></div><div class="sublogo-2"></div><div class="sublogo-3"></div></div>
   </div>
   <header>
-    <a href="home.html" class="homebut" title="Home">&#8962;</a>
+    <a href="home.html" class="homebut">&#8962;</a>
     <nav class="nav"><a href="achievements.html">&#127942;</a><a href="clubmembers.html">&#128100;</a><a href="faculty.html">&#127891;</a><a href="gallery.html">&#128197;</a><a href="contact.html">&#128172;</a></nav>
   </header>
 
   <div class="qouter">
-    <!-- JOIN -->
-    <div class="screen active" id="screen-join">
-      <div class="join-card">
-        <div style="font-size:52px;margin-bottom:16px">&#9889;</div>
-        <h2>Join Live Quiz</h2>
-        <p>Enter your full name. Your answers, timing, and behavior are fully monitored by the admin.</p>
-        <input class="join-input" id="pname" type="text" placeholder="Your Full Name" maxlength="50" autocomplete="off">
-        <div id="join-err" style="color:var(--red);font-size:13px;margin-bottom:12px;display:none"></div>
-        <button class="join-btn" onclick="joinQuiz()">&#9889; Join Quiz</button>
-        <div class="rules-box">
+
+    <!-- SCREEN: REGISTER -->
+    <div class="screen active" id="screen-register">
+      <div class="card-box">
+        <div class="big-icon">&#9889;</div>
+        <div class="card-title">Neural Nexus Live Quiz</div>
+        <div class="card-sub">Only registered club members may participate. Enter your full name exactly as registered.</div>
+        <input class="inp" id="reg-name" type="text" placeholder="Your Registered Full Name" maxlength="60" autocomplete="off">
+        <div id="reg-err" class="errmsg"></div>
+        <button class="btn-red" onclick="verifyMember()">&#128274; Verify &amp; Enter Waiting Room</button>
+        <div class="rules">
           <h4>&#9888;&#65039; Strict Quiz Rules</h4>
-          <ul style="margin:0;padding-left:18px">
-            <li>Once you select an answer it is <strong style="color:#fff">permanently locked</strong>.</li>
-            <li><strong style="color:#fff">Do NOT switch tabs</strong> or minimize — flagged instantly.</li>
-            <li><strong style="color:#fff">Do NOT open DevTools</strong> or inspect source code.</li>
-            <li><strong style="color:#fff">Right-click is disabled</strong> during the quiz.</li>
-            <li>Closing or refreshing the page is tracked and reported.</li>
-            <li>The admin can warn or remove you at any time.</li>
-            <li>Unanswered questions (timer expired) score zero.</li>
+          <ul style="margin:0;padding-left:16px">
+            <li><strong>Only registered members</strong> are allowed to participate.</li>
+            <li>Once you select an answer it is <strong>permanently locked</strong>.</li>
+            <li><strong>Do NOT switch tabs</strong> or minimize — flagged instantly and auto-removed after 3 violations.</li>
+            <li><strong>DevTools, right-click, and keyboard shortcuts</strong> are disabled.</li>
+            <li>You <strong>cannot open the quiz in multiple tabs</strong> simultaneously.</li>
+            <li>The admin must <strong>admit you</strong> from the waiting room before the quiz begins.</li>
+            <li>Unanswered questions (timer expired) score <strong>zero</strong>.</li>
           </ul>
         </div>
       </div>
     </div>
 
-    <!-- WAITING -->
+    <!-- SCREEN: WAITING ROOM -->
     <div class="screen" id="screen-waiting">
-      <div class="wait-card">
-        <div style="font-size:52px;margin-bottom:18px">&#128336;</div>
-        <div class="live-badge2"><span class="ldot"></span> LIVE SESSION</div>
-        <h3 style="color:#fff;font-size:22px;margin:0 0 10px">Waiting for quiz to begin...</h3>
-        <p style="color:var(--muted);font-size:14px;margin:0 0 28px">Keep this tab open and visible at all times. The admin will start shortly.</p>
-        <p style="color:rgba(255,255,255,.4);font-size:13px">Joined as <strong id="joined-as" style="color:#fff"></strong></p>
-        <div class="pill" style="margin-top:16px"><span class="pdot"></span><span id="wait-count">0</span>&nbsp;participants joined</div>
+      <div class="card-box">
+        <div class="big-icon">&#128336;</div>
+        <div class="badge-wait"><span class="ldot"></span> WAITING FOR ADMISSION</div>
+        <div class="card-title" style="font-size:22px">You are in the waiting room</div>
+        <div class="card-sub" style="margin-bottom:16px">The admin will review and admit you before the quiz begins. Keep this tab open and visible.</div>
+        <p style="color:rgba(255,255,255,.4);font-size:13px">Joined as <strong id="waiting-name" style="color:#fff"></strong></p>
+        <div class="pill"><span class="pdot"></span><span id="wait-count">0</span>&nbsp;members in waiting room</div>
       </div>
     </div>
 
-    <!-- QUESTION -->
+    <!-- SCREEN: ADMITTED (lobby) -->
+    <div class="screen" id="screen-admitted">
+      <div class="card-box">
+        <div class="big-icon">&#9989;</div>
+        <div class="badge-live"><span class="ldot"></span> ADMITTED</div>
+        <div class="card-title" style="font-size:22px">You have been admitted!</div>
+        <div class="card-sub" style="margin-bottom:16px">The quiz will begin shortly. Stay on this screen and do <strong style="color:#fff">NOT</strong> switch tabs.</div>
+        <p style="color:rgba(255,255,255,.4);font-size:13px">Participating as <strong id="admitted-name" style="color:#fff"></strong></p>
+        <div class="pill"><span class="pdot"></span><span id="lobby-count">0</span>&nbsp;participants admitted</div>
+      </div>
+    </div>
+
+    <!-- SCREEN: QUESTION -->
     <div class="screen" id="screen-question">
-      <div style="text-align:center"><span class="pill"><span class="pdot"></span><span id="q-pcount">0</span>&nbsp;participants live</span></div>
+      <div class="score-strip">
+        <span style="color:var(--muted)">&#128100; <span id="q-pcount">0</span> live</span>
+        <span style="color:#fff;font-weight:700">&#9889; <span id="score-live">0</span> pts</span>
+      </div>
       <div class="prog-wrap"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
       <div class="qheader">
-        <div class="qnum-label" id="q-label">Question 1</div>
-        <div style="text-align:center"><div class="tbig" id="q-timer">30</div><div class="tlbl">seconds</div></div>
+        <div class="qlabel" id="q-label">Question 1 of 1</div>
+        <div class="timer-wrap"><div class="tbig" id="q-timer">30</div><div class="tlbl">sec</div></div>
       </div>
       <div class="qcard">
         <div class="qtext" id="q-text"></div>
         <div class="opts" id="q-opts"></div>
         <div class="feedback" id="q-feedback"></div>
-        <div class="locknotice" id="locknotice">&#128274; Answer locked — waiting for next question...</div>
+        <div class="lock-note" id="lock-note">&#128274; Answer locked — next question loading automatically…</div>
       </div>
       <div class="wait-next" id="wait-next">
-        <div style="font-size:26px;margin-bottom:8px">&#9989;</div>
-        <div style="color:#fff;font-weight:700">Answer submitted!</div>
-        <div style="color:var(--muted);font-size:13px;margin-top:6px">Waiting for the next question...</div>
+        <div style="font-size:24px;margin-bottom:8px">&#9989;</div>
+        <div style="color:#fff;font-weight:700;font-size:14px">Answer submitted!</div>
+        <div style="color:var(--muted);font-size:12px;margin-top:5px">Next question will appear automatically…</div>
       </div>
     </div>
 
-    <!-- RESULT -->
+    <!-- SCREEN: RESULT -->
     <div class="screen" id="screen-result">
-      <div class="result-card">
-        <div style="font-size:52px;margin-bottom:16px">&#127937;</div>
-        <h2 style="color:#fff;font-size:26px;margin:0 0 10px">Quiz Complete!</h2>
+      <div class="card-box">
+        <div class="big-icon">&#127937;</div>
+        <div class="card-title">Quiz Complete!</div>
         <div class="big-score" id="final-score">0</div>
         <div style="color:var(--muted);font-size:14px;margin-top:8px">correct answers</div>
-        <div id="result-detail" style="color:rgba(255,255,255,.5);font-size:14px;margin-top:18px"></div>
-        <a href="home.html" style="display:inline-block;margin-top:28px;padding:14px 32px;background:var(--red);color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Back to Home</a>
+        <div id="result-sub" style="color:rgba(255,255,255,.5);font-size:13px;margin-top:16px"></div>
+        <a href="home.html" class="back-link">Back to Home</a>
       </div>
     </div>
 
-    <!-- BANNED -->
+    <!-- SCREEN: BANNED -->
     <div class="screen" id="screen-banned">
       <div class="banned-card">
-        <div style="font-size:52px;margin-bottom:16px">&#128683;</div>
-        <h2 style="color:var(--red);font-size:24px;margin:0 0 12px">Removed from Quiz</h2>
-        <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:400px;margin:0 auto 24px">The admin has removed you for misbehavior. Your responses have been recorded.</p>
-        <a href="home.html" style="display:inline-block;padding:14px 32px;background:var(--red);color:#fff;border-radius:50px;text-decoration:none;font-weight:700">Back to Home</a>
+        <div class="big-icon">&#128683;</div>
+        <h2 style="color:var(--red);margin:0 0 12px">Removed from Quiz</h2>
+        <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:400px;margin:0 auto 8px">The admin has removed you for misbehavior. Your activity has been recorded.</p>
+        <a href="home.html" class="back-link">Back to Home</a>
       </div>
     </div>
 
-    <!-- WARNED -->
+    <!-- SCREEN: WARNED -->
     <div class="screen" id="screen-warned">
       <div class="warned-card">
-        <div style="font-size:52px;margin-bottom:16px">&#9888;&#65039;</div>
-        <h2 style="color:#f5c842;font-size:24px;margin:0 0 12px">Warning Issued!</h2>
-        <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:400px;margin:0 auto 24px">The admin has issued you a warning. Do NOT misbehave again or you will be permanently removed from this quiz.</p>
-        <button class="join-btn" style="max-width:280px;margin:0 auto;display:block" onclick="dismissWarning()">I Understand — Continue Quiz</button>
+        <div class="big-icon">&#9888;&#65039;</div>
+        <h2 style="color:#f5c842;margin:0 0 12px">Final Warning!</h2>
+        <p style="color:rgba(255,255,255,.6);font-size:14px;max-width:400px;margin:0 auto 20px">The admin has issued a warning. One more violation and you will be permanently removed from this quiz.</p>
+        <button class="btn-red" style="max-width:260px;margin:0 auto;display:block" onclick="dismissWarning()">I Understand — Continue</button>
       </div>
     </div>
-  </div>
 
+    <!-- SCREEN: NO SESSION -->
+    <div class="screen" id="screen-nosession">
+      <div class="card-box">
+        <div class="big-icon">&#128683;</div>
+        <div class="card-title" style="font-size:20px">No Active Quiz</div>
+        <div class="card-sub">There is no quiz session open right now. Check back later or ask your admin.</div>
+        <a href="home.html" class="back-link">Back to Home</a>
+      </div>
+    </div>
+
+    <!-- SCREEN: NOT REGISTERED -->
+    <div class="screen" id="screen-noreg">
+      <div class="card-box" style="border-color:rgba(230,57,70,0.3)">
+        <div class="big-icon">&#128683;</div>
+        <div class="card-title" style="font-size:20px">Not Registered</div>
+        <div class="card-sub">Your name was not found in the club member list. Only registered Neural Nexus members may participate.</div>
+        <button class="btn-red" onclick="showScreen('register')">Try Again</button>
+        <div style="margin-top:14px;font-size:13px;color:var(--muted)">If you believe this is an error, contact the club admin.</div>
+      </div>
+    </div>
+
+  </div>
   <div class="page-footer">Neural Nexus — AI &amp; Data Science Club &middot; SIIET</div>
 </div>
 <button class="fs-btn" onclick="toggleFS()">&#x26F6; Fullscreen</button>
 
 <script src="firebase-content.js"></script>
 <script>
-const LETTERS = ['A','B','C','D'];
-let pid=null, pname='', sid=null, curQid=null, qStart=null;
-let answered=false, myScore=0, totalQ=0;
-let timerInt=null, unsubSess=null, unsubQ=null;
-let tabCount=0;
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const L = ['A','B','C','D'];
+const BC_KEY = 'nn_quiz_tab';
 
-function getDevId(){
-  let id=localStorage.getItem('nn_qdev');
-  if(!id){id='dv_'+Date.now()+'_'+Math.random().toString(36).substr(2,8);localStorage.setItem('nn_qdev',id);}
-  return id;
-}
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let pid=null, pname='', sid=null, curQid=null, qStart=null;
+let answered=false, myScore=0, totalQCount=0;
+let timerInt=null, unsubSess=null, unsubQ=null, tabCount=0;
+
+// ─── SINGLE TAB ENFORCEMENT ──────────────────────────────────────────────────
+(function enforceSingleTab(){
+  try {
+    const bc = new BroadcastChannel(BC_KEY);
+    bc.postMessage('ping');
+    bc.onmessage = e => {
+      if(e.data==='ping') bc.postMessage('pong');
+      if(e.data==='pong') showScreen('banned');
+    };
+  } catch(e){}
+})();
+
+// ─── UTILITIES ───────────────────────────────────────────────────────────────
 function showScreen(s){
   document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
   const el=document.getElementById('screen-'+s);
   if(el) el.classList.add('active');
 }
-async function joinQuiz(){
-  if(!db) return alert('Connection error. Refresh.');
-  const name=document.getElementById('pname').value.trim();
-  const err=document.getElementById('join-err');
-  err.style.display='none';
-  if(!name||name.length<2){err.textContent='Enter your full name (min 2 chars).';err.style.display='block';return;}
-  try{
-    const snap=await db.collection('quiz_sessions').where('status','in',['setup','active']).limit(1).get();
-    if(snap.empty){err.textContent='No active quiz session. Wait for the admin.';err.style.display='block';return;}
-    sid=snap.docs[0].id; pname=name;
-    pid=getDevId()+'_'+name.replace(/s+/g,'_').toLowerCase().substr(0,20);
-    await db.collection('quiz_participants').doc(pid).set({
-      sessionId:sid,name,deviceId:getDevId(),
-      joinedAt:firebase.firestore.FieldValue.serverTimestamp(),
-      lastSeen:firebase.firestore.FieldValue.serverTimestamp(),
-      score:0,tabSwitches:0,status:'active'
-    },{merge:true});
-    document.getElementById('joined-as').textContent=name;
-    showScreen('waiting');
-    startListening(); startHeartbeat(); initAntiCheat();
-  }catch(e){err.textContent='Error joining. Refresh and try again.';err.style.display='block';}
+function getDevId(){
+  let id=localStorage.getItem('nn_qdev');
+  if(!id){id='dv_'+Date.now()+'_'+Math.random().toString(36).substr(2,8);localStorage.setItem('nn_qdev',id);}
+  return id;
 }
+
+// ─── VERIFY MEMBER ───────────────────────────────────────────────────────────
+async function verifyMember(){
+  if(!db) return alert('Connection error — refresh.');
+  const name = document.getElementById('reg-name').value.trim();
+  const err = document.getElementById('reg-err');
+  err.style.display='none';
+  if(!name||name.length<2){err.textContent='Enter your full registered name.';err.style.display='block';return;}
+
+  // Check for open session
+  let sessionSnap;
+  try{
+    sessionSnap = await db.collection('quiz_sessions').where('status','in',['open','active']).limit(1).get();
+  }catch(e){ err.textContent='Connection error. Refresh.'; err.style.display='block'; return; }
+
+  if(sessionSnap.empty){ showScreen('nosession'); return; }
+  sid = sessionSnap.docs[0].id;
+
+  // Verify against club_members (case-insensitive name match)
+  try{
+    const membersSnap = await db.collection('club_members').get();
+    const match = membersSnap.docs.find(d=>{
+      const mname = (d.data().name||'').toLowerCase().trim();
+      return mname === name.toLowerCase().trim();
+    });
+    if(!match){ showScreen('noreg'); return; }
+  }catch(e){ err.textContent='Error checking membership. Try again.'; err.style.display='block'; return; }
+
+  // Register in waiting room
+  pname = name;
+  pid = getDevId()+'_'+name.replace(/\s+/g,'_').toLowerCase().substr(0,20);
+  try{
+    await db.collection('quiz_participants').doc(pid).set({
+      sessionId:sid, name, deviceId:getDevId(),
+      joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+      score:0, tabSwitches:0, status:'waiting'
+    },{merge:true});
+    document.getElementById('waiting-name').textContent = name;
+    showScreen('waiting');
+    startListening();
+    startHeartbeat();
+    initAntiCheat();
+  }catch(e){ err.textContent='Error joining. Refresh.'; err.style.display='block'; }
+}
+
+// ─── HEARTBEAT ────────────────────────────────────────────────────────────────
 function startHeartbeat(){
   setInterval(async()=>{
     if(!pid)return;
-    try{await db.collection('quiz_participants').doc(pid).update({lastSeen:firebase.firestore.FieldValue.serverTimestamp()});}catch(e){}
+    try{ await db.collection('quiz_participants').doc(pid).update({lastSeen:firebase.firestore.FieldValue.serverTimestamp()}); }catch(e){}
   },8000);
 }
+
+// ─── ANTI-CHEAT ───────────────────────────────────────────────────────────────
 function initAntiCheat(){
-  document.addEventListener('visibilitychange',async()=>{
+  // Tab switch
+  document.addEventListener('visibilitychange', async()=>{
     if(!document.hidden||!pid)return;
     tabCount++;
     try{
       await db.collection('quiz_participants').doc(pid).update({tabSwitches:firebase.firestore.FieldValue.increment(1)});
       await db.collection('quiz_flags').add({
-        sessionId:sid,participantId:pid,participantName:pname,type:'tab_switch',
-        count:tabCount,questionId:curQid,seen:false,
+        sessionId:sid, participantId:pid, participantName:pname,
+        type:'tab_switch', count:tabCount, questionId:curQid, seen:false,
         flaggedAt:firebase.firestore.FieldValue.serverTimestamp(),
         message:pname+' switched tab/minimized (total: '+tabCount+')'
       });
+      // Auto-ban after 3 tab switches
+      if(tabCount>=3){
+        await db.collection('quiz_participants').doc(pid).update({status:'banned'});
+        await db.collection('quiz_flags').add({
+          sessionId:sid, participantId:pid, participantName:pname,
+          type:'auto_ban', seen:false,
+          flaggedAt:firebase.firestore.FieldValue.serverTimestamp(),
+          message:pname+' AUTO-REMOVED: exceeded 3 tab switches'
+        });
+        showScreen('banned');
+      }
     }catch(e){}
   });
-  window.addEventListener('blur',async()=>{
+
+  // Window blur
+  window.addEventListener('blur', async()=>{
     if(!pid)return;
     try{
       await db.collection('quiz_flags').add({
-        sessionId:sid,participantId:pid,participantName:pname,type:'window_blur',
-        questionId:curQid,seen:false,
+        sessionId:sid, participantId:pid, participantName:pname,
+        type:'window_blur', questionId:curQid, seen:false,
         flaggedAt:firebase.firestore.FieldValue.serverTimestamp(),
-        message:pname+' left the quiz window'
+        message:pname+' left quiz window (blur)'
       });
     }catch(e){}
   });
+
+  // DevTools heuristic
   setInterval(async()=>{
     if(!pid)return;
     if((window.outerWidth-window.innerWidth>160)||(window.outerHeight-window.innerHeight>160)){
       try{
         await db.collection('quiz_flags').add({
-          sessionId:sid,participantId:pid,participantName:pname,type:'devtools',
-          questionId:curQid,seen:false,
+          sessionId:sid, participantId:pid, participantName:pname,
+          type:'devtools', questionId:curQid, seen:false,
           flaggedAt:firebase.firestore.FieldValue.serverTimestamp(),
           message:pname+' possibly opened DevTools'
         });
       }catch(e){}
     }
   },3000);
+
+  // Block right-click
   document.addEventListener('contextmenu',e=>e.preventDefault());
+  // Block keyboard shortcuts
   document.addEventListener('keydown',e=>{
-    if((e.ctrlKey||e.metaKey)&&['u','s','a','c','i','j'].includes(e.key.toLowerCase()))e.preventDefault();
+    if((e.ctrlKey||e.metaKey)&&['u','s','a','c','i','j','p','f12'].includes(e.key.toLowerCase()))e.preventDefault();
+    if(e.key==='F12')e.preventDefault();
+    if(e.key==='PrintScreen') document.body.style.filter='blur(20px)';
   });
+  document.addEventListener('keyup',e=>{ if(e.key==='PrintScreen') document.body.style.filter='none'; });
 }
+
+// ─── LISTENERS ────────────────────────────────────────────────────────────────
 function startListening(){
-  unsubSess=db.collection('quiz_sessions').doc(sid).onSnapshot(snap=>{
+  // Session listener
+  unsubSess = db.collection('quiz_sessions').doc(sid).onSnapshot(snap=>{
+    if(!snap.exists)return;
+    const d = snap.data();
+    if(d.status==='ended'){ clearInterval(timerInt); if(unsubQ)unsubQ(); showResultScreen(); return; }
+    updateCounts();
+  });
+
+  // Participant self-listener (watch for status changes)
+  db.collection('quiz_participants').doc(pid).onSnapshot(snap=>{
     if(!snap.exists)return;
     const d=snap.data();
-    if(d.status==='ended'){clearInterval(timerInt);if(unsubQ)unsubQ();showResultScreen();return;}
-    updateCount();
+    if(d.status==='banned'){showScreen('banned');return;}
+    if(d.status==='warned'){showScreen('warned');return;}
+    if(d.status==='admitted'||d.status==='active'){
+      document.getElementById('admitted-name').textContent=pname;
+      const cur=document.querySelector('.screen.active');
+      if(cur&&['screen-waiting','screen-register'].includes(cur.id)) showScreen('admitted');
+    }
   });
-  unsubQ=db.collection('quiz_questions').where('sessionId','==',sid).where('status','==','active').limit(1)
+
+  // Active question listener
+  unsubQ = db.collection('quiz_questions')
+    .where('sessionId','==',sid).where('status','==','active').limit(1)
     .onSnapshot(snap=>{
       if(snap.empty){
         const cur=document.querySelector('.screen.active');
-        if(cur&&!['screen-result','screen-banned','screen-warned'].includes(cur.id))showScreen('waiting');
-        clearInterval(timerInt);return;
+        if(cur&&!['screen-result','screen-banned','screen-warned'].includes(cur.id)){
+          // Keep admitted screen visible if no question active yet
+          if(cur.id!=='screen-admitted') showScreen('admitted');
+        }
+        clearInterval(timerInt); return;
       }
       const doc=snap.docs[0];
       if(doc.id===curQid)return;
       curQid=doc.id;
-      checkStatus(doc.data(),doc.id);
+      // Only show question if admitted or active
+      db.collection('quiz_participants').doc(pid).get().then(p=>{
+        if(!p.exists)return;
+        const st=p.data().status;
+        if(st==='banned'){showScreen('banned');return;}
+        if(st==='warned'){showScreen('warned');return;}
+        if(st==='admitted'||st==='active') showQuestion(doc.data(),doc.id);
+      }).catch(()=>showQuestion(doc.data(),doc.id));
     });
 }
-async function checkStatus(qdata,qid){
-  if(!pid)return showQuestion(qdata,qid);
-  try{
-    const p=await db.collection('quiz_participants').doc(pid).get();
-    if(p.exists){
-      const st=p.data().status;
-      if(st==='banned'){showScreen('banned');return;}
-      if(st==='warned'){showScreen('warned');return;}
-    }
-  }catch(e){}
-  showQuestion(qdata,qid);
-}
+
 function dismissWarning(){
-  if(pid) db.collection('quiz_participants').doc(pid).update({status:'active'}).catch(()=>{});
-  const cur=document.querySelector('.screen.active');
-  if(cur&&cur.id!=='screen-question') showScreen('question');
+  if(pid) db.collection('quiz_participants').doc(pid).update({status:'admitted'}).catch(()=>{});
+  showScreen('admitted');
 }
-async function updateCount(){
+
+async function updateCounts(){
+  if(!sid)return;
   try{
-    const s=await db.collection('quiz_participants').where('sessionId','==',sid).where('status','!=','banned').get();
-    document.getElementById('wait-count').textContent=s.size;
-    document.getElementById('q-pcount').textContent=s.size;
+    const [waiting,admitted] = await Promise.all([
+      db.collection('quiz_participants').where('sessionId','==',sid).where('status','==','waiting').get(),
+      db.collection('quiz_participants').where('sessionId','==',sid).where('status','in',['admitted','active']).get()
+    ]);
+    document.getElementById('wait-count').textContent = waiting.size + admitted.size;
+    document.getElementById('lobby-count').textContent = admitted.size;
+    document.getElementById('q-pcount').textContent = admitted.size;
   }catch(e){}
 }
-function showQuestion(q,qid){
+
+// ─── QUESTION DISPLAY ─────────────────────────────────────────────────────────
+function showQuestion(q, qid){
   clearInterval(timerInt);
-  answered=false; qStart=Date.now(); totalQ=q.totalQuestions||1;
-  document.getElementById('q-label').textContent='Question '+(q.order||1)+' of '+totalQ;
-  document.getElementById('prog-fill').style.width=((((q.order||1)-1)/totalQ)*100)+'%';
+  answered=false; qStart=Date.now(); totalQCount=q.totalQuestions||1;
+  document.getElementById('q-label').textContent='Question '+(q.order||1)+' of '+totalQCount;
+  document.getElementById('prog-fill').style.width=((((q.order||1)-1)/totalQCount)*100)+'%';
   document.getElementById('q-text').textContent=q.question||'';
+  document.getElementById('score-live').textContent=myScore;
+
   const optsEl=document.getElementById('q-opts');
   optsEl.innerHTML='';
   (q.options||[]).forEach((opt,i)=>{
     const btn=document.createElement('button');
     btn.className='opt';
-    btn.innerHTML='<span class="oletter">'+LETTERS[i]+'</span><span>'+opt+'</span>';
+    btn.innerHTML='<span class="oletter">'+L[i]+'</span><span>'+opt+'</span>';
     btn.onclick=()=>pickAnswer(i,q,qid);
     optsEl.appendChild(btn);
   });
   document.getElementById('q-feedback').style.display='none';
-  document.getElementById('locknotice').style.display='none';
+  document.getElementById('lock-note').style.display='none';
   document.getElementById('wait-next').style.display='none';
+
   let t=q.timer||30;
   const tel=document.getElementById('q-timer');
   tel.textContent=t; tel.classList.remove('urgent');
@@ -333,6 +479,7 @@ function showQuestion(q,qid){
   },1000);
   showScreen('question');
 }
+
 async function pickAnswer(idx,q,qid){
   if(answered)return;
   answered=true; clearInterval(timerInt);
@@ -340,14 +487,16 @@ async function pickAnswer(idx,q,qid){
   disableOpts();
   const ok=idx===q.correctIndex;
   if(ok) myScore++;
+  document.getElementById('score-live').textContent=myScore;
   const opts=document.querySelectorAll('.opt');
   opts[idx].classList.add(ok?'correct':'wrong');
   if(!ok&&q.correctIndex>=0&&opts[q.correctIndex]) opts[q.correctIndex].classList.add('correct');
   showFB(ok,idx,q.correctIndex,q.options);
-  document.getElementById('locknotice').style.display='block';
+  document.getElementById('lock-note').style.display='block';
   document.getElementById('wait-next').style.display='block';
   await submitResp(idx,q,qid,taken);
 }
+
 async function submitResp(idx,q,qid,taken){
   if(!pid||!db)return;
   try{
@@ -362,28 +511,32 @@ async function submitResp(idx,q,qid,taken){
     if(ok) await db.collection('quiz_participants').doc(pid).update({score:firebase.firestore.FieldValue.increment(1)});
   }catch(e){}
 }
-function disableOpts(){document.querySelectorAll('.opt').forEach(b=>b.disabled=true);}
+
+function disableOpts(){ document.querySelectorAll('.opt').forEach(b=>b.disabled=true); }
+
 function showFB(ok,sel,correct,opts){
   const fb=document.getElementById('q-feedback');
   fb.style.display='block';
-  if(sel<0){fb.style.background='rgba(245,200,66,0.12)';fb.style.color='#f5c842';fb.textContent="Time's up! Correct: "+(opts[correct]||'');}
-  else if(ok){fb.style.background='rgba(39,174,96,0.12)';fb.style.color='#27ae60';fb.textContent='Correct! Well done.';}
-  else{fb.style.background='rgba(230,57,70,0.12)';fb.style.color='#e63946';fb.textContent='Wrong! Correct answer: '+(opts[correct]||'');}
+  if(sel<0){fb.style.background='rgba(245,200,66,0.1)';fb.style.color='#f5c842';fb.textContent="Time's up! Correct: "+(opts[correct]||'');}
+  else if(ok){fb.style.background='rgba(39,174,96,0.1)';fb.style.color='#27ae60';fb.textContent='Correct! Well done.';}
+  else{fb.style.background='rgba(230,57,70,0.1)';fb.style.color='#e63946';fb.textContent='Wrong! Correct: '+(opts[correct]||'');}
 }
+
 async function showResultScreen(){
-  let score=myScore,total=totalQ;
+  let score=myScore,total=totalQCount;
   if(pid){
     try{
       const p=await db.collection('quiz_participants').doc(pid).get();
       if(p.exists) score=p.data().score||myScore;
       const r=await db.collection('quiz_responses').where('participantId','==',pid).where('sessionId','==',sid).get();
-      total=r.size||totalQ;
+      total=r.size||totalQCount;
     }catch(e){}
   }
   document.getElementById('final-score').textContent=score;
-  document.getElementById('result-detail').textContent=score+' correct out of '+total+' questions.';
+  document.getElementById('result-sub').textContent=score+' correct out of '+total+' questions.';
   showScreen('result');
 }
+
 function toggleFS(){
   if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
