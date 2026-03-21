@@ -163,9 +163,7 @@ async function loadHomePageImages() {
 
     snap.forEach(doc => {
       const { url } = doc.data();
-      // Only show data URLs (images uploaded via new system).
-      // Skip old Firebase Storage URLs — they may point to wrong images.
-      if (!url || !url.startsWith("data:")) return;
+      if (!url) return;
       const box = document.createElement("div");
       box.className = "box";
       const imgDiv = document.createElement("div");
