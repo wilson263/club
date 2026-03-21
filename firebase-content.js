@@ -55,6 +55,38 @@ async function loadTicker() {
   }
 }
 
+// ── Load announcements as cards on the home page ──
+async function loadAnnouncementsSection() {
+  if (!db) return;
+  const section = document.getElementById("announcements-section");
+  const cards   = document.getElementById("announcements-cards");
+  if (!section || !cards) return;
+  try {
+    const snap = await db.collection("announcements").get();
+    if (snap.empty) return;
+    section.style.display = "block";
+    const typeColor = { urgent:"#e63946", info:"#3b82f6", success:"#22c55e", warning:"#f59e0b" };
+    const typeIcon  = { urgent:"🚨", info:"📢", success:"✅", warning:"⚠️" };
+    cards.innerHTML = "";
+    snap.docs.forEach(doc => {
+      const d = doc.data();
+      const color = typeColor[d.type] || "#e63946";
+      const icon  = typeIcon[d.type]  || "📢";
+      const title = d.title || d.text || "";
+      const short = title.length > 120 ? title.substring(0, 120) + "…" : title;
+      const card  = document.createElement("div");
+      card.style.cssText = `background:rgba(255,255,255,0.04);border:1px solid ${color}33;border-left:4px solid ${color};border-radius:14px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap`;
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0">
+          <span style="font-size:22px;flex-shrink:0">${icon}</span>
+          <p style="margin:0;font-size:14px;font-weight:600;color:#fff;line-height:1.6">${short}</p>
+        </div>
+        <a href="register.html?ann=${doc.id}" style="flex-shrink:0;background:linear-gradient(135deg,#e63946,#c62a36);color:#fff;text-decoration:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;white-space:nowrap;transition:opacity 0.2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">📝 Register Now</a>`;
+      cards.appendChild(card);
+    });
+  } catch(e) { console.warn("Could not load announcements section:", e); }
+}
+
 // ── Load dynamic stats for home page ──
 async function loadHomeStats() {
   if (!db) return;
@@ -334,6 +366,14 @@ async function loadUpcomingEventsForRegistration(selectId) {
 
     if (count === 0) {
       select.innerHTML = '<option value="">No announcements yet — check back soon</option>';
+    }
+
+    // Pre-select if URL has ?ann=DOC_ID (from "Register Now" button on home page)
+    const urlParams = new URLSearchParams(window.location.search);
+    const preAnn = urlParams.get("ann");
+    if (preAnn) {
+      const target = select.querySelector(`option[value="ann_${preAnn}"]`);
+      if (target) { target.selected = true; }
     }
   } catch(e) {
     console.warn("Error loading registration options:", e);
