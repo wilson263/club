@@ -1901,14 +1901,17 @@ async function broadcastToSubscribers(type, title, details) {
       if (!data.email) return Promise.resolve();
       return emailjs.send(
         window.EMAILJS_SERVICE_ID || "service_neuralnexus",
-        window.EMAILJS_NEWSLETTER_TEMPLATE || "template_newsletter",
+        window.EMAILJS_CONFIRM_TEMPLATE || "template_confirm",
         {
           to_email: data.email,
           to_name: data.email.split("@")[0],
           update_type: typeLabel,
           update_title: title,
           update_details: details,
+          event_title: title,
           club_name: "Neural Nexus — AI & DS Club",
+          club_email: "neuralnexusclub@gmail.com",
+          club_phone: "9014196561",
           site_url: "https://neuralnexusgroup.in",
           register_url: type === "event" ? "https://neuralnexusgroup.in/register.html" : ""
         }
