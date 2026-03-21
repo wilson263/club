@@ -983,26 +983,35 @@
 
   <!-- ══ CHATBOT WIDGET ══ -->
   <style>
-    /* Chat button */
+    /* ── Chat FAB ── */
     #chat-fab {
       position: fixed; bottom: 24px; left: 24px; z-index: 9998;
       width: 56px; height: 56px; border-radius: 50%;
       background: linear-gradient(135deg, #e63946, #b52733);
       border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
       box-shadow: 0 6px 24px rgba(230,57,70,0.5);
-      transition: transform 0.25s, box-shadow 0.25s;
-      font-size: 24px;
+      transition: transform 0.25s, box-shadow 0.25s; font-size: 24px;
     }
     #chat-fab:hover { transform: scale(1.1); box-shadow: 0 10px 32px rgba(230,57,70,0.65); }
-    #chat-fab .chat-badge {
+    .chat-badge {
       position: absolute; top: -4px; right: -4px;
-      width: 18px; height: 18px; border-radius: 50%;
+      width: 14px; height: 14px; border-radius: 50%;
       background: #22c55e; border: 2px solid #080810;
       animation: pulse-green 2s ease-in-out infinite;
     }
     @keyframes pulse-green { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+    /* Feature 7: Unread badge */
+    #chat-unread-badge {
+      position: absolute; top: -6px; left: -6px;
+      min-width: 20px; height: 20px; border-radius: 100px;
+      background: #e63946; border: 2px solid #080810;
+      font-size: 10px; font-weight: 800; color: white;
+      display: none; align-items: center; justify-content: center;
+      padding: 0 4px; font-family: 'Inter', sans-serif;
+    }
+    #chat-unread-badge.show { display: flex; }
 
-    /* Chat window */
+    /* ── Chat window ── */
     #chat-window {
       position: fixed; bottom: 92px; left: 24px; z-index: 9999;
       width: 340px; max-width: calc(100vw - 48px);
@@ -1011,58 +1020,64 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
       display: none; flex-direction: column;
       height: 480px; max-height: calc(100vh - 120px);
+      transition: height 0.3s ease;
       animation: chatSlideIn 0.25s ease;
     }
     #chat-window.open { display: flex; }
+    /* Feature 8: Expand */
+    #chat-window.expanded { height: min(680px, calc(100vh - 80px)) !important; }
     @keyframes chatSlideIn {
       from { opacity: 0; transform: translateY(16px) scale(0.97); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* Chat header */
+    /* ── Chat header ── */
     .chat-header {
       background: linear-gradient(135deg, #1a0a0f, #14142a);
       border-bottom: 1px solid rgba(230,57,70,0.2);
-      padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+      padding: 11px 12px; display: flex; align-items: center; gap: 8px;
     }
     .chat-header-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
+      width: 34px; height: 34px; border-radius: 50%;
       background: linear-gradient(135deg, #e63946, #b52733);
       display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
+      font-size: 17px; flex-shrink: 0;
     }
     .chat-header-info { flex: 1; min-width: 0; }
-    .chat-header-name { font-size: 14px; font-weight: 800; color: white; }
-    .chat-header-status { font-size: 11px; color: #22c55e; font-weight: 600; }
-    .chat-close-btn {
+    .chat-header-name { font-size: 13px; font-weight: 800; color: white; }
+    .chat-header-status { font-size: 10px; color: #22c55e; font-weight: 600; }
+    /* Feature 4 + 8: header icon buttons */
+    .chat-header-btn {
       background: rgba(255,255,255,0.07); border: none; color: rgba(255,255,255,0.5);
-      width: 28px; height: 28px; border-radius: 50%; cursor: pointer;
-      font-size: 14px; display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
+      width: 27px; height: 27px; border-radius: 50%; cursor: pointer;
+      font-size: 13px; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; flex-shrink: 0;
     }
-    .chat-close-btn:hover { background: rgba(230,57,70,0.3); color: white; }
+    .chat-header-btn:hover { background: rgba(230,57,70,0.3); color: white; }
 
-    /* Messages area */
+    /* ── Messages area ── */
     .chat-messages {
-      flex: 1; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px;
+      flex: 1; overflow-y: auto; padding: 14px 12px;
+      display: flex; flex-direction: column; gap: 6px;
       scrollbar-width: thin; scrollbar-color: rgba(230,57,70,0.3) transparent;
     }
     .chat-messages::-webkit-scrollbar { width: 4px; }
     .chat-messages::-webkit-scrollbar-thumb { background: rgba(230,57,70,0.3); border-radius: 100px; }
 
-    /* Message bubbles */
+    /* ── Message bubbles ── */
     .chat-msg { display: flex; gap: 8px; align-items: flex-end; }
     .chat-msg.bot { flex-direction: row; }
     .chat-msg.user { flex-direction: row-reverse; }
-
     .bot-avatar {
-      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
       background: linear-gradient(135deg, #e63946, #b52733);
-      display: flex; align-items: center; justify-content: center; font-size: 13px;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
     }
-
+    .msg-col { display: flex; flex-direction: column; max-width: 84%; }
+    .chat-msg.user .msg-col { align-items: flex-end; }
+    .chat-msg.bot  .msg-col { align-items: flex-start; }
     .chat-bubble {
-      max-width: 82%; padding: 10px 13px; border-radius: 16px;
+      padding: 9px 12px; border-radius: 16px;
       font-size: 13px; line-height: 1.55; font-family: 'Inter', sans-serif;
     }
     .chat-msg.bot .chat-bubble {
@@ -1075,7 +1090,28 @@
     }
     .chat-bubble a { color: #ff8a95; text-decoration: underline; }
 
-    /* Typing indicator */
+    /* Feature 5: Timestamps */
+    .chat-time {
+      font-size: 10px; color: rgba(255,255,255,0.22);
+      margin-top: 3px; font-family: 'Inter', sans-serif; padding: 0 3px;
+    }
+
+    /* Feature 2: Feedback buttons */
+    .chat-feedback {
+      display: flex; gap: 4px; align-items: center; margin-top: 4px; padding: 0 3px;
+    }
+    .feedback-btn {
+      background: none; border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.35); font-size: 11px; padding: 2px 7px;
+      border-radius: 100px; cursor: pointer; transition: all 0.2s;
+      font-family: 'Inter', sans-serif; line-height: 1.5;
+    }
+    .feedback-btn:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: white; }
+    .feedback-btn.liked  { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.4); color: #22c55e; }
+    .feedback-btn.disliked { background: rgba(230,57,70,0.15); border-color: rgba(230,57,70,0.4); color: #e63946; }
+    .feedback-label { font-size: 10px; color: rgba(255,255,255,0.2); font-family: 'Inter',sans-serif; }
+
+    /* ── Typing indicator ── */
     .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 4px 2px; }
     .typing-indicator span {
       width: 7px; height: 7px; border-radius: 50%;
@@ -1086,19 +1122,29 @@
     .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typing-bounce { 0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-6px);} }
 
-    /* Quick reply chips */
-    .quick-chips {
-      display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 10px;
-    }
+    /* ── Quick chips ── */
+    .quick-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 10px; }
     .quick-chip {
       background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.3);
-      color: #ff8a95; font-size: 12px; font-weight: 600; padding: 5px 11px;
+      color: #ff8a95; font-size: 11px; font-weight: 600; padding: 4px 10px;
       border-radius: 100px; cursor: pointer; transition: background 0.2s;
       font-family: 'Inter', sans-serif;
     }
     .quick-chip:hover { background: rgba(230,57,70,0.25); }
 
-    /* Input area */
+    /* Feature 6: Did you mean */
+    .did-you-mean { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 8px 10px; margin-top: 4px; }
+    .did-you-mean p { font-size: 11px; color: rgba(255,255,255,0.4); margin: 0 0 6px; }
+    .dym-chip {
+      display: inline-block; background: rgba(230,57,70,0.1);
+      border: 1px solid rgba(230,57,70,0.3); color: #ff8a95;
+      font-size: 11px; font-weight: 600; padding: 3px 9px;
+      border-radius: 100px; cursor: pointer; margin: 2px;
+      transition: background 0.2s; font-family: 'Inter', sans-serif;
+    }
+    .dym-chip:hover { background: rgba(230,57,70,0.25); }
+
+    /* ── Input area ── */
     .chat-input-area {
       border-top: 1px solid rgba(255,255,255,0.07);
       padding: 10px 12px; display: flex; gap: 8px; align-items: center;
@@ -1107,25 +1153,25 @@
     #chat-input {
       flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
       border-radius: 12px; padding: 9px 13px; font-size: 13px; color: white;
-      outline: none; font-family: 'Inter', sans-serif; resize: none;
-      transition: border-color 0.2s;
+      outline: none; font-family: 'Inter', sans-serif; transition: border-color 0.2s;
     }
     #chat-input::placeholder { color: rgba(255,255,255,0.3); }
     #chat-input:focus { border-color: rgba(230,57,70,0.4); }
     #chat-send {
-      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
       background: linear-gradient(135deg, #e63946, #b52733);
       border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: transform 0.15s, opacity 0.15s; font-size: 15px;
+      transition: transform 0.15s, opacity 0.15s; font-size: 14px;
     }
     #chat-send:hover { transform: scale(1.08); }
     #chat-send:active { transform: scale(0.95); opacity: 0.85; }
   </style>
 
-  <!-- Chat button -->
+  <!-- Chat FAB -->
   <button id="chat-fab" onclick="toggleChat()" title="Chat with Neural Nexus Bot">
     <span id="chat-fab-icon">🤖</span>
     <div class="chat-badge"></div>
+    <div id="chat-unread-badge"></div>
   </button>
 
   <!-- Chat window -->
@@ -1136,158 +1182,231 @@
         <div class="chat-header-name">Neural Nexus Bot</div>
         <div class="chat-header-status">● Online — Ask me anything!</div>
       </div>
-      <button class="chat-close-btn" onclick="toggleChat()">✕</button>
+      <button class="chat-header-btn" onclick="clearChat()" title="Clear chat">🗑️</button>
+      <button class="chat-header-btn" id="expand-btn" onclick="toggleExpand()" title="Expand">⤢</button>
+      <button class="chat-header-btn" onclick="toggleChat()" title="Close">✕</button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
     <div class="quick-chips" id="quick-chips"></div>
     <div class="chat-input-area">
-      <input id="chat-input" type="text" placeholder="Type your question..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
+      <input id="chat-input" type="text" placeholder="Ask in English or Telugu..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
       <button id="chat-send" onclick="sendChat()">➤</button>
     </div>
   </div>
 
   <script>
   // ═══════════════════════════════════════════════════
-  //  NEURAL NEXUS CHATBOT — KNOWLEDGE BASE
+  //  NEURAL NEXUS CHATBOT — ALL 10 FEATURES
   // ═══════════════════════════════════════════════════
+
+  // ── Knowledge Base (with topic tags + Telugu/Hindi keywords) ──
   const KB = [
-    // Greetings
-    { k: ['hello','hi','hey','greet','hola','namaste','sup','yo'],
-      a: "Hello! 👋 I'm the Neural Nexus Bot. I can answer anything about this website — events, members, HOD, contact, resources, and more. What would you like to know?" },
-
-    // What is Neural Nexus
-    { k: ['what is neural nexus','about club','tell me about','who are you','neural nexus'],
-      a: "🧠 <b>Neural Nexus</b> is the <b>AI & Data Science Club</b> of Sri Indu Institute of Engineering & Technology (SIIET), Hyderabad. We are a community of students passionate about Artificial Intelligence and Data Science — learning, building, and competing together! Founded in 2024." },
-
-    // HOD
-    { k: ['hod','head of department','pavan kumar','dr.','professor','faculty head'],
-      a: "👨‍🏫 <b>Dr. S. Venkata Pavan Kumar</b> is our Head of the Department (AI & DS). He has:<br>• M.Tech & Ph.D<br>• 15+ years of teaching experience<br>• 7 Research Papers published<br>• 8 International Journals published<br>• INDIAN IDOL Best Professor 2024<br>• Indian Glowry Award 2024<br><br><a href='hodprofile.html'>📋 View Full Profile →</a>" },
-
-    // Events
-    { k: ['event','events','conducted','past event','activities','what happened'],
-      a: "📅 You can see all our <b>Conducted & Upcoming Events</b> on the <a href='gallery.html'>Events page</a>. Events are posted live by the admin — including date, venue, and details. Real events only, no fake ones!" },
-
-    // Upcoming events
-    { k: ['upcoming','next event','future','what\'s next','schedule','coming soon'],
-      a: "🔔 Check the <b>Upcoming Events</b> tab on the <a href='gallery.html'>Events page</a>. Upcoming events are posted by the admin as they are scheduled. Follow us on Instagram <b>@siiet_ai_ds_club</b> to get notified first!" },
-
-    // Quiz
-    { k: ['quiz','competition','quiz competition','quizz'],
-      a: "🏆 The <b>Neural Nexus Quiz Competition</b> was our first major event held on <b>December 18, 2024</b> at CSE Seminar Hall. It tested members' AI & Data Science knowledge. <a href='quiz.html'>📄 View quiz details →</a>" },
-
-    // Members / Team
-    { k: ['member','team','who are','club member','student','people','join','roster'],
-      a: "👤 Our club has <b>50+ active members</b> passionate about AI & Data Science. You can view the full team on the <a href='clubmembers.html'>Club Members page</a>. Want to join? <a href='register.html'>Register here →</a>" },
-
-    // Executive team
-    { k: ['president','vice president','secretary','executive','leadership','goutham','naga','shivani'],
-      a: "👑 Our Executive Team:<br>• <b>Goutham</b> — President (AI&DS, 4th Year)<br>• <b>Naga Charan</b> — Vice President (AI&DS, 2nd Year)<br>• <b>Shivani</b> — General Secretary (AI&DS, 3rd Year)" },
-
-    // Faculty
-    { k: ['faculty','teacher','lecturer','staff','guide','mentor','instructor'],
-      a: "🎓 Meet our club's faculty mentors and advisors on the <a href='faculty.html'>Faculty page</a>. They guide and support all our club activities and events." },
-
-    // Gallery / Photos
-    { k: ['gallery','photo','picture','image','moment','memory','photos'],
-      a: "📸 Browse club photos and event highlights in the <b>Club Photo Gallery</b> on the <a href='gallery.html'>Events & Gallery page</a>. Images are updated after every event!" },
-
-    // Resources
-    { k: ['resource','material','study','learn','notes','library','course','tutorial','pdf'],
-      a: "📚 We have a <b>Resources Library</b> with study materials, tutorials, and learning resources for AI & Data Science. Visit the <a href='resources.html'>Resources page →</a>" },
-
-    // Projects
-    { k: ['project','showcase','build','work','portfolio'],
-      a: "💡 Explore what our members are building! Check out the <a href='projects.html'>Project Showcase →</a> to see real AI & Data Science projects by Neural Nexus members." },
-
-    // Register / Join
-    { k: ['register','join','membership','sign up','enroll','how to join','become member'],
-      a: "📝 Want to join Neural Nexus? Head over to the <a href='register.html'>Registration page</a> to sign up for events or become a member. We welcome students from all backgrounds!" },
-
-    // Alumni
-    { k: ['alumni','graduate','past member','former','batch','passout'],
-      a: "🎓 Our alumni network is growing! Visit the <a href='alumni.html'>Alumni page</a> to see our graduates and their journeys after Neural Nexus." },
-
-    // Placements
-    { k: ['placement','job','internship','career','hire','company','recruit'],
-      a: "💼 Check our members' placement achievements and career opportunities on the <a href='placements.html'>Placements page →</a>" },
-
-    // Leaderboard
-    { k: ['leaderboard','rank','ranking','top','score','points','best','winner'],
-      a: "🏅 Check who's on top! View the <a href='leaderboard.html'>Leaderboard →</a> to see member rankings, scores, and competition results." },
-
-    // Blog
-    { k: ['blog','article','post','write','read','news'],
-      a: "✍️ Read articles, insights and updates written by Neural Nexus members on the <a href='blog.html'>Blog →</a>" },
-
-    // Achievements
-    { k: ['achievement','award','won','prize','recognition','honor','accomplish'],
-      a: "🏆 See all our club's achievements and awards on the <a href='achievements.html'>Achievements page →</a>. We're proud of what our members accomplish!" },
-
-    // Contact
-    { k: ['contact','reach','email','phone','message','call','talk','enquiry','whatsapp'],
-      a: "💬 You can reach Neural Nexus through:<br>📞 <b>9014196561</b><br>✉️ <b>neuralnexusgroup@gmail.com</b><br>📱 Instagram: <b>@siiet_ai_ds_club</b><br><br>Or use the <a href='contact.html'>Contact page →</a> to send us a message directly." },
-
-    // Instagram / Social
-    { k: ['instagram','social media','insta','follow','twitter','facebook'],
-      a: "📱 Follow us on Instagram: <a href='https://www.instagram.com/siiet_ai_ds_club' target='_blank'><b>@siiet_ai_ds_club</b></a> to stay updated on events, news, and club activities!" },
-
-    // Dashboard
-    { k: ['dashboard','all pages','overview','sitemap','navigate','where','find'],
-      a: "🧭 You can find <b>everything</b> through the <a href='dashboard.html'>Full Dashboard →</a>. It links to all sections: Events, Members, Resources, Projects, Alumni, Placements, Leaderboard, Blog, and more!" },
-
-    // College / SIIET
-    { k: ['siiet','sri indu','college','university','institution','campus'],
-      a: "🏫 <b>Sri Indu Institute of Engineering & Technology (SIIET)</b> is a UGC Autonomous Institution located in Sheriguda, Rangareddy, Telangana — 501510.<br>📞 93947187999<br>✉️ acct.siiet@gmail.com<br>🌐 <a href='https://sriindu.ac.in/' target='_blank'>sriindu.ac.in</a>" },
-
-    // Live quiz
-    { k: ['live quiz','online quiz','live','attempt','play','participate'],
-      a: "🎮 Want to test your knowledge? Check the <a href='live-quiz.html'>Live Quiz →</a> page to participate in ongoing or upcoming quiz sessions!" },
-
-    // Attendance
-    { k: ['attendance','present','mark','absent'],
-      a: "📋 Club attendance is tracked through the <a href='attendance.html'>Attendance page →</a>. Make sure to mark your presence at events!" },
-
-    // Minutes
-    { k: ['minutes','meeting','minutes of meeting','mom','proceedings'],
-      a: "📄 Read meeting notes and proceedings on the <a href='minutes.html'>Minutes of Meeting page →</a>" },
-
-    // Open Source
-    { k: ['open source','github','contribution','contribute','code'],
-      a: "💻 Interested in open source? Check the <a href='opensource.html'>Open Source page →</a> to see Neural Nexus contributions and how you can participate." },
-
-    // Press / Media
-    { k: ['press','media','news','coverage','article about us'],
-      a: "📰 Read news coverage and media features about Neural Nexus on the <a href='press.html'>Press page →</a>" },
-
-    // Sponsors
-    { k: ['sponsor','partner','support','fund'],
-      a: "🤝 Interested in sponsoring Neural Nexus? View our <a href='sponsors.html'>Sponsors page →</a> or contact us at neuralnexusgroup@gmail.com." },
-
-    // Feedback
-    { k: ['feedback','suggestion','improve','opinion','review','rate'],
-      a: "📝 We value your feedback! Share your thoughts and suggestions on the <a href='feedback.html'>Feedback page →</a>" },
-
-    // Verify / Certificate
-    { k: ['verify','certificate','verify certificate','credential','proof'],
-      a: "✅ You can verify your participation certificates on the <a href='verify.html'>Certificate Verification page →</a>" },
-
-    // Home page itself
-    { k: ['home','homepage','main page','this page','start','landing'],
-      a: "🏠 You're on the <b>Neural Nexus Home page!</b> It shows the club logo, news ticker, photo gallery, about section, stats (members, events, workshops), vision & mission, HOD profile, executive team, and links to all sections. Scroll down to explore!" },
-
-    // Thanks / bye
-    { k: ['thank','thanks','bye','goodbye','ok','okay','great','cool','awesome','nice'],
-      a: "You're welcome! 😊 Feel free to ask anything else about Neural Nexus. We're here to help! 🚀" },
-
-    // Help
-    { k: ['help','what can you do','what do you know','options','topics'],
-      a: "I can help you with anything about this website! Try asking about:<br>• 🏆 Events & Achievements<br>• 👤 Members & Team<br>• 📚 Resources & Projects<br>• 📞 Contact details<br>• 🏫 College & Club info<br>• 💼 Placements & Alumni<br>• 🎓 Faculty & HOD" },
+    { t:'greeting',    k:['hello','hi','hey','greet','hola','namaste','sup','yo','vanakkam','ela unnaru','kem cho','namaskar','salaam','meeru ela unnaru'],
+      a:"Hello! 👋 I'm the <b>Neural Nexus Bot</b>. I can answer anything about this website — events, members, HOD, contact, resources, and more. What would you like to know?" },
+    { t:'club',        k:['what is neural nexus','about club','tell me about','who are you','neural nexus','club gurinchi','club enti','club kya hai','idi enti'],
+      a:"🧠 <b>Neural Nexus</b> is the <b>AI & Data Science Club</b> of Sri Indu Institute of Engineering & Technology (SIIET), Hyderabad. We are a community of students passionate about Artificial Intelligence and Data Science — learning, building, and competing together! Founded in 2024." },
+    { t:'hod',         k:['hod','head of department','pavan kumar','dr.','professor','faculty head','vibhagaadhipati','department head','sir peru','professor peru','hod kaun hai','hod evaru'],
+      a:"👨‍🏫 <b>Dr. S. Venkata Pavan Kumar</b> is our Head of the Department (AI & DS). He has:<br>• M.Tech & Ph.D<br>• 15+ years of teaching experience<br>• 7 Research Papers published<br>• 8 International Journals published<br>• INDIAN IDOL Best Professor 2024<br>• Indian Glowry Award 2024<br><br><a href='hodprofile.html'>📋 View Full Profile →</a>" },
+    { t:'events',      k:['event','events','conducted','past event','activities','what happened','events ela','events emi unnai','karyakramalu','programs','events kya hain','jarigina events'],
+      a:"📅 You can see all our <b>Conducted & Upcoming Events</b> on the <a href='gallery.html'>Events page</a>. Events are posted live by the admin — including date, venue, and details. Real events only, no fake ones!" },
+    { t:'upcoming',    k:['upcoming','next event','future','schedule','coming soon','mundunna events','aagami events','aane wale events','future events'],
+      a:"🔔 Check the <b>Upcoming Events</b> tab on the <a href='gallery.html'>Events page</a>. Upcoming events are posted by the admin as they are scheduled. Follow us on Instagram <b>@siiet_ai_ds_club</b> to get notified first!" },
+    { t:'quiz',        k:['quiz','competition','quiz competition','quizz','quiz gurinchi','quiz enti','quiz kya tha'],
+      a:"🏆 The <b>Neural Nexus Quiz Competition</b> was our first major event held on <b>December 18, 2024</b> at CSE Seminar Hall. It tested members' AI & Data Science knowledge. <a href='quiz.html'>📄 View quiz details →</a>" },
+    { t:'members',     k:['member','team','who are','club member','student','people','roster','members evaru','team evaru','members kaun hain','log evaru'],
+      a:"👤 Our club has <b>50+ active members</b> passionate about AI & Data Science. You can view the full team on the <a href='clubmembers.html'>Club Members page</a>. Want to join? <a href='register.html'>Register here →</a>" },
+    { t:'executive',   k:['president','vice president','secretary','executive','leadership','goutham','naga','shivani','andhara team','committee','leaders evaru'],
+      a:"👑 Our Executive Team:<br>• <b>Goutham</b> — President (AI&DS, 4th Year)<br>• <b>Naga Charan</b> — Vice President (AI&DS, 2nd Year)<br>• <b>Shivani</b> — General Secretary (AI&DS, 3rd Year)" },
+    { t:'faculty',     k:['faculty','teacher','lecturer','staff','guide','mentor','instructor','adhyapakulu','faculty evaru','teachers kaun hain','masters'],
+      a:"🎓 Meet our club's faculty mentors and advisors on the <a href='faculty.html'>Faculty page</a>. They guide and support all our club activities and events." },
+    { t:'gallery',     k:['gallery','photo','picture','image','moment','memory','photos','photos chudali','photos kahan hain','images chupiyandi'],
+      a:"📸 Browse club photos and event highlights in the <b>Club Photo Gallery</b> on the <a href='gallery.html'>Events & Gallery page</a>. Images are updated after every event!" },
+    { t:'resources',   k:['resource','material','study','learn','notes','library','course','tutorial','pdf','padukovalante','notes ela','sikhna chahte','study material kahan','resources emi unnai'],
+      a:"📚 We have a <b>Resources Library</b> with study materials, tutorials, and learning resources for AI & Data Science. Visit the <a href='resources.html'>Resources page →</a>" },
+    { t:'projects',    k:['project','showcase','build','work','portfolio','projects emi unnai','projects kya hain','build chesamu','projects chupiyandi'],
+      a:"💡 Explore what our members are building! Check out the <a href='projects.html'>Project Showcase →</a> to see real AI & Data Science projects by Neural Nexus members." },
+    { t:'register',    k:['register','join','membership','sign up','enroll','how to join','become member','join avvali','join avvadam ela','member avvali','kaise join kare','membership kaise le'],
+      a:"📝 Want to join Neural Nexus? Head over to the <a href='register.html'>Registration page</a> to sign up for events or become a member. We welcome students from all backgrounds!" },
+    { t:'alumni',      k:['alumni','graduate','past member','former','batch','passout','senior','purana member','poorv chhatra','alumni evaru'],
+      a:"🎓 Our alumni network is growing! Visit the <a href='alumni.html'>Alumni page</a> to see our graduates and their journeys after Neural Nexus." },
+    { t:'placements',  k:['placement','job','internship','career','hire','company','recruit','job ela','naukri','placements kya hain','job vacancies'],
+      a:"💼 Check our members' placement achievements and career opportunities on the <a href='placements.html'>Placements page →</a>" },
+    { t:'leaderboard', k:['leaderboard','rank','ranking','top','score','points','best','winner','first place','rankings ela','top members evaru','leaderboard chupiyandi'],
+      a:"🏅 Check who's on top! View the <a href='leaderboard.html'>Leaderboard →</a> to see member rankings, scores, and competition results." },
+    { t:'blog',        k:['blog','article','post','write','read','news','blog lo emi','blog kya hai','articles kahan hain'],
+      a:"✍️ Read articles, insights and updates written by Neural Nexus members on the <a href='blog.html'>Blog →</a>" },
+    { t:'achievements',k:['achievement','award','won','prize','recognition','honor','accomplish','awards emi','achievements emi','puraskar','medal'],
+      a:"🏆 See all our club's achievements and awards on the <a href='achievements.html'>Achievements page →</a>. We're proud of what our members accomplish!" },
+    { t:'contact',     k:['contact','reach','email','phone','message','call','talk','enquiry','whatsapp','contact ela','sampark','contact kaise kare','number'],
+      a:"💬 You can reach Neural Nexus through:<br>📞 <b>9014196561</b><br>✉️ <b>neuralnexusgroup@gmail.com</b><br>📱 Instagram: <b>@siiet_ai_ds_club</b><br><br>Or use the <a href='contact.html'>Contact page →</a> to send us a message directly." },
+    { t:'instagram',   k:['instagram','social media','insta','follow','twitter','facebook','social','follow cheyyadam ela'],
+      a:"📱 Follow us on Instagram: <a href='https://www.instagram.com/siiet_ai_ds_club' target='_blank'><b>@siiet_ai_ds_club</b></a> to stay updated on events, news, and club activities!" },
+    { t:'dashboard',   k:['dashboard','all pages','overview','sitemap','navigate','where','find','anni pages','sab kuch kahan','anni links'],
+      a:"🧭 You can find <b>everything</b> through the <a href='dashboard.html'>Full Dashboard →</a>. It links to all sections: Events, Members, Resources, Projects, Alumni, Placements, Leaderboard, Blog, and more!" },
+    { t:'college',     k:['siiet','sri indu','college','university','institution','campus','college gurinchi','college kya hai','college address','siiet ela undi'],
+      a:"🏫 <b>Sri Indu Institute of Engineering & Technology (SIIET)</b> is a UGC Autonomous Institution located in Sheriguda, Rangareddy, Telangana — 501510.<br>📞 93947187999<br>✉️ acct.siiet@gmail.com<br>🌐 <a href='https://sriindu.ac.in/' target='_blank'>sriindu.ac.in</a>" },
+    { t:'livequiz',    k:['live quiz','online quiz','attempt','play','participate','live lo play','quiz khelo','ippudu quiz','live quiz ela'],
+      a:"🎮 Want to test your knowledge? Check the <a href='live-quiz.html'>Live Quiz →</a> page to participate in ongoing or upcoming quiz sessions!" },
+    { t:'attendance',  k:['attendance','present','mark','absent','hajaari','attendance ela cheyyadam','attendance kaise kare','attendance chupiyandi'],
+      a:"📋 Club attendance is tracked through the <a href='attendance.html'>Attendance page →</a>. Make sure to mark your presence at events!" },
+    { t:'minutes',     k:['minutes','meeting','minutes of meeting','mom','proceedings','meeting notes','meeting lo emi','baithak'],
+      a:"📄 Read meeting notes and proceedings on the <a href='minutes.html'>Minutes of Meeting page →</a>" },
+    { t:'opensource',  k:['open source','github','contribution','contribute','code','coding','open source gurinchi','github lo','coding projects'],
+      a:"💻 Interested in open source? Check the <a href='opensource.html'>Open Source page →</a> to see Neural Nexus contributions and how you can participate." },
+    { t:'press',       k:['press','media','news','coverage','article about us','newspaper','media lo','press lo','news lo'],
+      a:"📰 Read news coverage and media features about Neural Nexus on the <a href='press.html'>Press page →</a>" },
+    { t:'sponsors',    k:['sponsor','partner','support','fund','sponsor avvadam ela','sahayam','madad','sponsorship'],
+      a:"🤝 Interested in sponsoring Neural Nexus? View our <a href='sponsors.html'>Sponsors page →</a> or contact us at neuralnexusgroup@gmail.com." },
+    { t:'feedback',    k:['feedback','suggestion','improve','opinion','review','rate','feedback ela','ray ichi','raaye aapna','suggestions'],
+      a:"📝 We value your feedback! Share your thoughts and suggestions on the <a href='feedback.html'>Feedback page →</a>" },
+    { t:'verify',      k:['verify','certificate','verify certificate','credential','proof','certificate verify','certificate ela','praman patra','certificate valid'],
+      a:"✅ You can verify your participation certificates on the <a href='verify.html'>Certificate Verification page →</a>" },
+    { t:'home',        k:['home','homepage','main page','this page','start','landing','meru unnaru'],
+      a:"🏠 You're on the <b>Neural Nexus Home page!</b> It shows the club logo, news ticker, photo gallery, about section, stats (members, events, workshops), vision & mission, HOD profile, executive team, and links to all sections. Scroll down to explore!" },
+    { t:'thanks',      k:['thank','thanks','bye','goodbye','ok','okay','great','cool','awesome','nice','dhanyavaadalu','shukriya','alvida','chala manchidi'],
+      a:"You're welcome! 😊 Feel free to ask anything else about Neural Nexus. We're here to help! 🚀" },
+    { t:'help',        k:['help','what can you do','what do you know','options','topics','sahayam','kya puchh sakta','ela andam','emi adigali'],
+      a:"I can help you with anything about this website! Try asking about:<br>• 🏆 Events & Achievements<br>• 👤 Members & Team<br>• 📚 Resources & Projects<br>• 📞 Contact details<br>• 🏫 College & Club info<br>• 💼 Placements & Alumni<br>• 🎓 Faculty & HOD<br><br>💡 <i>You can also ask in Telugu! e.g. \"events emi unnai\", \"join avvadam ela\"</i>" },
+    // Feature 9: Context memory trigger
+    { t:'more',        k:['tell me more','more details','elaborate','what else','explain more','inka cheppandi','aur batao','more info','details cheppu','continue','and then'],
+      a:"__CONTEXT__" },
   ];
 
-  const QUICK = ["Events", "Join Us", "Contact", "Members", "Resources", "HOD"];
+  // Feature 1: Context chips per topic
+  const CONTEXT_CHIPS = {
+    greeting:   ["Events","Join Us","Contact","Members","Resources","HOD"],
+    club:       ["HOD","Executive Team","College Info","Members","Faculty"],
+    hod:        ["Faculty","Executive Team","Achievements","College Info"],
+    events:     ["Upcoming Events","Quiz","Gallery","Live Quiz"],
+    upcoming:   ["Events","Register","Instagram"],
+    quiz:       ["Live Quiz","Leaderboard","Events"],
+    members:    ["Executive Team","Join Us","Faculty","Leaderboard"],
+    executive:  ["Members","HOD","Faculty"],
+    faculty:    ["HOD","Members","Resources"],
+    gallery:    ["Events","Blog","Achievements"],
+    resources:  ["Projects","Open Source","Blog"],
+    projects:   ["Resources","Open Source","Achievements"],
+    register:   ["Members","Events","Contact"],
+    alumni:     ["Placements","Blog","Members"],
+    placements: ["Alumni","Projects","Blog"],
+    leaderboard:["Quiz","Live Quiz","Members"],
+    blog:       ["Resources","Projects","Press"],
+    achievements:["Events","Members","Press"],
+    contact:    ["Instagram","Feedback","Sponsors"],
+    instagram:  ["Contact","Events","Blog"],
+    dashboard:  ["Events","Members","Resources"],
+    college:    ["HOD","Faculty","Contact"],
+    livequiz:   ["Quiz","Leaderboard","Events"],
+    attendance: ["Events","Members","Live Quiz"],
+    minutes:    ["Events","Members","Faculty"],
+    opensource: ["Projects","Resources","Blog"],
+    press:      ["Achievements","Events","Blog"],
+    sponsors:   ["Contact","Achievements","Events"],
+    feedback:   ["Contact","Events","Blog"],
+    verify:     ["Events","Achievements","Contact"],
+    home:       ["Events","Members","Dashboard"],
+    thanks:     ["Events","Join Us","Contact"],
+    help:       ["Events","Join Us","Contact","Members","Resources","HOD"],
+    more:       ["Events","Join Us","Contact","Members","Resources","HOD"],
+  };
+  const DEFAULT_CHIPS = ["Events","Join Us","Contact","Members","Resources","HOD"];
 
-  let chatOpen = false;
-  let chatInited = false;
+  // Chip label → query string
+  const CHIP_QUERY = {
+    "Events":"events","Join Us":"how to join","Contact":"contact","Members":"members",
+    "Resources":"resources","HOD":"hod","Upcoming Events":"upcoming events",
+    "Quiz":"quiz competition","Gallery":"gallery photos","Live Quiz":"live quiz",
+    "Register":"register","Instagram":"instagram","Leaderboard":"leaderboard",
+    "Executive Team":"executive team","Faculty":"faculty","Projects":"projects",
+    "Open Source":"open source","Blog":"blog","Achievements":"achievements",
+    "Placements":"placements","Alumni":"alumni","Press":"press media",
+    "Feedback":"feedback","Sponsors":"sponsors","College Info":"siiet college",
+    "Dashboard":"dashboard","Attendance":"attendance",
+  };
+
+  // "Did you mean" topic label map
+  const TOPIC_LABELS = {
+    greeting:'Greetings', club:'About Club', hod:'HOD', events:'Events',
+    upcoming:'Upcoming Events', quiz:'Quiz', members:'Members', executive:'Executive Team',
+    faculty:'Faculty', gallery:'Gallery', resources:'Resources', projects:'Projects',
+    register:'Join / Register', alumni:'Alumni', placements:'Placements',
+    leaderboard:'Leaderboard', blog:'Blog', achievements:'Achievements',
+    contact:'Contact', instagram:'Instagram', dashboard:'Dashboard',
+    college:'College Info', livequiz:'Live Quiz', attendance:'Attendance',
+    opensource:'Open Source', press:'Press', sponsors:'Sponsors',
+    feedback:'Feedback', verify:'Certificates',
+  };
+
+  // ── State ──
+  let chatOpen    = false;
+  let chatInited  = false;
+  let isExpanded  = false;
+  let unreadCount = 0;
+  let lastTopic   = null;   // Feature 9
+  let lastAnswer  = null;   // Feature 9
+  const STORAGE_KEY = 'nn_chat_v2';  // Feature 3
+
+  // ── Feature 5: timestamp ──
+  function nowTime() {
+    return new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  }
+
+  // ── Feature 3: save/load history ──
+  function saveHistory() {
+    const msgs = document.getElementById('chat-messages');
+    const items = [];
+    msgs.querySelectorAll('.chat-msg').forEach(row => {
+      const bubble = row.querySelector('.chat-bubble');
+      const time   = row.querySelector('.chat-time');
+      if (!bubble) return;
+      items.push({ type: row.classList.contains('user') ? 'user' : 'bot', html: bubble.innerHTML, time: time ? time.textContent : '' });
+    });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch(e) {}
+  }
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const items = JSON.parse(raw);
+      if (!items || !items.length) return false;
+      items.forEach(item => {
+        if (item.type === 'user') addUserMsg(item.html, item.time, true);
+        else addBotMsg(item.html, item.time, true);
+      });
+      return true;
+    } catch(e) { return false; }
+  }
+
+  // ── Feature 7: unread badge ──
+  function updateUnreadBadge() {
+    const badge = document.getElementById('chat-unread-badge');
+    if (unreadCount > 0 && !chatOpen) {
+      badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+  }
+
+  // ── Feature 8: expand ──
+  function toggleExpand() {
+    isExpanded = !isExpanded;
+    document.getElementById('chat-window').classList.toggle('expanded', isExpanded);
+    const btn = document.getElementById('expand-btn');
+    btn.textContent = isExpanded ? '⤡' : '⤢';
+    btn.title = isExpanded ? 'Collapse' : 'Expand';
+  }
+
+  // ── Feature 4: clear chat ──
+  function clearChat() {
+    if (!confirm('Clear all chat messages?')) return;
+    document.getElementById('chat-messages').innerHTML = '';
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    lastTopic = null; lastAnswer = null;
+    addBotMsg("Chat cleared! 🧹 Ask me anything about Neural Nexus.");
+    renderChips(DEFAULT_CHIPS);
+  }
 
   function toggleChat() {
     chatOpen = !chatOpen;
@@ -1295,100 +1414,180 @@
     win.classList.toggle('open', chatOpen);
     document.getElementById('chat-fab-icon').textContent = chatOpen ? '✕' : '🤖';
     if (chatOpen && !chatInited) { initChat(); chatInited = true; }
-    if (chatOpen) setTimeout(() => document.getElementById('chat-input').focus(), 100);
+    if (chatOpen) {
+      unreadCount = 0; updateUnreadBadge();
+      setTimeout(() => document.getElementById('chat-input').focus(), 100);
+    }
   }
 
   function initChat() {
-    addBotMsg("👋 Hi! I'm the <b>Neural Nexus Bot</b>. I know everything about this website — from events and members to contact info and resources. What would you like to know?");
-    renderChips();
+    const restored = loadHistory();
+    if (!restored) {
+      addBotMsg("👋 Hi! I'm the <b>Neural Nexus Bot</b>. I know everything about this website — from events and members to contact info and resources. What would you like to know?");
+    }
+    renderChips(DEFAULT_CHIPS);
   }
 
-  function renderChips() {
+  // Feature 1: context-aware chips
+  function renderChips(chips) {
     const c = document.getElementById('quick-chips');
-    c.innerHTML = QUICK.map(q =>
+    c.innerHTML = (chips || DEFAULT_CHIPS).map(q =>
       `<button class="quick-chip" onclick="chipClick('${q}')">${q}</button>`
     ).join('');
   }
 
-  function chipClick(text) {
-    addUserMsg(text);
+  function chipClick(label) {
+    const query = CHIP_QUERY[label] || label;
+    addUserMsg(label);
     document.getElementById('quick-chips').innerHTML = '';
-    setTimeout(() => { reply(text); renderChips(); }, 600);
+    setTimeout(() => {
+      const { answer, topic } = findAnswer(query);
+      addBotMsg(answer);
+      renderChips(CONTEXT_CHIPS[topic] || DEFAULT_CHIPS);
+    }, 600);
   }
 
-  function addBotMsg(html) {
+  function addBotMsg(html, timeStr, skipSave) {
     const msgs = document.getElementById('chat-messages');
-    const div = document.createElement('div');
-    div.className = 'chat-msg bot';
-    div.innerHTML = `<div class="bot-avatar">🤖</div><div class="chat-bubble">${html}</div>`;
-    msgs.appendChild(div);
+    const time  = timeStr || nowTime();
+    const row   = document.createElement('div');
+    row.className = 'chat-msg bot';
+    // Feature 2: feedback buttons (only on fresh messages, not restored history)
+    const feedbackHtml = skipSave ? '' :
+      `<div class="chat-feedback">
+        <button class="feedback-btn" onclick="rateFeedback(this,'up')">👍</button>
+        <button class="feedback-btn" onclick="rateFeedback(this,'down')">👎</button>
+        <span class="feedback-label">Was this helpful?</span>
+      </div>`;
+    row.innerHTML =
+      `<div class="bot-avatar">🤖</div>
+       <div class="msg-col">
+         <div class="chat-bubble">${html}</div>
+         <div class="chat-time">${time}</div>
+         ${feedbackHtml}
+       </div>`;
+    msgs.appendChild(row);
     scrollBottom();
+    if (!skipSave) {
+      saveHistory();
+      if (!chatOpen) { unreadCount++; updateUnreadBadge(); }
+    }
   }
 
-  function addUserMsg(text) {
+  function addUserMsg(text, timeStr, skipSave) {
     const msgs = document.getElementById('chat-messages');
-    const div = document.createElement('div');
-    div.className = 'chat-msg user';
-    div.innerHTML = `<div class="chat-bubble">${escHtml(text)}</div>`;
-    msgs.appendChild(div);
+    const time  = timeStr || nowTime();
+    const row   = document.createElement('div');
+    row.className = 'chat-msg user';
+    row.innerHTML =
+      `<div class="msg-col">
+         <div class="chat-bubble">${escHtml ? escHtml(text) : text}</div>
+         <div class="chat-time">${time}</div>
+       </div>`;
+    msgs.appendChild(row);
     scrollBottom();
+    if (!skipSave) saveHistory();
+  }
+
+  // Feature 2: rate feedback
+  function rateFeedback(btn, type) {
+    const feedback = btn.closest('.chat-feedback');
+    feedback.querySelectorAll('.feedback-btn').forEach(b => { b.disabled = true; b.classList.remove('liked','disliked'); });
+    btn.classList.add(type === 'up' ? 'liked' : 'disliked');
+    feedback.querySelector('.feedback-label').textContent = type === 'up' ? 'Thanks! 😊' : 'Sorry about that!';
   }
 
   function showTyping() {
     const msgs = document.getElementById('chat-messages');
-    const div = document.createElement('div');
+    const div  = document.createElement('div');
     div.className = 'chat-msg bot'; div.id = 'typing-row';
-    div.innerHTML = `<div class="bot-avatar">🤖</div><div class="chat-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
+    div.innerHTML = `<div class="bot-avatar">🤖</div><div class="msg-col"><div class="chat-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;
     msgs.appendChild(div);
     scrollBottom();
-    return div;
   }
 
-  function removeTyping() {
-    const el = document.getElementById('typing-row');
-    if (el) el.remove();
-  }
+  function removeTyping() { const el = document.getElementById('typing-row'); if (el) el.remove(); }
 
-  function scrollBottom() {
-    const m = document.getElementById('chat-messages');
-    m.scrollTop = m.scrollHeight;
-  }
+  function scrollBottom() { const m = document.getElementById('chat-messages'); m.scrollTop = m.scrollHeight; }
 
-  function escHtml(t) {
-    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+  function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+  // ── Feature 6 + 9 + 10: Smart answer engine ──
   function findAnswer(q) {
     const lower = q.toLowerCase().trim();
-    // Find best matching entry
     let best = null, bestScore = 0;
     for (const entry of KB) {
       let score = 0;
       for (const kw of entry.k) {
-        if (lower.includes(kw)) score += kw.split(' ').length; // multi-word keywords score higher
+        if (lower.includes(kw)) score += kw.split(' ').length;
       }
       if (score > bestScore) { bestScore = score; best = entry; }
     }
-    if (best && bestScore > 0) return best.a;
-    return "🤔 I'm not sure about that! You can explore the <a href='dashboard.html'>Dashboard</a> to find what you're looking for, or contact us at <b>neuralnexusgroup@gmail.com</b> or call <b>9014196561</b>.";
+
+    // Feature 9: context memory
+    if (best && best.t === 'more') {
+      if (lastAnswer) return { answer: "Here's more on what we discussed:<br><br>" + lastAnswer, topic: lastTopic || 'more' };
+      return { answer: "🤔 Could you clarify what you'd like more info on? Try asking about Events, Members, Resources, or anything else!", topic: 'help' };
+    }
+
+    if (best && bestScore > 0) {
+      lastTopic = best.t; lastAnswer = best.a;
+      return { answer: best.a, topic: best.t };
+    }
+
+    // Feature 6: "Did you mean?" with partial matching
+    const suggestions = [];
+    for (const entry of KB) {
+      if (entry.t === 'more' || !TOPIC_LABELS[entry.t]) continue;
+      for (const kw of entry.k) {
+        const minLen = Math.max(3, kw.length - 2);
+        if (kw.length >= 3 && (lower.includes(kw.substring(0, minLen)) || (lower.length >= 3 && kw.includes(lower.substring(0, Math.min(lower.length, 5)))))) {
+          if (!suggestions.find(s => s.t === entry.t)) {
+            suggestions.push({ t: entry.t, label: TOPIC_LABELS[entry.t], q: entry.k[0] });
+          }
+          break;
+        }
+      }
+      if (suggestions.length >= 3) break;
+    }
+
+    if (suggestions.length) {
+      const chips = suggestions.map(s => `<button class="dym-chip" onclick="dymClick('${s.label}','${s.q}')">${s.label}</button>`).join('');
+      return { answer: `🤔 Not sure about that. Did you mean:<div class="did-you-mean"><p>Related topics:</p>${chips}</div>`, topic: 'help' };
+    }
+
+    return { answer: "🤔 I couldn't find an answer to that! You can explore the <a href='dashboard.html'>Dashboard</a>, or contact us at <b>neuralnexusgroup@gmail.com</b> or call <b>9014196561</b>.", topic: 'help' };
+  }
+
+  // Feature 6: DYM chip click
+  function dymClick(label, query) {
+    addUserMsg(label);
+    document.getElementById('quick-chips').innerHTML = '';
+    setTimeout(() => {
+      const { answer, topic } = findAnswer(query);
+      addBotMsg(answer);
+      renderChips(CONTEXT_CHIPS[topic] || DEFAULT_CHIPS);
+    }, 600);
   }
 
   function reply(text) {
-    const typing = showTyping();
+    showTyping();
     setTimeout(() => {
       removeTyping();
-      addBotMsg(findAnswer(text));
+      const { answer, topic } = findAnswer(text);
+      addBotMsg(answer);
+      renderChips(CONTEXT_CHIPS[topic] || DEFAULT_CHIPS);
     }, 700 + Math.random() * 400);
   }
 
   function sendChat() {
-    const inp = document.getElementById('chat-input');
+    const inp  = document.getElementById('chat-input');
     const text = inp.value.trim();
     if (!text) return;
     inp.value = '';
     addUserMsg(text);
     document.getElementById('quick-chips').innerHTML = '';
-    setTimeout(() => { reply(text); renderChips(); }, 600);
+    reply(text);
   }
   </script>
 
