@@ -35,36 +35,40 @@ if (isConfigured) {
   db      = firebase.firestore();
   storage = firebase.storage();
 
-  // Ensure session survives page navigation (explicit LOCAL persistence)
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        currentUser = user;
-        const cachedRole = localStorage.getItem("nn_role_" + user.uid);
-        if (cachedRole !== null) {
-          isPermanentAdmin = cachedRole === "true";
-          hideAuthLoading();
-          updateSidebarForRole(user);
-          showDashboard();
-          loadCurrentUser(user);
-        } else if (user.email === PERMANENT_ADMIN_EMAIL) {
-          isPermanentAdmin = true;
-          localStorage.setItem("nn_role_" + user.uid, "true");
-          hideAuthLoading();
-          updateSidebarForRole(user);
-          showDashboard();
-          loadCurrentUser(user);
-        } else {
-          await loadCurrentUser(user);
-          hideAuthLoading();
-          showDashboard();
-        }
-      } else {
-        currentUser = null;
+  // Set LOCAL persistence (fire-and-forget — do NOT await, so auth listener starts immediately)
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+  // Safety net: if Firebase hasn't responded in 4 seconds, show login
+  const authTimeout = setTimeout(() => { hideAuthLoading(); showLogin(); }, 4000);
+
+  auth.onAuthStateChanged(async (user) => {
+    clearTimeout(authTimeout);
+    if (user) {
+      currentUser = user;
+      const cachedRole = localStorage.getItem("nn_role_" + user.uid);
+      if (cachedRole !== null) {
+        isPermanentAdmin = cachedRole === "true";
         hideAuthLoading();
-        showLogin();
+        updateSidebarForRole(user);
+        showDashboard();
+        loadCurrentUser(user);
+      } else if (user.email === PERMANENT_ADMIN_EMAIL) {
+        isPermanentAdmin = true;
+        localStorage.setItem("nn_role_" + user.uid, "true");
+        hideAuthLoading();
+        updateSidebarForRole(user);
+        showDashboard();
+        loadCurrentUser(user);
+      } else {
+        await loadCurrentUser(user);
+        hideAuthLoading();
+        showDashboard();
       }
-    });
+    } else {
+      currentUser = null;
+      hideAuthLoading();
+      showLogin();
+    }
   });
 } else {
   hideAuthLoading();
