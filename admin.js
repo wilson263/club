@@ -337,60 +337,55 @@ async function loadStats() {
 function loadDashboardData() { loadStats(); }
 
 // ─── STORAGE UPLOAD HELPER ────────────────────────────────────────────────────
-// ─── STORAGE UPLOAD — uses Firebase Storage REST API via XHR (no SDK)
-// Bypasses compat SDK bucket issues. Works with firebasestorage.app buckets.
-async function uploadFileToStorage(file, storagePath, onProgress) {
-  if (!auth.currentUser) throw new Error("Not authenticated — please log in again");
-
-  // Use cached token first (faster), no forced refresh
-  let token;
-  try {
-    token = await auth.currentUser.getIdToken(false);
-  } catch (e) {
-    throw new Error("Auth token error: " + e.message);
-  }
-
-  const bucket  = firebaseConfig.storageBucket;
-  const encoded = encodeURIComponent(storagePath);
-  const apiUrl  = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o?uploadType=media&name=${encoded}`;
-
+// ─── IMAGE COMPRESS + STORE ──────────────────────────────────────────────────
+// Compresses an image client-side using Canvas and returns a data URL.
+// Images are stored directly in Firestore — no Firebase Storage needed,
+// no CORS issues, no auth token problems. Works everywhere.
+function compressImage(file, maxPx, quality) {
   return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", apiUrl, true);
-    xhr.timeout = 60000; // 60-second hard timeout
-    xhr.setRequestHeader("Authorization", "Firebase " + token);
-    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
-    xhr.setRequestHeader("X-Firebase-Storage-Version", "webjs/10.12.2");
-
-    xhr.upload.addEventListener("progress", e => {
-      if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total * 0.95);
-    });
-
-    xhr.addEventListener("load", () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          const data  = JSON.parse(xhr.responseText);
-          const dlToken = data.downloadTokens;
-          const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encoded}?alt=media&token=${dlToken}`;
-          if (onProgress) onProgress(1);
-          resolve(downloadUrl);
-        } catch (e) {
-          reject(new Error("Upload response parse error: " + e.message));
+    if (!file || !file.type.startsWith("image/")) {
+      reject(new Error("Please select a valid image file")); return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("Could not read the selected file"));
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("Could not load the selected image"));
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxPx || height > maxPx) {
+          if (width > height) { height = Math.round(height * maxPx / width);  width  = maxPx; }
+          else                { width  = Math.round(width  * maxPx / height); height = maxPx; }
         }
-      } else if (xhr.status === 401 || xhr.status === 403) {
-        reject(new Error("Upload permission denied (" + xhr.status + ") — check Firebase Storage rules"));
-      } else {
-        let msg = "Upload failed (HTTP " + xhr.status + ")";
-        try { const d = JSON.parse(xhr.responseText); if (d.error) msg = (d.error.message || msg); } catch (_) {}
-        reject(new Error(msg));
-      }
-    });
-
-    xhr.addEventListener("timeout", () => reject(new Error("Upload timed out — please check your connection and try again")));
-    xhr.addEventListener("error",   () => reject(new Error("Upload network error — check your internet connection")));
-    xhr.addEventListener("abort",   () => reject(new Error("Upload was cancelled")));
-    xhr.send(file);
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        // Guard against images that compress larger than 900 KB
+        if (dataUrl.length > 950000) {
+          const dataUrl2 = canvas.toDataURL("image/jpeg", 0.4);
+          resolve(dataUrl2);
+        } else {
+          resolve(dataUrl);
+        }
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   });
+}
+
+// uploadFileToStorage — compresses image and returns data URL stored in Firestore.
+// storagePath is kept for API compatibility but not used (no Firebase Storage).
+async function uploadFileToStorage(file, storagePath, onProgress) {
+  if (onProgress) onProgress(0.05);
+  // Gallery/home images get a higher max dimension; profile photos stay small
+  const isLarge  = storagePath.startsWith("home_images/") || storagePath.startsWith("gallery_images/");
+  const maxPx    = isLarge ? 1100 : 700;
+  const quality  = isLarge ? 0.72 : 0.68;
+  const dataUrl  = await compressImage(file, maxPx, quality);
+  if (onProgress) onProgress(1);
+  return dataUrl;
 }
 
 // ─── HOME IMAGES ──────────────────────────────────
