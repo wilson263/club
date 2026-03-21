@@ -336,29 +336,67 @@ async function loadStats() {
 }
 function loadDashboardData() { loadStats(); }
 
-// ─── STORAGE UPLOAD HELPER (REST API — bypasses SDK CORS issues) ──────────────
+// ─── STORAGE UPLOAD HELPER (SDK + REST API fallback) ──────────────────────────
 async function uploadFileToStorage(file, storagePath, onProgress) {
-  const bucket = firebaseConfig.storageBucket;
+  // ── Primary: SDK put() with a 90-second hard timeout ──
+  try {
+    const url = await new Promise((resolve, reject) => {
+      const ref  = storage.ref(storagePath);
+      const task = ref.put(file);
+      const timer = setTimeout(() => { task.cancel(); reject(new Error("SDK upload timed out")); }, 90000);
+
+      task.on("state_changed",
+        snap => { if (onProgress) onProgress(snap.bytesTransferred / snap.totalBytes * 0.9); },
+        err  => { clearTimeout(timer); reject(err); },
+        ()   => {
+          clearTimeout(timer);
+          task.snapshot.ref.getDownloadURL()
+            .then(u => { if (onProgress) onProgress(1); resolve(u); })
+            .catch(reject);
+        }
+      );
+    });
+    return url;
+  } catch (sdkErr) {
+    console.warn("SDK upload failed, trying REST API fallback:", sdkErr.message);
+  }
+
+  // ── Fallback: Firebase Storage REST API ──
+  const bucket  = firebaseConfig.storageBucket;
   const idToken = await currentUser.getIdToken(true);
   const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket)}/o?uploadType=media&name=${encodeURIComponent(storagePath)}`;
-  return new Promise((resolve, reject) => {
+
+  const restData = await new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open("POST", uploadUrl);
     xhr.setRequestHeader("Authorization", "Firebase " + idToken);
-    xhr.setRequestHeader("Content-Type", file.type || "image/jpeg");
-    xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total); };
+    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    xhr.upload.onprogress = e => { if (e.lengthComputable && onProgress) onProgress(e.loaded / e.total * 0.9); };
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        const data = JSON.parse(xhr.responseText);
-        const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket)}/o/${encodeURIComponent(storagePath)}?alt=media&token=${data.downloadTokens}`;
-        resolve(downloadUrl);
+        try { resolve(JSON.parse(xhr.responseText)); }
+        catch { reject(new Error("Could not parse storage response")); }
       } else {
-        reject(new Error(`Storage upload failed (${xhr.status}): ${xhr.responseText}`));
+        reject(new Error(`Storage REST failed (${xhr.status}): ${xhr.responseText}`));
       }
     };
-    xhr.onerror = () => reject(new Error("Network error during upload"));
+    xhr.onerror = () => reject(new Error("Network error during REST upload"));
     xhr.send(file);
   });
+
+  if (onProgress) onProgress(1);
+
+  // Prefer SDK getDownloadURL for a proper token-bearing URL
+  try {
+    return await storage.ref(storagePath).getDownloadURL();
+  } catch {
+    // Build URL manually from REST response
+    const token = restData.downloadTokens;
+    const enc   = encodeURIComponent(storagePath);
+    return token
+      ? `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket)}/o/${enc}?alt=media&token=${token}`
+      : `https://firebasestorage.googleapis.com/v0/b/${encodeURIComponent(bucket)}/o/${enc}?alt=media`;
+  }
 }
 
 // ─── HOME IMAGES ──────────────────────────────────
