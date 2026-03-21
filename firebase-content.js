@@ -55,6 +55,39 @@ async function loadTicker() {
   }
 }
 
+// ── Load upcoming events as cards on the home page ──
+async function loadUpcomingEventsSection() {
+  if (!db) return;
+  const section = document.getElementById("upcoming-events-section");
+  const cards   = document.getElementById("upcoming-events-cards");
+  if (!section || !cards) return;
+  try {
+    const snap = await db.collection("events").where("type", "==", "upcoming").get();
+    if (snap.empty) return;
+    section.style.display = "block";
+    cards.innerHTML = "";
+    snap.docs.forEach(doc => {
+      const d = doc.data();
+      const title = d.title || "Upcoming Event";
+      const short = title.length > 120 ? title.substring(0, 120) + "…" : title;
+      const dateStr = d.date ? " — " + d.date : "";
+      const venueStr = d.venue ? " 📍 " + d.venue : "";
+      const card = document.createElement("div");
+      card.style.cssText = "background:rgba(255,255,255,0.04);border:1px solid rgba(41,128,185,0.35);border-left:4px solid #3b82f6;border-radius:14px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap";
+      card.innerHTML = `
+        <div style="display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0">
+          <span style="font-size:22px;flex-shrink:0">📅</span>
+          <div>
+            <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:#fff;line-height:1.5">${short}</p>
+            <p style="margin:0;font-size:12px;color:rgba(255,255,255,0.5)">${dateStr}${venueStr}</p>
+          </div>
+        </div>
+        <a href="register.html?event=${doc.id}" style="flex-shrink:0;background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;text-decoration:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:800;white-space:nowrap;transition:opacity 0.2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">📝 Register Now</a>`;
+      cards.appendChild(card);
+    });
+  } catch(e) { console.warn("Could not load upcoming events section:", e); }
+}
+
 // ── Load announcements as cards on the home page ──
 async function loadAnnouncementsSection() {
   if (!db) return;
@@ -368,11 +401,15 @@ async function loadUpcomingEventsForRegistration(selectId) {
       select.innerHTML = '<option value="">No announcements yet — check back soon</option>';
     }
 
-    // Pre-select if URL has ?ann=DOC_ID (from "Register Now" button on home page)
+    // Pre-select if URL has ?ann=DOC_ID or ?event=DOC_ID (from home page "Register Now" buttons)
     const urlParams = new URLSearchParams(window.location.search);
     const preAnn = urlParams.get("ann");
+    const preEvent = urlParams.get("event");
     if (preAnn) {
       const target = select.querySelector(`option[value="ann_${preAnn}"]`);
+      if (target) { target.selected = true; }
+    } else if (preEvent) {
+      const target = select.querySelector(`option[value="${preEvent}"]`);
       if (target) { target.selected = true; }
     }
   } catch(e) {
@@ -400,13 +437,14 @@ async function submitRegistration(event) {
     await db.collection("registrations").add({
       eventId, eventTitle, name: name.trim(), email: email.trim(),
       phone: phone.trim(), yearDept: yearDept.trim(),
+      confirmed: false,
       registeredAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showRegMsg("success", "✅ Registered successfully! We'll confirm via email soon.");
+    showRegMsg("success", "✅ Registered successfully! The admin will confirm your spot. Watch your email for confirmation.");
     ["reg-name","reg-email","reg-phone","reg-yeardept"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
     if (select) select.value = "";
   } catch(e) { showRegMsg("error", "Error registering. Please try again."); }
-  if (btn) { btn.disabled = false; btn.textContent = "Register Now"; }
+  if (btn) { btn.disabled = false; btn.textContent = "📝 Register Now"; }
 }
 
 function showRegMsg(type, msg) {
@@ -624,5 +662,22 @@ async function subscribeNewsletter(event) {
     await db.collection("newsletter").add({ email: email.trim().toLowerCase(), subscribedAt: firebase.firestore.FieldValue.serverTimestamp() });
     if (msg) { msg.style.display="block"; msg.style.color="#27ae60"; msg.style.background="rgba(39,174,96,0.08)"; msg.textContent="✅ Subscribed! You'll receive club updates."; }
     const el = document.getElementById("nl-email"); if (el) el.value = "";
+    // Send subscription confirmation email
+    sendSubscriptionConfirmationEmail(email.trim().toLowerCase());
   } catch(e) { if (msg) { msg.style.display="block"; msg.style.color="#e63946"; msg.textContent="Error. Please try again."; } }
+}
+
+// ── Send subscription confirmation email via EmailJS ──
+function sendSubscriptionConfirmationEmail(email) {
+  if (typeof emailjs === "undefined") return;
+  emailjs.send(
+    window.EMAILJS_SERVICE_ID || "service_neuralnexus",
+    window.EMAILJS_SUBSCRIBE_TEMPLATE || "template_subscribe",
+    {
+      to_email: email,
+      to_name: email.split("@")[0],
+      club_name: "Neural Nexus — AI & DS Club",
+      site_url: window.location.origin
+    }
+  ).catch(err => console.warn("Subscription email error:", err));
 }

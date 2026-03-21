@@ -1054,5 +1054,37 @@
     else if (inputId === 'gallery-file-input') uploadGalleryImages(files);
   }
 </script>
+
+<!-- EmailJS for sending confirmation and newsletter emails -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  (function() {
+    // ─── EmailJS Configuration ────────────────────────────────────────────────────
+    // Sign up at https://www.emailjs.com/ (free plan: 200 emails/month)
+    // Then:
+    // 1. Create an Email Service (Gmail recommended) → copy the Service ID below
+    // 2. Create 3 Email Templates (see template variables needed below)
+    // 3. Copy your Public Key from Account → API Keys
+    //
+    // Template variables needed:
+    //   template_confirm  → {{to_name}}, {{to_email}}, {{event_title}}, {{club_name}}, {{club_email}}, {{club_phone}}
+    //   template_newsletter → {{to_email}}, {{to_name}}, {{update_type}}, {{update_title}}, {{update_details}}, {{club_name}}, {{site_url}}, {{register_url}}
+    //   template_subscribe  → {{to_email}}, {{to_name}}, {{club_name}}, {{site_url}}
+    // ─────────────────────────────────────────────────────────────────────────────
+    var EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY"; // ← Replace with your key
+
+    window.EMAILJS_SERVICE_ID          = "service_neuralnexus"; // ← Your EmailJS service ID
+    window.EMAILJS_CONFIRM_TEMPLATE    = "template_confirm";     // ← Registration confirmation template
+    window.EMAILJS_NEWSLETTER_TEMPLATE = "template_newsletter";  // ← Newsletter broadcast template
+    window.EMAILJS_SUBSCRIBE_TEMPLATE  = "template_subscribe";   // ← Subscription confirmation template
+
+    if (EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY" && typeof emailjs !== "undefined") {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      console.log("EmailJS initialized ✓");
+    } else {
+      console.warn("EmailJS not configured — email sending is disabled. Add your EmailJS public key in admin.html.");
+    }
+  })();
+</script>
 </body>
 </html>

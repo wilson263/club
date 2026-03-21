@@ -429,6 +429,9 @@ async function addEvent() {
     document.getElementById("evt-image-input").value = "";
     document.getElementById("evt-preview-area").innerHTML = `<div style="font-size:28px">🖼️</div><div style="font-size:14px">Click to select image</div>`;
     loadEvents();
+    // Notify subscribers about new event
+    const details = [title, date ? "Date: " + date : "", venue ? "Venue: " + venue : "", desc].filter(Boolean).join(" | ");
+    broadcastToSubscribers("event", title, details);
   } catch(e) { handleFirebaseError(e, "addEvent"); }
   wrapper.style.display = "none"; fill.style.width = "0%";
 }
@@ -1047,6 +1050,8 @@ async function addAnnouncement() {
     document.getElementById("ann-text").value = "";
     showToast("Announcement added!", "success");
     loadAnnouncements();
+    // Notify all newsletter subscribers about this announcement
+    broadcastToSubscribers("announcement", text, text);
   } catch(e) { handleFirebaseError(e, "addAnnouncement"); }
 }
 
@@ -1330,12 +1335,14 @@ async function loadRegistrations() {
               <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Phone</th>
               <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Year/Dept</th>
               <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Event</th>
-              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Action</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Status</th>
+              <th style="padding:10px 12px;text-align:left;color:#aaa;font-weight:600">Actions</th>
             </tr>
           </thead>
           <tbody>
             ${snap.docs.map((doc, i) => {
               const d = doc.data();
+              const isConfirmed = d.confirmed === true;
               return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05)">
                 <td style="padding:10px 12px;color:#aaa">${i+1}</td>
                 <td style="padding:10px 12px;font-weight:600">${d.name || "—"}</td>
@@ -1343,7 +1350,15 @@ async function loadRegistrations() {
                 <td style="padding:10px 12px;color:#aaa">${d.phone || "—"}</td>
                 <td style="padding:10px 12px;color:#aaa">${d.yearDept || "—"}</td>
                 <td style="padding:10px 12px;color:#aaa">${d.eventTitle || d.eventId || "—"}</td>
-                <td style="padding:10px 12px"><button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteRegistration('${doc.id}')">🗑</button></td>
+                <td style="padding:10px 12px">
+                  <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;background:${isConfirmed ? 'rgba(39,174,96,0.15)' : 'rgba(255,200,0,0.12)'};color:${isConfirmed ? '#27ae60' : '#f0c000'}">
+                    ${isConfirmed ? '✅ Confirmed' : '⏳ Pending'}
+                  </span>
+                </td>
+                <td style="padding:10px 12px;display:flex;gap:6px;align-items:center">
+                  ${!isConfirmed ? `<button class="btn btn-primary" style="padding:4px 10px;font-size:11px;background:rgba(39,174,96,0.2);border:1px solid rgba(39,174,96,0.4);color:#27ae60" onclick="confirmRegistration('${doc.id}','${(d.name||'').replace(/'/g,"\\'")}','${(d.email||'').replace(/'/g,"\\'")}','${(d.eventTitle||d.eventId||'').replace(/'/g,"\\'")}')">✅ Confirm</button>` : ""}
+                  <button class="btn btn-danger" style="padding:4px 10px;font-size:11px" onclick="deleteRegistration('${doc.id}')">🗑</button>
+                </td>
               </tr>`;
             }).join("")}
           </tbody>
@@ -1351,6 +1366,45 @@ async function loadRegistrations() {
       </div>
     `;
   } catch(e) { list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading registrations. Ensure Firestore indexes are set up.</p></div>'; console.error(e); }
+}
+
+async function confirmRegistration(docId, userName, userEmail, eventTitle) {
+  if (!confirm(`Confirm registration for ${userName} (${userEmail})?`)) return;
+  try {
+    await db.collection("registrations").doc(docId).update({
+      confirmed: true,
+      confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      confirmedBy: currentUser.email
+    });
+    showToast("Registration confirmed!", "success");
+    // Send confirmation email to the user
+    sendRegistrationConfirmationEmail(userName, userEmail, eventTitle);
+    loadRegistrations();
+  } catch(e) { showToast("Error confirming registration: " + e.message, "error"); }
+}
+
+function sendRegistrationConfirmationEmail(userName, userEmail, eventTitle) {
+  if (typeof emailjs === "undefined") {
+    console.warn("EmailJS not loaded — skipping email send.");
+    return;
+  }
+  emailjs.send(
+    window.EMAILJS_SERVICE_ID || "service_neuralnexus",
+    window.EMAILJS_CONFIRM_TEMPLATE || "template_confirm",
+    {
+      to_name: userName,
+      to_email: userEmail,
+      event_title: eventTitle,
+      club_name: "Neural Nexus — AI & DS Club",
+      club_email: "neuralnexus.siiet@gmail.com",
+      club_phone: "9014196561"
+    }
+  ).then(() => {
+    showToast("Confirmation email sent to " + userEmail, "success");
+  }).catch(err => {
+    console.warn("EmailJS error:", err);
+    showToast("Confirmation saved but email failed — check EmailJS config", "info");
+  });
 }
 
 async function deleteRegistration(docId) {
@@ -1829,6 +1883,42 @@ async function saveSponsor() {
     ["sp-name","sp-website","sp-logo"].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=""; });
     loadAdminSponsors();
   } catch(e) { handleFirebaseError(e, "saveSponsor"); }
+}
+
+// ── NEWSLETTER BROADCAST ──────────────────────────────────
+async function broadcastToSubscribers(type, title, details) {
+  if (typeof emailjs === "undefined") {
+    console.warn("EmailJS not configured — skipping newsletter broadcast.");
+    return;
+  }
+  try {
+    const snap = await db.collection("newsletter").get();
+    if (snap.empty) return;
+    const typeLabel = type === "event" ? "📅 New Event" : "📢 New Announcement";
+    let sent = 0;
+    const promises = snap.docs.map(doc => {
+      const data = doc.data();
+      if (!data.email) return Promise.resolve();
+      return emailjs.send(
+        window.EMAILJS_SERVICE_ID || "service_neuralnexus",
+        window.EMAILJS_NEWSLETTER_TEMPLATE || "template_newsletter",
+        {
+          to_email: data.email,
+          to_name: data.email.split("@")[0],
+          update_type: typeLabel,
+          update_title: title,
+          update_details: details,
+          club_name: "Neural Nexus — AI & DS Club",
+          site_url: "https://neuralnexusgroup.in",
+          register_url: type === "event" ? "https://neuralnexusgroup.in/register.html" : ""
+        }
+      ).then(() => { sent++; }).catch(err => console.warn("Newsletter send error for " + data.email + ":", err));
+    });
+    await Promise.allSettled(promises);
+    if (sent > 0) showToast(`Newsletter sent to ${sent} subscriber(s)!`, "success");
+  } catch(e) {
+    console.warn("broadcastToSubscribers error:", e);
+  }
 }
 
 // ── SHARED DELETE HELPER ──────────────────────────────────
