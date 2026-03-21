@@ -146,6 +146,9 @@
         <div class="nav-item" id="admin-mgmt-btn" data-panel="admins" onclick="showPanel('admins')">
           <span class="nav-icon">👥</span> Admins
         </div>
+        <div class="nav-item" data-panel="activity-log" onclick="showPanel('activity-log');loadActivityLog()">
+          <span class="nav-icon">📋</span> Activity Log
+        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -763,6 +766,35 @@
             <button class="btn btn-primary" onclick="saveSponsor()">➕ Add Sponsor</button>
           </div>
           <div class="card" style="margin-top:16px"><div id="sponsors-admin-list"><div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div></div></div>
+        </div>
+
+
+        <!-- ── ACTIVITY LOG ── -->
+        <div class="panel" id="panel-activity-log">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title"><span class="ct-icon">📋</span> Activity Log</div>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                <select id="activity-filter" onchange="loadActivityLog()" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-size:13px">
+                  <option value="">All Actions</option>
+                  <option value="login">Login</option>
+                  <option value="event">Events</option>
+                  <option value="gallery">Gallery</option>
+                  <option value="achievement">Achievements</option>
+                  <option value="member">Members</option>
+                  <option value="faculty">Faculty</option>
+                  <option value="announcement">Announcements</option>
+                  <option value="blog">Blog</option>
+                  <option value="certificate">Certificates</option>
+                  <option value="admin">Admins</option>
+                </select>
+                <button class="btn btn-secondary" onclick="loadActivityLog()">🔄 Refresh</button>
+                <button class="btn btn-danger" id="clear-log-btn" onclick="clearActivityLog()" style="display:none">🗑️ Clear All</button>
+              </div>
+            </div>
+            <p class="hint-text">Shows the last 100 actions performed by all admins, sorted by most recent.</p>
+            <div id="activity-log-list"><div class="hint-text" style="text-align:center;padding:40px">Click "Refresh" to load activity.</div></div>
+          </div>
         </div>
 
       </div><!-- /content-area -->
