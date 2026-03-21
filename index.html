@@ -239,11 +239,11 @@
 
     <div class="stats-row">
       <div class="stat-item">
-        <div class="stat-num">50+</div>
+        <div class="stat-num" id="hero-members-count">—</div>
         <div class="stat-lbl">Members</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">10+</div>
+        <div class="stat-num" id="hero-events-count">—</div>
         <div class="stat-lbl">Events</div>
       </div>
       <div class="stat-item">
@@ -456,6 +456,44 @@
       requestAnimationFrame(animate);
     }
     animate();
+  </script>
+
+  <!-- Firebase for live stats -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script>
+    (function () {
+      const firebaseConfig = {
+        apiKey: "AIzaSyAkYeTlfnicPo1JczB4rZZj61UnHFbvqVE",
+        authDomain: "neuralnexus-be2c7.firebaseapp.com",
+        projectId: "neuralnexus-be2c7",
+        storageBucket: "neuralnexus-be2c7.firebasestorage.app",
+        messagingSenderId: "1094362929898",
+        appId: "1:1094362929898:web:2c48716b8e23bbe05bd593"
+      };
+
+      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      async function loadHeroStats() {
+        try {
+          const [membersSnap, eventsSnap] = await Promise.all([
+            db.collection("club_members").get(),
+            db.collection("events").get()
+          ]);
+
+          const membersEl = document.getElementById("hero-members-count");
+          const eventsEl  = document.getElementById("hero-events-count");
+
+          if (membersEl) membersEl.textContent = membersSnap.size > 0 ? membersSnap.size + "+" : "0";
+          if (eventsEl)  eventsEl.textContent  = eventsSnap.size  > 0 ? eventsSnap.size  + "+" : "0";
+        } catch (e) {
+          // Fallback gracefully — leave as "—" if Firebase fails
+        }
+      }
+
+      loadHeroStats();
+    })();
   </script>
 </body>
 </html>
