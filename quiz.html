@@ -1,157 +1,283 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-    <title> Artificial Intelligence & Data Science Club's Quiz Competation</title>
-    <meta name="description" content="Neural Nexus Group is a student-led Artificial Intelligence and Data Science club offering workshops, projects, tech events, research, and innovation opportunities.">
-        <meta http-equiv="X-UA-Compatible" content="IE-edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
-        <link href="quiz.css" rel="stylesheet">
-    </head>
-    <body>
-  
-            <div class="navbar">
-            <div class="logo"></div>
-            <div class="clgname">
-            <p class="name">Sri Indu</p>
-            <p class="institute">Institute of Engineering & Technology</p>
-            <p class="ugc">UGC Autonomous Institution</p>
-            <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>   
-       </div>
-       <div class="sublogo-1"></div>
-       <div class="sublogo-2"></div>
-       <div class="sublogo-3"></div>
-       <div class="sublogo-4"></div>
-       
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Quiz Competition — Neural Nexus AI &amp; Data Science Club, Sri Indu Institute of Engineering &amp; Technology.">
+  <title>Quiz Competition — Neural Nexus | SIIET</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', Arial, sans-serif; }
+    html { scroll-behavior: smooth; }
+    body { background: #080810; color: white; min-height: 100vh; }
 
+    .navbar {
+      width: 100%; height: 72px; display: flex; align-items: center;
+      background: rgba(8,8,16,0.97); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(230,57,70,0.2);
+      position: sticky; top: 0; z-index: 999;
+    }
+    .logo { position: absolute; left: 8px; top: 8px; background-image: url(images-1/logo.jpeg); height: 56px; width: 56px; background-size: cover; border-radius: 50%; border: 2px solid #e63946; box-shadow: 0 0 16px rgba(230,57,70,0.35); }
+    .clgname { margin-left: 76px; }
+    .name { font-size: clamp(16px,4vw,28px); font-weight: 900; color: #e63946; line-height: 1.1; }
+    .institute { font-size: 11px; font-weight: 700; color: #ccc; }
+    .ugc { font-size: 10px; color: rgba(230,57,70,0.8); font-weight: 700; }
+    .rec { font-size: 9px; color: #888; }
+    .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 46px; width: 46px; background-size: cover; border-radius: 50%; position: absolute; border: 2px solid rgba(255,255,255,0.15); }
+    .sublogo-4 { background-image: url(images-1/clublogo.jpeg); right: 156px; top: 13px; }
+    .sublogo-1 { background-image: url(images-1/sublogo-3.jpeg); right: 107px; top: 13px; }
+    .sublogo-2 { background-image: url(images-1/sublogo-2.jpeg); right: 58px; top: 13px; }
+    .sublogo-3 { background-image: url(images-1/sublogo-1.jpeg); right: 9px; top: 13px; }
+    @media(max-width:600px) {
+      .sublogo-1,.sublogo-2,.sublogo-3,.sublogo-4 { height: 36px; width: 36px; }
+      .sublogo-4 { right: 118px; top: 18px; } .sublogo-1 { right: 80px; top: 18px; }
+      .sublogo-2 { right: 42px; top: 18px; } .sublogo-3 { right: 4px; top: 18px; }
+    }
+
+    header {
+      position: sticky; top: 72px; z-index: 998;
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0808 100%);
+      border-bottom: 1px solid rgba(230,57,70,0.15);
+      display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;
+    }
+    .homebut { font-size: 15px; color: #e63946; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; background: rgba(230,57,70,0.15); }
+    .nav { display: flex; gap: 4px; }
+    .nav a { font-size: 15px; color: #ccc; text-decoration: none; padding: 9px 14px; border-radius: 8px; transition: all 0.2s; }
+    .homebut:hover,.nav a:hover { background: #e63946; color: white; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(230,57,70,0.4); }
+    .nav a.active { background: rgba(230,57,70,0.2); color: #e63946; }
+
+    /* HERO */
+    .event-hero {
+      background: linear-gradient(135deg, #0a0a14 0%, #1a0a0f 50%, #0a0e1a 100%);
+      padding: 64px 24px 48px; text-align: center; position: relative; overflow: hidden;
+    }
+    .event-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(230,57,70,0.15) 0%, transparent 70%);
+    }
+    .event-hero::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(230,57,70,0.5), transparent);
+    }
+    .event-icon {
+      width: 90px; height: 90px; border-radius: 50%; background: rgba(230,57,70,0.1);
+      border: 2px solid rgba(230,57,70,0.4); margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; position: relative; z-index: 1;
+      box-shadow: 0 0 40px rgba(230,57,70,0.2);
+    }
+    .event-hero h1 {
+      font-size: clamp(28px, 6vw, 56px); font-weight: 900; letter-spacing: -1px;
+      background: linear-gradient(135deg, #fff 0%, #e63946 60%, #ff6b7a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      position: relative; z-index: 1; margin-bottom: 10px;
+    }
+    .event-hero p { color: rgba(255,255,255,0.4); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; position: relative; z-index: 1; }
+
+    /* MAIN LAYOUT */
+    .main-layout {
+      display: flex; gap: 24px; max-width: 1100px; margin: 0 auto; padding: 48px 24px 64px;
+    }
+    .event-left { flex: 1; min-width: 0; }
+    .event-right { width: 300px; flex-shrink: 0; }
+
+    .section-label {
+      font-size: 11px; font-weight: 800; color: rgba(230,57,70,0.7); letter-spacing: 3px;
+      text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .about-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 28px; margin-bottom: 32px;
+      position: relative; overflow: hidden;
+    }
+    .about-card::before {
+      content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
+      background: linear-gradient(180deg, #e63946, transparent);
+    }
+    .about-card p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.9; }
+
+    /* GALLERY GRID */
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 32px;
+    }
+    .gallery-grid img {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.07); transition: all 0.3s; display: block;
+    }
+    .gallery-grid img:hover { transform: scale(1.02); border-color: rgba(230,57,70,0.35); box-shadow: 0 8px 24px rgba(230,57,70,0.12); }
+
+    /* UPCOMING SIDEBAR */
+    .upcoming-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px; padding: 24px; margin-bottom: 16px;
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+    .upcoming-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #e63946, transparent);
+    }
+    .upcoming-card:hover { border-color: rgba(230,57,70,0.3); transform: translateX(4px); }
+    .upcoming-card .uc-tag {
+      font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+      color: #e63946; margin-bottom: 8px;
+    }
+    .upcoming-card .uc-title { font-size: 15px; font-weight: 700; color: white; margin-bottom: 6px; }
+    .upcoming-card .uc-date { font-size: 12px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 6px; }
+
+    /* STATS ROW */
+    .stats-row { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+    .stat-box {
+      flex: 1; min-width: 100px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px; padding: 18px 16px; text-align: center;
+    }
+    .stat-box .stat-num { font-size: 28px; font-weight: 900; color: #e63946; line-height: 1; margin-bottom: 6px; }
+    .stat-box .stat-lbl { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* FOOTER */
+    footer { background: #04040a; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 24px 0; }
+    .footer-inner { display: flex; flex-wrap: wrap; gap: 32px; max-width: 1100px; margin: 0 auto; padding-bottom: 32px; }
+    .footer-col { flex: 1; min-width: 200px; }
+    .footer-col .logo-f { width: 50px; height: 50px; border-radius: 50%; background-image: url(images-1/logo.jpeg); background-size: cover; border: 2px solid #e63946; margin-bottom: 12px; }
+    .footer-col .name-f { font-size: 18px; font-weight: 900; color: #e63946; }
+    .footer-col .inst-f { font-size: 11px; color: #999; margin-top: 2px; }
+    .footer-heading { font-size: 12px; font-weight: 800; color: #e63946; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 14px; }
+    .footer-col p, .footer-col a { font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none; display: block; margin-bottom: 7px; line-height: 1.6; }
+    .footer-col a:hover { color: #e63946; }
+    .footer-social { display: flex; gap: 14px; margin-top: 12px; }
+    .footer-social a { font-size: 20px !important; color: rgba(255,255,255,0.35) !important; transition: color 0.2s; margin: 0 !important; display: inline !important; }
+    .footer-social a:hover { color: #e63946 !important; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.07); text-align: center; padding: 16px; color: rgba(255,255,255,0.25); font-size: 12px; }
+    .admin-fab { position: fixed; bottom: 28px; right: 28px; background: linear-gradient(135deg,#c0392b,#96281b); color: white; border-radius: 50px; padding: 13px 22px; font-size: 14px; font-weight: 700; box-shadow: 0 6px 24px rgba(192,57,43,0.45); display: flex; align-items: center; gap: 8px; z-index: 999; text-decoration: none; transition: transform 0.2s; }
+    .admin-fab:hover { transform: translateY(-2px); }
+
+    @media(max-width:800px) {
+      .main-layout { flex-direction: column; }
+      .event-right { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <div class="logo"></div>
+    <div class="clgname">
+      <p class="name">Sri Indu</p>
+      <p class="institute">Institute of Engineering &amp; Technology</p>
+      <p class="ugc">UGC Autonomous Institution</p>
+      <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
+    </div>
+    <div class="sublogo-4"></div>
+    <div class="sublogo-1"></div>
+    <div class="sublogo-2"></div>
+    <div class="sublogo-3"></div>
+  </div>
+
+  <header>
+    <a href="home.html" class="homebut"><i class="fa-solid fa-house"></i></a>
+    <nav class="nav">
+      <a href="quiz.html" class="active"><i class="fa-solid fa-trophy"></i></a>
+      <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
+      <a href="faculty.html"><i class="fa-solid fa-graduation-cap"></i></a>
+      <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
+      <a href="#contact"><i class="fa-solid fa-comment"></i></a>
+    </nav>
+  </header>
+
+  <div class="event-hero">
+    <div class="event-icon">🏆</div>
+    <h1>Quiz Competition</h1>
+    <p>✦ AI &amp; Data Science Club Event ✦</p>
+  </div>
+
+  <div class="main-layout">
+    <div class="event-left">
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num">5+</div>
+          <div class="stat-lbl">Departments</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">50+</div>
+          <div class="stat-lbl">Participants</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">3</div>
+          <div class="stat-lbl">Rounds</div>
+        </div>
+      </div>
+
+      <div class="section-label">📋 About the Event</div>
+      <div class="about-card">
+        <p>Our club successfully conducted a Quiz Competition aimed at improving students' general knowledge, critical thinking, and teamwork. The event witnessed enthusiastic participation from students of various departments, fostering a spirit of healthy competition and learning in the domains of Artificial Intelligence and Data Science.</p>
+      </div>
+
+      <div class="section-label">📸 Event Gallery</div>
+      <div class="gallery-grid">
+        <img src="images-1/quiz1.jpeg" alt="Quiz Competition">
+        <img src="images-1/quiz3.jpeg" alt="Quiz Competition">
+        <img src="images-1/quiz4.jpeg" alt="Quiz Competition">
+        <img src="images-1/club1.jpeg" alt="Club Event">
+      </div>
     </div>
 
-
-    
-<header>
-        <a href="home.html" class="homebut"><i class="fa-solid fa-house"></i></a>
-        <nav class="nav">
-        <a href=""><i class="fa-solid fa-trophy"></i></a>
-        <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
-        <a href="faculty.html"><i class="fa-solid fa-graduation-cap"></i></a>
-        <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
-        <a href=""><i class="fa-solid fa-comment"></i></a>
-      </nav>    
-    </header>
-
-    <div class="club">
-        <div class="clublogo"></div>
-        <div class="clubname">
-            <p>Neural Nexus</p>
-        </div>
-        <div class="branch">
-            <p>Artificial Intelligence And Data Science</p>
-        </div>
-    </div>
-
-   <!-- Hero Section -->
-<section class="hero">
-</section>
-
-<!-- Main Content -->
-<section class="content">
-
-  <!-- Left Content -->
-  <div class="left">
-    <h2>About the Event</h2>
-    <p>
-      Recently, our club successfully conducted a Quiz Competition aimed at
-      improving students’ general knowledge, critical thinking, and teamwork.
-      The event witnessed enthusiastic participation from students of various
-      departments.
-    </p>
-
-    <h2>Gallery</h2>
-    <div class="gallery">
-      <img src="images-1/quiz1.jpeg">
-      <img src="images-1/quiz3.jpeg">
-      <img src="images-1/quiz4.jpeg">
-      <img src="images-1/club1.jpeg">
+    <div class="event-right">
+      <div class="section-label">📅 Upcoming Events</div>
+      <div class="upcoming-card">
+        <div class="uc-tag">Upcoming</div>
+        <div class="uc-title">Expert Lecture Series</div>
+        <div class="uc-date"><i class="fa-regular fa-calendar"></i> Coming Soon</div>
+      </div>
+      <div class="upcoming-card">
+        <div class="uc-tag">Upcoming</div>
+        <div class="uc-title">AI Workshop</div>
+        <div class="uc-date"><i class="fa-regular fa-calendar"></i> Coming Soon</div>
+      </div>
+      <div class="upcoming-card">
+        <div class="uc-tag">Upcoming</div>
+        <div class="uc-title">Hackathon</div>
+        <div class="uc-date"><i class="fa-regular fa-calendar"></i> Coming Soon</div>
+      </div>
     </div>
   </div>
 
-  <!-- Right Content -->
-  <div class="right">
-    <h3>Upcoming Events</h3>
-
-    <div class="card">
-      <h4>Lecture</h4>
-      <p>28 Feb</p>
-    </div>
-    <div class="card">
-      <h4>Lecture</h4>
-      <p>28 Feb</p>
-    </div>
-    <div class="card">
-      <h4>Lecture</h4>
-      <p>28 Feb</p>
-    </div>
-
-
-</section>
-      
-    <div class="last">
-      <div class="last-1">
-        <div class="all">
-
-          <div class="logo-1"></div>
-           <div class="clgname-1">
-               <p class="name-1">Sri Indu</p>
-               <p class="institute-1">Institute of Engineering & Technology</p>
-               <p class="ugc-1">UGC Autonomous Institution</p>
-               <p class="rec-1">Institution, Recognized under 2(f) of UGC Act 1956.</p>   
-          </div>
- 
-          <div class="list">
-           <p class="info">College Contact info</p>
-           <ul class="address">Sheriguda, Rangareddy, Telangana</ul>
-           <ul class="address">PIN:501510</ul>
-           <ul class="address">Mobile:93947187999, 8096951507</ul>
-           <ul class="address">Email: acct.siiet@gmail.com</ul>
-           <ul class="address"><a href="https://sriindu.ac.in/" style="text-decoration: none; color:black">web: siiet.ac.in</a></ul>
-          </div>
+  <footer id="contact">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <div class="logo-f"></div>
+        <div class="name-f">Sri Indu</div>
+        <div class="inst-f">Institute of Engineering &amp; Technology<br>UGC Autonomous Institution</div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">College Contact</div>
+        <p>Sheriguda, Rangareddy, Telangana</p>
+        <p>PIN: 501510</p>
+        <p>📞 93947187999, 8096951507</p>
+        <p>✉️ acct.siiet@gmail.com</p>
+        <a href="https://sriindu.ac.in/" target="_blank">🌐 sriindu.ac.in</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-heading">Neural Nexus</div>
+        <p>📱 9014196561</p>
+        <p>✉️ neuralnexus.siiet@gmail.com</p>
+        <p style="margin-top:8px;color:rgba(255,255,255,0.3);font-size:11px;letter-spacing:1px;">FOLLOW US</p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/siiet_ai_ds_club" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="#"><i class="fa-brands fa-telegram"></i></a>
+          <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
         </div>
-        
-        <div class="all-2"></div>
-         <div class="details-2">
-          <p class="details-1">Contact us &middot; 9014196561</p>
-          <p class="details-1">CLub Mail &middot;neuralnexus.siiet@gmail.com</p>
-          <p class="details-1">Social Media Handlings</p>
-          <p class="details-1">Faculty Member's</p>
-    
-         </div>
-
-
-        </div>
-         <div class="social-5">
-         <p class="social-6" >Let's talk social </p>
-         <p class="social-7">#SIIET</p>
-         <div class="icon">
-          <a href="https://www.instagram.com/siiet_ai_ds_club?igsh=MTJydTl2b3A4ZnAzdg==" style="text-decoration: none; color:black"><i class="fa-brands fa-instagram"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-whatsapp"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-telegram"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-x-twitter"></i></a>
-         </div>
-        </div>
-        <footer style="background:#111; color:white; text-align:center; padding:15px 0; font-size:14px; margin-top:40px;">
-  Copyright © 2025 NeuralNexusGroup | All rights reserved.
-        </footer>
-
-    </div>     
+      </div>
     </div>
-        
-    </body>
-    </html>
+    <div class="footer-bottom">Copyright &copy; 2025 Neural Nexus Group | All rights reserved.</div>
+  </footer>
 
+  <a href="admin.html" class="admin-fab"><i class="fa-solid fa-lock"></i> Admin</a>
 
-
-    
+</body>
+</html>
