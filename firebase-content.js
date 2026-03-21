@@ -189,12 +189,14 @@ async function loadHomePageImages() {
     snap.forEach(doc => { if (doc.data().url) urls.push(doc.data().url); });
     if (!urls.length) return;
 
-    // Build first set + duplicate for seamless infinite loop
-    urls.forEach(url => container.appendChild(makeCard(url)));
+    // Always render the actual images
     urls.forEach(url => container.appendChild(makeCard(url)));
 
-    // Pause animation when fewer than 3 images (no need to scroll)
-    if (urls.length < 3) {
+    // Only duplicate for seamless infinite loop when there are enough images
+    if (urls.length >= 4) {
+      urls.forEach(url => container.appendChild(makeCard(url)));
+    } else {
+      // Not enough to scroll — just center them statically
       container.style.animation = "none";
       container.style.width = "100%";
       container.style.justifyContent = "center";
