@@ -1071,14 +1071,14 @@
     //   template_newsletter → {{to_email}}, {{to_name}}, {{update_type}}, {{update_title}}, {{update_details}}, {{club_name}}, {{site_url}}, {{register_url}}
     //   template_subscribe  → {{to_email}}, {{to_name}}, {{club_name}}, {{site_url}}
     // ─────────────────────────────────────────────────────────────────────────────
-    var EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY"; // ← Replace with your key
+    var EMAILJS_PUBLIC_KEY = "X_qmv5PR7T6UAoWMK"; // ← Replace with your key
 
-    window.EMAILJS_SERVICE_ID          = "service_neuralnexus"; // ← Your EmailJS service ID
+    window.EMAILJS_SERVICE_ID          = "service_bl7cyvf"; // ← Your EmailJS service ID
     window.EMAILJS_CONFIRM_TEMPLATE    = "template_confirm";     // ← Registration confirmation template
     window.EMAILJS_NEWSLETTER_TEMPLATE = "template_newsletter";  // ← Newsletter broadcast template
     window.EMAILJS_SUBSCRIBE_TEMPLATE  = "template_subscribe";   // ← Subscription confirmation template
 
-    if (EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY" && typeof emailjs !== "undefined") {
+    if (EMAILJS_PUBLIC_KEY && typeof emailjs !== "undefined") {
       emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
       console.log("EmailJS initialized ✓");
     } else {
