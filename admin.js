@@ -470,14 +470,8 @@ async function addEvent() {
   try {
     let imageUrl = "";
     if (file) {
-      const ref  = storage.ref(`event_images/${Date.now()}_${file.name}`);
-      const task = ref.put(file);
-      await new Promise((resolve, reject) => {
-        task.on("state_changed",
-          snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
-          reject,
-          async () => { imageUrl = await ref.getDownloadURL(); resolve(); }
-        );
+      imageUrl = await uploadFileToStorage(file, `event_images/${Date.now()}_${file.name}`, pct => {
+        fill.style.width = (pct * 100) + "%";
       });
     }
     await db.collection("events").add({ title, type, date, venue, desc, imageUrl, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
@@ -869,14 +863,8 @@ async function saveMember() {
   try {
     let photoUrl = existingPhoto;
     if (file) {
-      const ref  = storage.ref(`member_photos/${Date.now()}_${file.name}`);
-      const task = ref.put(file);
-      await new Promise((resolve, reject) => {
-        task.on("state_changed",
-          snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
-          reject,
-          async () => { photoUrl = await ref.getDownloadURL(); resolve(); }
-        );
+      photoUrl = await uploadFileToStorage(file, `member_photos/${Date.now()}_${file.name}`, pct => {
+        fill.style.width = (pct * 100) + "%";
       });
     }
 
@@ -1030,14 +1018,8 @@ async function saveFaculty() {
   try {
     let photoUrl = existingPhoto;
     if (file) {
-      const ref  = storage.ref(`faculty_photos/${Date.now()}_${file.name}`);
-      const task = ref.put(file);
-      await new Promise((resolve, reject) => {
-        task.on("state_changed",
-          snap => { fill.style.width = (snap.bytesTransferred / snap.totalBytes * 100) + "%"; },
-          reject,
-          async () => { photoUrl = await ref.getDownloadURL(); resolve(); }
-        );
+      photoUrl = await uploadFileToStorage(file, `faculty_photos/${Date.now()}_${file.name}`, pct => {
+        fill.style.width = (pct * 100) + "%";
       });
     }
 
