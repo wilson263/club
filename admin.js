@@ -1004,7 +1004,7 @@ async function loadAnnouncements() {
   const list = document.getElementById("ann-list");
   list.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⏳ Loading...</div>';
   try {
-    const snap = await db.collection("announcements").orderBy("order").get();
+    const snap = await db.collection("announcements").orderBy("addedAt", "desc").get();
     if (snap.empty) {
       list.innerHTML = '<div class="empty-state"><div class="es-icon">📢</div><p>No announcements yet. Add one above.</p></div>';
       return;
@@ -1020,20 +1020,26 @@ async function loadAnnouncements() {
       `;
       list.appendChild(row);
     });
-  } catch(e) { list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading announcements</p></div>'; }
+  } catch(e) {
+    list.innerHTML = '<div class="empty-state"><div class="es-icon">⚠️</div><p>Error loading announcements. Check Firestore rules.</p></div>';
+    console.error("loadAnnouncements error:", e);
+  }
 }
 
 async function addAnnouncement() {
   const text = document.getElementById("ann-text").value.trim();
   if (!text) { showToast("Please enter announcement text", "error"); return; }
   try {
-    const snap = await db.collection("announcements").orderBy("order", "desc").limit(1).get();
-    const maxOrder = snap.empty ? 0 : (snap.docs[0].data().order || 0);
-    await db.collection("announcements").add({ text, order: maxOrder + 1, addedBy: currentUser.email, addedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection("announcements").add({
+      text,
+      order: Date.now(),
+      addedBy: currentUser.email,
+      addedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
     document.getElementById("ann-text").value = "";
     showToast("Announcement added!", "success");
     loadAnnouncements();
-  } catch(e) { showToast("Error: " + e.message, "error"); }
+  } catch(e) { showToast("Error: " + e.message, "error"); console.error("addAnnouncement error:", e); }
 }
 
 async function deleteAnnouncement(docId) {
