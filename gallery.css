@@ -146,12 +146,21 @@ header{
     border-radius: 100px;
 
 } 
+.nav {
+   display: flex;
+   align-items: center;
+   flex-wrap: wrap;
+   gap: 4px;
+   overflow: visible;
+}
 .nav a{
    font-size: 15px;
    color:black;
    background-color: white;
    padding:10px;
    border-radius: 100px;
+   white-space: nowrap;
+   flex-shrink: 0;
 }
 
 /** main **/
