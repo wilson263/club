@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Neural Nexus</title>
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- ═══════ LOGIN SCREEN ═══════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="images-1/clublogo.jpeg" alt="Neural Nexus Logo">
+      <h2>Admin Login</h2>
+      <p>Neural Nexus Club — SIIET</p>
+    </div>
+    <div class="login-error" id="login-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span id="login-error-msg">Invalid credentials. Please try again.</span>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" id="login-email" placeholder="admin@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()" id="login-btn" style="margin-top:8px">
+      <i class="fa-solid fa-sign-in-alt"></i> Sign In
+    </button>
+    <p style="text-align:center;margin-top:20px;font-size:12px;color:#666">
+      <a href="home.html" style="color:#888;text-decoration:none">← Back to Website</a>
+    </p>
+  </div>
+</div>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div id="dashboard">
+
+  <!-- Mobile overlay -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <img src="images-1/clublogo.jpeg" alt="logo">
+      <div>
+        <h3>Neural Nexus</h3>
+        <p>Admin Panel</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Overview</span>
+      <button class="nav-item active" onclick="showPanel('overview')">
+        <i class="fa-solid fa-gauge-high"></i> Dashboard
+      </button>
+
+      <span class="nav-section-label">Content</span>
+      <button class="nav-item" onclick="showPanel('home-images')">
+        <i class="fa-solid fa-house-image"></i> Home Page Images
+      </button>
+      <button class="nav-item" onclick="showPanel('events')">
+        <i class="fa-solid fa-calendar-plus"></i> Events
+      </button>
+      <button class="nav-item" onclick="showPanel('gallery')">
+        <i class="fa-solid fa-images"></i> Photo Gallery
+      </button>
+
+      <span class="nav-section-label" id="admin-mgmt-label" style="display:none">Management</span>
+      <button class="nav-item" id="admin-mgmt-btn" onclick="showPanel('admins')" style="display:none">
+        <i class="fa-solid fa-users-gear"></i> Admin Accounts
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-badge">
+        <div class="avatar" id="sidebar-avatar">A</div>
+        <div class="info">
+          <div class="name" id="sidebar-name">Admin</div>
+          <div class="role" id="sidebar-role">Administrator</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-full" onclick="doLogout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:14px">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h1 id="topbar-title">Dashboard</h1>
+      </div>
+      <div class="topbar-actions">
+        <a href="home.html" class="btn btn-ghost" target="_blank">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> View Site
+        </a>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ── OVERVIEW PANEL ── -->
+      <div class="panel active" id="panel-overview">
+        <div class="stats-row" id="stats-row">
+          <div class="stat-card">
+            <div class="icon">🖼️</div>
+            <div class="value" id="stat-home-images">—</div>
+            <div class="label">Home Images</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon">📅</div>
+            <div class="value" id="stat-events">—</div>
+            <div class="label">Events</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon">🖼️</div>
+            <div class="value" id="stat-gallery">—</div>
+            <div class="label">Gallery Photos</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon">👤</div>
+            <div class="value" id="stat-admins">—</div>
+            <div class="label">Admin Accounts</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-circle-info"></i> Quick Guide</div>
+          </div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
+            <li style="display:flex;align-items:flex-start;gap:12px">
+              <i class="fa-solid fa-house-image" style="color:#c0392b;margin-top:2px"></i>
+              <div><strong>Home Page Images</strong> — Upload images for the scrolling gallery on the main page</div>
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:12px">
+              <i class="fa-solid fa-calendar-plus" style="color:#c0392b;margin-top:2px"></i>
+              <div><strong>Events</strong> — Add conducted or upcoming events with images, dates &amp; details</div>
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:12px">
+              <i class="fa-solid fa-images" style="color:#c0392b;margin-top:2px"></i>
+              <div><strong>Photo Gallery</strong> — Upload general club photos to the gallery page</div>
+            </li>
+            <li style="display:flex;align-items:flex-start;gap:12px" id="guide-admin" style="display:none">
+              <i class="fa-solid fa-users-gear" style="color:#c0392b;margin-top:2px"></i>
+              <div><strong>Admin Accounts</strong> — Add up to 3 temporary admins (permanent admin only)</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ── HOME IMAGES PANEL ── -->
+      <div class="panel" id="panel-home-images">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-upload"></i> Upload Home Page Images</div>
+          </div>
+          <p style="color:#aaa;font-size:14px;margin-bottom:18px">These images appear in the scrolling gallery on the home page.</p>
+
+          <div class="upload-zone" id="home-upload-zone">
+            <input type="file" id="home-image-input" accept="image/*" multiple onchange="uploadHomeImages(this.files)">
+            <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="upload-text">Click or drag images here</div>
+            <div class="upload-hint">JPG, PNG, WEBP — max 10 MB each</div>
+          </div>
+          <div class="progress-bar-wrapper" id="home-progress-wrapper">
+            <div class="progress-bar-fill" id="home-progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-images"></i> Current Home Images</div>
+            <span id="home-image-count" style="font-size:13px;color:#aaa"></span>
+          </div>
+          <div class="image-grid" id="home-image-grid">
+            <div class="empty-state" id="home-empty" style="grid-column:1/-1">
+              <i class="fa-solid fa-image"></i>
+              <p>No images uploaded yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── EVENTS PANEL ── -->
+      <div class="panel" id="panel-events">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-calendar-plus"></i> Add New Event</div>
+          </div>
+
+          <div class="event-form">
+            <div>
+              <label class="field-label">Event Title</label>
+              <input class="input-field" type="text" id="evt-title" placeholder="e.g. Quiz Competition 2025">
+            </div>
+            <div>
+              <label class="field-label">Event Type</label>
+              <select class="input-field" id="evt-type">
+                <option value="conducted">Conducted Event</option>
+                <option value="upcoming">Upcoming Event</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Date</label>
+              <input class="input-field" type="date" id="evt-date">
+            </div>
+            <div>
+              <label class="field-label">Venue</label>
+              <input class="input-field" type="text" id="evt-venue" placeholder="e.g. CSE Seminar Hall">
+            </div>
+            <div class="full-width">
+              <label class="field-label">Description</label>
+              <input class="input-field" type="text" id="evt-desc" placeholder="Short description of the event">
+            </div>
+            <div class="full-width">
+              <label class="field-label">Event Image</label>
+              <div class="upload-zone" id="evt-upload-zone" style="padding:24px">
+                <input type="file" id="evt-image-input" accept="image/*" onchange="previewEventImage(this)">
+                <div id="evt-preview-area">
+                  <div class="upload-icon" style="font-size:28px"><i class="fa-solid fa-image"></i></div>
+                  <div class="upload-text" style="font-size:14px">Click to select image</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-bar-wrapper" id="evt-progress-wrapper">
+            <div class="progress-bar-fill" id="evt-progress-fill"></div>
+          </div>
+
+          <button class="btn btn-primary" onclick="addEvent()" style="margin-top:16px">
+            <i class="fa-solid fa-plus"></i> Add Event
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-list"></i> All Events</div>
+          </div>
+
+          <div class="tab-row">
+            <button class="tab-btn active" onclick="filterEvents('all', this)">All</button>
+            <button class="tab-btn" onclick="filterEvents('conducted', this)">Conducted</button>
+            <button class="tab-btn" onclick="filterEvents('upcoming', this)">Upcoming</button>
+          </div>
+
+          <div id="events-list"></div>
+        </div>
+      </div>
+
+      <!-- ── GALLERY PANEL ── -->
+      <div class="panel" id="panel-gallery">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-upload"></i> Upload Gallery Photos</div>
+          </div>
+          <p style="color:#aaa;font-size:14px;margin-bottom:18px">These photos appear in the photo gallery section.</p>
+
+          <div class="upload-zone" id="gallery-upload-zone">
+            <input type="file" id="gallery-image-input" accept="image/*" multiple onchange="uploadGalleryImages(this.files)">
+            <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="upload-text">Click or drag images here</div>
+            <div class="upload-hint">JPG, PNG, WEBP — multiple allowed</div>
+          </div>
+          <div class="progress-bar-wrapper" id="gallery-progress-wrapper">
+            <div class="progress-bar-fill" id="gallery-progress-fill"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-images"></i> Gallery Photos</div>
+            <span id="gallery-image-count" style="font-size:13px;color:#aaa"></span>
+          </div>
+          <div class="image-grid" id="gallery-image-grid">
+            <div class="empty-state" id="gallery-empty" style="grid-column:1/-1">
+              <i class="fa-solid fa-image"></i>
+              <p>No photos uploaded yet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ADMINS PANEL ── -->
+      <div class="panel" id="panel-admins">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fa-solid fa-users-gear"></i> Admin Accounts</div>
+          </div>
+
+          <p style="font-size:13px;color:#aaa;margin-bottom:20px">
+            You can have a maximum of <strong style="color:white">4 admins</strong> — 1 permanent admin (you) + 3 temporary admins.
+            Only you (the permanent admin) can add or remove temporary admins.
+          </p>
+
+          <div class="admin-list" id="admin-list">
+            <div style="text-align:center;padding:30px;color:#aaa">
+              <i class="fa-solid fa-spinner fa-spin"></i> Loading admins...
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div id="add-admin-section">
+            <div class="card-title" style="margin-bottom:14px;font-size:14px">
+              <i class="fa-solid fa-user-plus"></i> Add Temporary Admin
+            </div>
+            <p style="font-size:13px;color:#aaa;margin-bottom:14px">
+              Enter the email address of the person to add as a temporary admin.
+              They will receive an email to set their password.
+            </p>
+            <div class="add-admin-form">
+              <input type="email" id="new-admin-email" placeholder="email@example.com">
+              <input type="password" id="new-admin-password" placeholder="Set temporary password">
+              <button class="btn btn-success" onclick="addTempAdmin()">
+                <i class="fa-solid fa-user-plus"></i> Add Admin
+              </button>
+            </div>
+            <p id="admin-limit-msg" style="display:none;font-size:13px;color:#f39c12;margin-top:10px">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              Maximum of 3 temporary admins reached. Remove one to add a new admin.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-content -->
+</div><!-- /dashboard -->
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<script src="admin.js"></script>
+</body>
+</html>

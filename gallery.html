@@ -1,226 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Playwrite+DE+SAS:wght@100..400&display=swap" rel="stylesheet">
-    <title>Event page</title>
-    <link href="gallery.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <title>Events — Neural Nexus Club</title>
+  <link href="gallery.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { font-family: 'Inter', Arial, sans-serif; }
+
+    /* Admin FAB */
+    .admin-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: linear-gradient(135deg, #c0392b, #96281b);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 13px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 24px rgba(192,57,43,0.45);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 999;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .admin-fab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(192,57,43,0.5);
+    }
+
+    /* Dynamic event cards */
+    .event-card-dynamic {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: transform 0.2s;
+    }
+    .event-card-dynamic:hover { transform: translateY(-2px); }
+    .event-img { height: 200px; background-size: cover; background-position: center; }
+    .event-info-dynamic {
+      display: flex;
+      gap: 16px;
+      padding: 18px;
+      align-items: flex-start;
+    }
+    .date-badge {
+      background: #c0392b;
+      border-radius: 10px;
+      padding: 10px 14px;
+      text-align: center;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+      min-width: 54px;
+    }
+    .event-details-dynamic h3 { font-size: 17px; margin-bottom: 6px; color: white; font-weight: 700; }
+    .event-details-dynamic p  { font-size: 13px; color: #ccc; line-height: 1.7; display: flex; align-items: center; gap: 6px; }
+
+    /* Dynamic gallery grid */
+    .dynamic-gallery-section {
+      padding: 20px 0;
+    }
+    .dynamic-gallery-section h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+    #dynamic-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+    }
+    .gallery-item img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .gallery-item img:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    /* nav hover */
+    .nav a:hover {
+      background: #c0392b;
+      color: white;
+      transform: scale(1.08);
+    }
+  </style>
 </head>
 <body>
- <div class="container">
-            <div class="navbar">
-            <div class="logo"></div>
-            <div class="clgname">
-            <p class="name">Sri Indu</p>
-            <p class="institute">Institute of Engineering & Technology</p>
-            <p class="ugc">UGC Autonomous Institution</p>
-            <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>   
-       </div>
-       <div class="sublogo-1"></div>
-       <div class="sublogo-2"></div>
-       <div class="sublogo-3"></div>
-       <div class="sublogo-4"></div>
-       
+  <div class="container">
 
+    <!-- ══ NAVBAR ══ -->
+    <div class="navbar">
+      <div class="logo"></div>
+      <div class="clgname">
+        <p class="name">Sri Indu</p>
+        <p class="institute">Institute of Engineering &amp; Technology</p>
+        <p class="ugc">UGC Autonomous Institution</p>
+        <p class="rec">Institution, Recognized under 2(f) of UGC Act 1956.</p>
+      </div>
+      <div class="sublogo-1"></div>
+      <div class="sublogo-2"></div>
+      <div class="sublogo-3"></div>
+      <div class="sublogo-4"></div>
     </div>
 
-
-    
-<header>
-        <a href="home.html" class="homebut"><i class="fa-solid fa-house"></i></a>
-        <nav class="nav">
-        <a href=""><i class="fa-solid fa-trophy"></i></a>
-        <a href="clubmembers.html"><i class="fa-solid fa-user"></i></a>
-        <a href="faculty.html"><i class="fa-solid fa-graduation-cap"></i></a>
-        <a href="gallery.html"><i class="fa-solid fa-calendar"></i></a>
-        <a href=""><i class="fa-solid fa-comment"></i></a>
-      </nav>    
+    <!-- ══ HEADER NAV ══ -->
+    <header>
+      <a href="home.html" class="homebut" title="Home"><i class="fa-solid fa-house"></i></a>
+      <nav class="nav">
+        <a href="" title="Achievements"><i class="fa-solid fa-trophy"></i></a>
+        <a href="clubmembers.html" title="Members"><i class="fa-solid fa-user"></i></a>
+        <a href="faculty.html" title="Faculty"><i class="fa-solid fa-graduation-cap"></i></a>
+        <a href="gallery.html" title="Events" style="background:#c0392b;color:white"><i class="fa-solid fa-calendar"></i></a>
+        <a href="" title="Contact"><i class="fa-solid fa-comment"></i></a>
+      </nav>
     </header>
 
-   <main>
-    <div class="logoback">
+    <!-- ══ LOGO BANNER ══ -->
+    <main>
+      <div class="logoback">
         <div class="clublogo"></div>
-    </div>
-   </main> 
+      </div>
+    </main>
 
- 
+    <!-- ══ EVENTS SECTION ══ -->
+    <div class="whitebox">
 
+      <!-- TOP VIDEO -->
+      <div class="videobox">
+        <video autoplay muted loop playsinline>
+          <source src="images-1/intro.mp4" type="video/mp4">
+        </video>
+        <div class="video-text">
+          <h2>NEURAL NEXUS</h2>
+          <p>Moments &middot; Culture &middot; Innovation</p>
+        </div>
+      </div>
 
-<div class="whitebox">
+      <!-- MAIN AREA -->
+      <div class="main-area">
 
-  <!-- TOP VIDEO -->
-  <div class="videobox">
-    <video autoplay muted loop playsinline>
-      <source src="images-1/intro.mp4" type="video/mp4">
-    </video>
-    <div class="video-text">
-      <h2>NEURAL NEXUS</h2>
-      <p>Moments · Culture · Innovation</p>
-    </div>
-  </div>
+        <!-- Radio switches -->
+        <input type="radio" name="main" id="conducted" checked>
+        <input type="radio" name="main" id="upcoming">
+        <input type="radio" name="cond-event" id="cond-cultural" checked>
+        <input type="radio" name="cond-event" id="cond-technical">
+        <input type="radio" name="cond-event" id="cond-sports">
+        <input type="radio" name="up-event"   id="up-cultural" checked>
+        <input type="radio" name="up-event"   id="up-technical">
 
-  <!-- MAIN AREA -->
-  <div class="main-area">
-
-    <!-- MAIN SWITCH -->
-    <input type="radio" name="main" id="conducted" checked>
-    <input type="radio" name="main" id="upcoming">
-
-    <!-- CONDUCTED EVENT SWITCH -->
-    <input type="radio" name="cond-event" id="cond-cultural" checked>
-    <input type="radio" name="cond-event" id="cond-technical">
-    <input type="radio" name="cond-event" id="cond-sports">
-
-    <!-- UPCOMING EVENT SWITCH -->
-    <input type="radio" name="up-event" id="up-cultural" checked>
-    <input type="radio" name="up-event" id="up-technical">
-
-    <!-- LEFT SIDEBAR -->
-    <div class="sidebar">
-      <label for="conducted" class="side-btn">Conducted Events</label>
-      <label for="upcoming" class="side-btn">Upcoming Events</label>
-    </div>
-
-    <!-- CONTENT AREA -->
-    <div class="content-area">
-
-      <!-- ================= CONDUCTED ================= -->
-      <div class="content conducted-content">
-
-        <div class="event-list">
-          <h3>&middot;Quiz Competation</h3>
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+          <label for="conducted" class="side-btn">Conducted Events</label>
+          <label for="upcoming"  class="side-btn">Upcoming Events</label>
         </div>
 
-        <div class="details cond-cultural">
-          <div class="quizzimage">
-             <div class="gallery">
-                <img src="images-1/quizz logo.jpeg" alt="Event">
-             </div>
-             <div class="dateback">
-                 <div class="date">
+        <!-- CONTENT AREA -->
+        <div class="content-area">
+
+          <!-- ── CONDUCTED ── -->
+          <div class="content conducted-content">
+            <div class="event-list">
+              <h3>&middot; Quiz Competition</h3>
+            </div>
+            <div class="details cond-cultural">
+              <div class="quizzimage">
+                <div class="gallery">
+                  <img src="images-1/quizz logo.jpeg" alt="Quiz Event">
+                </div>
+                <div class="dateback">
+                  <div class="date">
                     <p>DEC</p>
                     <p>18</p>
-                 </div>
-                 <div class="line"></div>
-                 <div class="venue">
+                  </div>
+                  <div class="line"></div>
+                  <div class="venue">
                     <ul>NEURAL NEXUS</ul>
-                    <ul class="matter">quiz competation conducting by AI&DS club</ul>
+                    <ul class="matter">Quiz competition conducted by AI&amp;DS Club</ul>
                     <div class="location">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <ul class="matter">CSE Seminar hall</ul>
+                      <i class="fa-solid fa-location-dot"></i>
+                      <ul class="matter">CSE Seminar Hall</ul>
                     </div>
                     <a href="quiz.html"><button>Details</button></a>
-                 </div>
-             </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Firebase: dynamic conducted events appear here -->
+            <div id="conducted-events-list"></div>
+
           </div>
 
-        </div>
+          <!-- ── UPCOMING ── -->
+          <div class="content upcoming-content">
+            <div class="event-list">
+              <h3>&middot; One Day Guest Lecture</h3>
+            </div>
+            <div class="details up-cultural">
+              <h4>Guest Lecture 2025</h4>
+              <p>Upcoming guest lecture on AI &amp; Data Science topics.</p>
+            </div>
 
+            <!-- Firebase: dynamic upcoming events appear here -->
+            <div id="upcoming-events-list"></div>
+
+          </div>
+
+        </div><!-- /content-area -->
+      </div><!-- /main-area -->
+    </div><!-- /whitebox -->
+
+    <!-- ══ PHOTO GALLERY ══ -->
+    <div class="whitebox" style="margin-top:20px;padding:24px">
+      <div class="dynamic-gallery-section">
+        <h3><i class="fa-solid fa-images" style="color:#c0392b;margin-right:8px"></i> Club Photo Gallery</h3>
+        <div id="dynamic-gallery-grid">
+          <!-- Static photos (always visible) -->
+          <div class="gallery-item"><img src="images-1/quiz1.jpeg" alt="Quiz"></div>
+          <div class="gallery-item"><img src="images-1/quiz3.jpeg" alt="Quiz"></div>
+          <div class="gallery-item"><img src="images-1/quiz4.jpeg" alt="Quiz"></div>
+          <div class="gallery-item"><img src="images-1/club1.jpeg" alt="Club"></div>
+          <div class="gallery-item"><img src="images-1/event2.jpeg" alt="Event"></div>
+        </div>
       </div>
-
-      <!-- ================= UPCOMING ================= -->
-      <div class="content upcoming-content">
-
-        <div class="event-list">
-          <h3>&middot;One Day Guest Lecture</h3>
-        </div>
-
-        <div class="details up-cultural">
-          <h4>Cultural Fest 2025</h4>
-          <p>Upcoming cultural celebrations.</p>
-        </div>
-
-      </div>
-
     </div>
-  </div>
-</div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-        
+    <!-- ══ FOOTER ══ -->
     <div class="last">
       <div class="last-1">
         <div class="all">
-
           <div class="logo-1"></div>
-           <div class="clgname-1">
-               <p class="name-1">Sri Indu</p>
-               <p class="institute-1">Institute of Engineering & Technology</p>
-               <p class="ugc-1">UGC Autonomous Institution</p>
-               <p class="rec-1">Institution, Recognized under 2(f) of UGC Act 1956.</p>   
+          <div class="clgname-1">
+            <p class="name-1">Sri Indu</p>
+            <p class="institute-1">Institute of Engineering &amp; Technology</p>
+            <p class="ugc-1">UGC Autonomous Institution</p>
+            <p class="rec-1">Institution, Recognized under 2(f) of UGC Act 1956.</p>
           </div>
- 
           <div class="list">
-           <p class="info">College Contact info</p>
-           <ul class="address">Sheriguda, Rangareddy, Telangana</ul>
-           <ul class="address">PIN:501510</ul>
-           <ul class="address">Mobile:93947187999, 8096951507</ul>
-           <ul class="address">Email: acct.siiet@gmail.com</ul>
-           <ul class="address"><a href="https://sriindu.ac.in/" style="text-decoration: none; color:black">web: siiet.ac.in</a></ul>
+            <p class="info">College Contact Info</p>
+            <ul class="address">Sheriguda, Rangareddy, Telangana</ul>
+            <ul class="address">PIN: 501510</ul>
+            <ul class="address">Mobile: 93947187999, 8096951507</ul>
+            <ul class="address">Email: acct.siiet@gmail.com</ul>
+            <ul class="address"><a href="https://sriindu.ac.in/" style="text-decoration:none;color:black" target="_blank">Web: sriindu.ac.in</a></ul>
           </div>
         </div>
-        
         <div class="all-2"></div>
-         <div class="details-2">
+        <div class="details-2">
           <p class="details-1">Contact us &middot; 9014196561</p>
-          <p class="details-1">CLub Mail &middot;neuralnexus.siiet@gmail.com</p>
+          <p class="details-1">Club Mail &middot; neuralnexus.siiet@gmail.com</p>
           <p class="details-1">Social Media Handlings</p>
-          <p class="details-1">Faculty Member's</p>
-    
-         </div>
-
-
+          <p class="details-1">Faculty Members</p>
         </div>
-         <div class="social-5">
-         <p class="social-6" >Let's talk social </p>
-         <p class="social-7">#SIIET</p>
-         <div class="icon">
-          <a href="https://www.instagram.com/siiet_ai_ds_club?igsh=MTJydTl2b3A4ZnAzdg==" style="text-decoration: none; color:black"><i class="fa-brands fa-instagram"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-whatsapp"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-telegram"></i></a>
-          <a href=""  style="text-decoration: none; color:black"><i class="fa-brands fa-x-twitter"></i></a>
-         </div>
+      </div>
+      <div class="social-5">
+        <p class="social-6">Let's talk social</p>
+        <p class="social-7">&nbsp;#SIIET</p>
+        <div class="icon">
+          <a href="https://www.instagram.com/siiet_ai_ds_club?igsh=MTJydTl2b3A4ZnAzdg==" style="text-decoration:none;color:black" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+          <a href="" style="text-decoration:none;color:black"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="" style="text-decoration:none;color:black"><i class="fa-brands fa-telegram"></i></a>
+          <a href="" style="text-decoration:none;color:black"><i class="fa-brands fa-x-twitter"></i></a>
         </div>
-        <footer style="background:#111; color:white; text-align:center; padding:15px 0; font-size:14px; margin-top:40px;">
-  Copyright © 2025 NeuralNexusGroup | All rights reserved.
-        </footer>
-
-    </div>     
+      </div>
+      <footer style="background:#111;color:white;text-align:center;padding:15px 0;font-size:14px;margin-top:40px;">
+        Copyright &copy; 2025 Neural Nexus Group &mdash; AI &amp; DS Club, SIIET. All rights reserved.
+      </footer>
     </div>
-        
-    </body>
-    </html>
 
+  </div><!-- /container -->
 
+  <!-- ══ ADMIN FAB ══ -->
+  <a href="admin.html" class="admin-fab" title="Admin Panel">
+    <i class="fa-solid fa-lock"></i> Admin
+  </a>
 
-    
-  
-            
-    
-
-
- 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-content.js"></script>
+  <script>
+    window.addEventListener("load", () => {
+      loadFirebaseEvents();
+      loadFirebaseGalleryImages();
+    });
+  </script>
 </body>
 </html>
