@@ -158,20 +158,47 @@ async function loadHomePageImages() {
 
   try {
     const snap = await db.collection("home_images").orderBy("uploadedAt", "desc").get();
-    container.innerHTML = ""; // clear any existing content first
+    container.innerHTML = "";
     if (snap.empty) return;
 
-    snap.forEach(doc => {
-      const { url } = doc.data();
-      if (!url) return;
+    function makeCard(url) {
       const box = document.createElement("div");
       box.className = "box";
+
       const imgDiv = document.createElement("div");
       imgDiv.className = "boximg";
       imgDiv.style.backgroundImage = "url(" + url + ")";
+
+      const overlay = document.createElement("div");
+      overlay.className = "box-overlay";
+
+      const glow = document.createElement("div");
+      glow.className = "box-glow";
+
+      const shine = document.createElement("div");
+      shine.className = "box-shine";
+
       box.appendChild(imgDiv);
-      container.appendChild(box);
-    });
+      box.appendChild(overlay);
+      box.appendChild(glow);
+      box.appendChild(shine);
+      return box;
+    }
+
+    const urls = [];
+    snap.forEach(doc => { if (doc.data().url) urls.push(doc.data().url); });
+    if (!urls.length) return;
+
+    // Build first set + duplicate for seamless infinite loop
+    urls.forEach(url => container.appendChild(makeCard(url)));
+    urls.forEach(url => container.appendChild(makeCard(url)));
+
+    // Pause animation when fewer than 3 images (no need to scroll)
+    if (urls.length < 3) {
+      container.style.animation = "none";
+      container.style.width = "100%";
+      container.style.justifyContent = "center";
+    }
   } catch(e) {
     console.warn("Could not load home images:", e);
   }
