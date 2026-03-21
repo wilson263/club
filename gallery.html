@@ -445,12 +445,29 @@
     /* Footer */
     .last { background: #060610 !important; }
     .last-1 { background: #0a0a18 !important; border-top: 1px solid rgba(255,255,255,0.06) !important; padding: 32px 24px !important; }
-    .logo-1 { background-image: url(images-1/logo.jpeg) !important; border-radius: 50% !important; border: 2px solid #e63946 !important; }
+    .logo-1 { background-image: url(images-1/logo.jpeg) !important; border-radius: 50% !important; border: 2px solid #e63946 !important; position: relative !important; left: auto !important; margin-left: 0 !important; }
+    .details-2 { width: auto !important; height: auto !important; min-width: 200px !important; }
     .name-1      { color: #e63946 !important; }
     .institute-1, .ugc-1, .rec-1, .address { color: rgba(255,255,255,0.6) !important; }
     .info        { color: white !important; font-weight: 700 !important; margin-bottom: 10px !important; }
     .details-1   { color: rgba(255,255,255,0.6) !important; font-size: 13px !important; line-height: 2 !important; }
-    .social-5    { background: #060610 !important; border-top: 1px solid rgba(255,255,255,0.06) !important; padding: 14px 20px !important; }
+    .social-5    { background: #060610 !important; border-top: 1px solid rgba(255,255,255,0.06) !important; padding: 14px 20px !important; position: relative !important; right: auto !important; width: 100% !important; }
+
+    /* Navbar sublogos: fix absolute stacking from gallery.css */
+    .sublogo-group {
+      display: flex !important; align-items: center !important; gap: 6px !important;
+      position: absolute !important; right: 10px !important; top: 50% !important;
+      transform: translateY(-50%) !important; flex-shrink: 0 !important;
+    }
+    .sublogo-1, .sublogo-2, .sublogo-3, .sublogo-4 {
+      position: static !important; right: auto !important; top: auto !important;
+      width: 42px !important; height: 42px !important; border-radius: 50% !important;
+      border: 2px solid rgba(230,57,70,0.4) !important; flex-shrink: 0 !important;
+    }
+    @media (max-width: 480px) {
+      .sublogo-1, .sublogo-2, .sublogo-3, .sublogo-4 { width: 30px !important; height: 30px !important; }
+      .sublogo-group { gap: 4px !important; right: 6px !important; }
+    }
     .social-6    { color: white !important; font-weight: 700 !important; }
     .social-7    { color: #e63946 !important; font-weight: 800 !important; }
 
