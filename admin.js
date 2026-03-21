@@ -161,6 +161,7 @@ const panelTitles = {
   "home-images": "Home Page Images",
   events: "Events",
   gallery: "Photo Gallery",
+  achievements: "Achievements",
   admins: "Admin Accounts"
 };
 
@@ -174,9 +175,10 @@ function showPanel(name) {
   document.getElementById("topbar-title").textContent = panelTitles[name] || "Dashboard";
   closeSidebar();
 
-  if (name === "home-images") loadHomeImages();
+  if (name === "home-images")  loadHomeImages();
   if (name === "events")       loadEvents();
   if (name === "gallery")      loadGalleryImages();
+  if (name === "achievements") loadAchievements();
   if (name === "admins")       loadAdmins();
   if (name === "overview")     loadStats();
 }
@@ -184,16 +186,18 @@ function showPanel(name) {
 // ─── STATS ────────────────────────────────────────
 async function loadStats() {
   try {
-    const [homeSnap, eventsSnap, gallerySnap, adminsSnap] = await Promise.all([
+    const [homeSnap, eventsSnap, gallerySnap, achSnap, adminsSnap] = await Promise.all([
       db.collection("home_images").get(),
       db.collection("events").get(),
       db.collection("gallery_images").get(),
+      db.collection("achievements").get(),
       db.collection("admins").get()
     ]);
-    document.getElementById("stat-home-images").textContent = homeSnap.size;
-    document.getElementById("stat-events").textContent      = eventsSnap.size;
-    document.getElementById("stat-gallery").textContent     = gallerySnap.size;
-    document.getElementById("stat-admins").textContent      = adminsSnap.size;
+    document.getElementById("stat-home-images").textContent  = homeSnap.size;
+    document.getElementById("stat-events").textContent       = eventsSnap.size;
+    document.getElementById("stat-gallery").textContent      = gallerySnap.size;
+    document.getElementById("stat-achievements").textContent = achSnap.size;
+    document.getElementById("stat-admins").textContent       = adminsSnap.size;
   } catch(e) { console.error(e); }
 }
 
@@ -509,17 +513,121 @@ async function removeTempAdmin(docId, email) {
   } catch(e) { showToast("Error removing admin", "error"); }
 }
 
+// ─── ACHIEVEMENTS ─────────────────────────────────
+async function loadAchievements() {
+  const grid = document.getElementById("ach-grid");
+  grid.innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted);grid-column:1/-1">⏳ Loading...</div>';
+  try {
+    const snap = await db.collection("achievements").orderBy("addedAt", "desc").get();
+    if (snap.empty) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">🏆</div><p>No achievements yet. Click "Add Achievement" to add one.</p></div>';
+      return;
+    }
+    grid.innerHTML = "";
+    snap.forEach(doc => {
+      const d = doc.data();
+      const card = document.createElement("div");
+      card.className = "ach-card";
+      card.innerHTML = `
+        <div class="ach-card-top">
+          <span class="ach-emoji">${d.emoji || "🏆"}</span>
+          <span class="ach-cat">${d.category || ""}</span>
+        </div>
+        <div class="ach-title">${d.title || "Untitled"}</div>
+        <div class="ach-desc">${d.description || ""}</div>
+        <div class="ach-footer">
+          <span class="ach-date">📅 ${d.year || ""}</span>
+          <div class="ach-actions">
+            <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick='openAchievementModal(${JSON.stringify({id:doc.id,...d})})'>✏️</button>
+            <button class="btn btn-danger" style="padding:6px 12px;font-size:12px" onclick="deleteAchievement('${doc.id}')">🗑️</button>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  } catch(e) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="es-icon">⚠️</div><p>Error loading achievements</p></div>'; }
+}
+
+function openAchievementModal(existing) {
+  document.getElementById("ach-modal").classList.add("open");
+  if (existing && typeof existing === "object") {
+    document.getElementById("ach-modal-title").textContent = "Edit Achievement";
+    document.getElementById("ach-edit-id").value    = existing.id || "";
+    document.getElementById("ach-emoji").value       = existing.emoji || "";
+    document.getElementById("ach-cat").value         = existing.category || "";
+    document.getElementById("ach-year").value        = existing.year || "";
+    document.getElementById("ach-title").value       = existing.title || "";
+    document.getElementById("ach-desc").value        = existing.description || "";
+    document.getElementById("ach-badge").value       = existing.badge || "";
+  } else {
+    document.getElementById("ach-modal-title").textContent = "Add Achievement";
+    document.getElementById("ach-edit-id").value    = "";
+    document.getElementById("ach-emoji").value       = "";
+    document.getElementById("ach-cat").value         = "";
+    document.getElementById("ach-year").value        = new Date().getFullYear();
+    document.getElementById("ach-title").value       = "";
+    document.getElementById("ach-desc").value        = "";
+    document.getElementById("ach-badge").value       = "";
+  }
+}
+
+function closeAchievementModal() {
+  document.getElementById("ach-modal").classList.remove("open");
+}
+
+async function saveAchievement() {
+  const id    = document.getElementById("ach-edit-id").value;
+  const emoji = document.getElementById("ach-emoji").value.trim() || "🏆";
+  const cat   = document.getElementById("ach-cat").value.trim();
+  const year  = document.getElementById("ach-year").value.trim();
+  const title = document.getElementById("ach-title").value.trim();
+  const desc  = document.getElementById("ach-desc").value.trim();
+  const badge = document.getElementById("ach-badge").value.trim();
+
+  if (!title) { showToast("Please enter a title", "error"); return; }
+
+  const data = {
+    emoji, category: cat, year, title, description: desc, badge,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    if (id) {
+      await db.collection("achievements").doc(id).update(data);
+      showToast("Achievement updated!", "success");
+    } else {
+      data.addedBy = currentUser.email;
+      data.addedAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("achievements").add(data);
+      showToast("Achievement added!", "success");
+    }
+    closeAchievementModal();
+    loadAchievements();
+    loadStats();
+  } catch(e) { showToast("Error saving achievement: " + e.message, "error"); }
+}
+
+async function deleteAchievement(docId) {
+  if (!confirm("Delete this achievement?")) return;
+  try {
+    await db.collection("achievements").doc(docId).delete();
+    showToast("Achievement deleted", "info");
+    loadAchievements();
+    loadStats();
+  } catch(e) { showToast("Error deleting achievement", "error"); }
+}
+
 // ─── HELPERS ──────────────────────────────────────
 function makeImageItem(url, onDelete) {
   const item = document.createElement("div");
-  item.className = "image-item";
+  item.className = "img-item";
   item.innerHTML = `
     <img src="${url}" loading="lazy" alt="image">
-    <div class="overlay">
-      <button class="delete-btn">🗑 Delete</button>
+    <div class="img-overlay">
+      <button class="img-del">🗑 Delete</button>
     </div>
   `;
-  item.querySelector(".delete-btn").onclick = onDelete;
+  item.querySelector(".img-del").onclick = onDelete;
   return item;
 }
 
