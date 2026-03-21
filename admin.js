@@ -24,43 +24,50 @@ let currentUser = null;
 let isPermanentAdmin = false;
 let allEvents = [];
 
+function hideAuthLoading() {
+  const el = document.getElementById("auth-loading");
+  if (el) el.style.display = "none";
+}
+
 if (isConfigured) {
   firebase.initializeApp(firebaseConfig);
   auth    = firebase.auth();
   db      = firebase.firestore();
   storage = firebase.storage();
 
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      currentUser = user;
-
-      // Check localStorage cache first — instant, no network needed
-      const cachedRole = localStorage.getItem("nn_role_" + user.uid);
-      if (cachedRole !== null) {
-        isPermanentAdmin = cachedRole === "true";
-        updateSidebarForRole(user);
-        showDashboard();
-        // Refresh role silently in background
-        loadCurrentUser(user);
-      } else if (user.email === PERMANENT_ADMIN_EMAIL) {
-        // Permanent admin — no need to wait for Firestore
-        isPermanentAdmin = true;
-        localStorage.setItem("nn_role_" + user.uid, "true");
-        updateSidebarForRole(user);
-        showDashboard();
-        // Sync Firestore in background
-        loadCurrentUser(user);
+  // Ensure session survives page navigation (explicit LOCAL persistence)
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        const cachedRole = localStorage.getItem("nn_role_" + user.uid);
+        if (cachedRole !== null) {
+          isPermanentAdmin = cachedRole === "true";
+          hideAuthLoading();
+          updateSidebarForRole(user);
+          showDashboard();
+          loadCurrentUser(user);
+        } else if (user.email === PERMANENT_ADMIN_EMAIL) {
+          isPermanentAdmin = true;
+          localStorage.setItem("nn_role_" + user.uid, "true");
+          hideAuthLoading();
+          updateSidebarForRole(user);
+          showDashboard();
+          loadCurrentUser(user);
+        } else {
+          await loadCurrentUser(user);
+          hideAuthLoading();
+          showDashboard();
+        }
       } else {
-        // Temp admin — must load role before showing dashboard
-        await loadCurrentUser(user);
-        showDashboard();
+        currentUser = null;
+        hideAuthLoading();
+        showLogin();
       }
-    } else {
-      currentUser = null;
-      showLogin();
-    }
+    });
   });
 } else {
+  hideAuthLoading();
   showLogin();
   document.getElementById("config-banner").style.display = "flex";
 }
