@@ -437,15 +437,15 @@
   <!-- STATS BAR -->
   <div class="stats-bar">
     <div class="stat-item">
-      <div class="stat-num">10+</div>
+      <div class="stat-num" id="stat-events">—</div>
       <div class="stat-label">Events Conducted</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num">5+</div>
+      <div class="stat-num" id="stat-awards">—</div>
       <div class="stat-label">Awards Won</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num">200+</div>
+      <div class="stat-num" id="stat-members">—</div>
       <div class="stat-label">Members</div>
     </div>
     <div class="stat-item">
@@ -464,73 +464,12 @@
     </div>
 
     <div class="achievements-grid" id="dynamic-ach-grid">
-
-      <div class="achievement-card">
-        <div class="card-icon gold">🏆</div>
-        <div class="card-category">Quiz Competition</div>
-        <div class="card-title">Inter-College AI Quiz Championship</div>
-        <div class="card-desc">Our team secured 1st place in the inter-college AI &amp; Data Science quiz competition, showcasing deep knowledge in machine learning and AI concepts.</div>
-        <div class="card-footer">
-          <span class="card-date">📅 2024</span>
-          <span class="card-badge badge-gold">🥇 1st Place</span>
-        </div>
-      </div>
-
-      <div class="achievement-card">
-        <div class="card-icon blue">💻</div>
-        <div class="card-category">Hackathon</div>
-        <div class="card-title">Smart India Hackathon Participation</div>
-        <div class="card-desc">Neural Nexus members participated in Smart India Hackathon, presenting innovative AI-based solutions for real-world problems.</div>
-        <div class="card-footer">
-          <span class="card-date">📅 2024</span>
-          <span class="card-badge badge-participant">🔵 Participant</span>
-        </div>
-      </div>
-
-      <div class="achievement-card">
-        <div class="card-icon green">🎓</div>
-        <div class="card-category">Workshop</div>
-        <div class="card-title">100+ Students Trained in Python &amp; ML</div>
-        <div class="card-desc">Conducted a series of hands-on workshops training over 100 students in Python programming, machine learning fundamentals, and data analysis.</div>
-        <div class="card-footer">
-          <span class="card-date">📅 2023–2024</span>
-          <span class="card-badge badge-winner">✅ Completed</span>
-        </div>
-      </div>
-
-      <div class="achievement-card">
-        <div class="card-icon purple">🤖</div>
-        <div class="card-category">Project Expo</div>
-        <div class="card-title">Best AI Project Award — College Expo</div>
-        <div class="card-desc">Club members won the Best Project award at the annual college technical exposition for their AI-based project solving an industry problem.</div>
-        <div class="card-footer">
-          <span class="card-date">📅 2023</span>
-          <span class="card-badge badge-gold">🥇 Best Project</span>
-        </div>
-      </div>
-
-      <div class="achievement-card">
-        <div class="card-icon silver">📊</div>
-        <div class="card-category">Data Science</div>
-        <div class="card-title">Data Science Case Study Runner-Up</div>
-        <div class="card-desc">Secured 2nd place in a state-level data science case study competition, demonstrating strong analytical and visualization skills.</div>
-        <div class="card-footer">
-          <span class="card-date">📅 2023</span>
-          <span class="card-badge badge-silver">🥈 2nd Place</span>
-        </div>
-      </div>
-
-      <div class="achievement-card">
-        <div class="card-icon gold">🌟</div>
-        <div class="card-category">Club Recognition</div>
-        <div class="card-title">Best Technical Club — SIIET</div>
-        <div class="card-desc">Neural Nexus was recognized as the Best Technical Club of the year by Sri Indu Institute of Engineering &amp; Technology for outstanding performance and community impact.</div>
-        <div class="card-footer">
-          <span class="card-date">📅 2023</span>
-          <span class="card-badge badge-winner">🏅 Recognized</span>
-        </div>
-      </div>
-
+      <!-- Loaded from Firestore by admin — empty until admin posts -->
+    </div>
+    <div id="ach-empty" style="display:none;text-align:center;padding:60px 20px;color:rgba(255,255,255,0.35)">
+      <div style="font-size:48px;margin-bottom:16px">🏆</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;color:rgba(255,255,255,0.5)">No achievements posted yet</div>
+      <div style="font-size:14px">Check back soon — big things are coming!</div>
     </div>
 
     <!-- TIMELINE -->
@@ -610,21 +549,27 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-content.js"></script>
 <script>
-(async function loadAchievements() {
-  const grid = document.getElementById("dynamic-ach-grid");
-  if (!grid) return;
-
+(async function loadAll() {
   try {
-    const snap = await firebase.firestore().collection("achievements").orderBy("addedAt","desc").get();
-    if (!snap.empty) {
-      // Replace hardcoded cards with Firebase data
+    const db = firebase.firestore();
+
+    // ── 1. Load achievements from Firestore ──────────────
+    const achSnap = await db.collection("achievements").orderBy("addedAt","desc").get();
+    const grid    = document.getElementById("dynamic-ach-grid");
+    const empty   = document.getElementById("ach-empty");
+    const colors  = ["gold","silver","blue","green","purple"];
+
+    if (achSnap.empty) {
+      grid.style.display = "none";
+      empty.style.display = "block";
+    } else {
       grid.innerHTML = "";
-      snap.forEach(doc => {
+      achSnap.forEach((doc, i) => {
         const d = doc.data();
-        const colorClass = ["gold","silver","bronze","blue","green","purple"][Math.floor(Math.random()*6)];
+        const color = colors[i % colors.length];
         grid.innerHTML += `
           <div class="achievement-card">
-            <div class="card-icon ${colorClass}">${d.emoji || "🏆"}</div>
+            <div class="card-icon ${color}">${d.emoji || "🏆"}</div>
             <div class="card-category">${d.category || "Achievement"}</div>
             <div class="card-title">${d.title || ""}</div>
             <div class="card-desc">${d.description || ""}</div>
@@ -632,13 +577,25 @@
               <span class="card-date">📅 ${d.year || ""}</span>
               ${d.badge ? `<span class="card-badge badge-winner">${d.badge}</span>` : ""}
             </div>
-          </div>
-        `;
+          </div>`;
       });
     }
-    // Update stats
-    document.querySelector(".stat-num:nth-of-type(2)");
-  } catch(e) { console.warn("Achievements: Firebase not loaded", e.message); }
+
+    // ── 2. Stats — all live from Firestore ──────────────
+    const [eventsSnap, membersSnap] = await Promise.all([
+      db.collection("events").get(),
+      db.collection("club_members").get()
+    ]);
+
+    const evCount  = eventsSnap.size;
+    const memCount = membersSnap.size;
+    const achCount = achSnap.size;
+
+    document.getElementById("stat-events").textContent  = evCount  > 0 ? evCount + "+"  : "0";
+    document.getElementById("stat-awards").textContent  = achCount > 0 ? achCount + "+" : "0";
+    document.getElementById("stat-members").textContent = memCount > 0 ? memCount + "+" : "0";
+
+  } catch(e) { console.warn("Achievements page: Firebase error —", e.message); }
 })();
 </script>
 
