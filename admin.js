@@ -1396,7 +1396,7 @@ function sendRegistrationConfirmationEmail(userName, userEmail, eventTitle) {
       to_email: userEmail,
       event_title: eventTitle,
       club_name: "Neural Nexus — AI & DS Club",
-      club_email: "neuralnexus.siiet@gmail.com",
+      club_email: "neuralnexusgroup@gmail.com",
       club_phone: "9014196561"
     }
   ).then(() => {
