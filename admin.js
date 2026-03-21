@@ -25,6 +25,7 @@ let isPermanentAdmin = false;
 let allEvents = [];
 
 function hideAuthLoading() {
+  if (window._nn_authFallback) { clearTimeout(window._nn_authFallback); window._nn_authFallback = null; }
   const el = document.getElementById("auth-loading");
   if (el) el.style.display = "none";
 }
