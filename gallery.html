@@ -319,70 +319,93 @@
 
     .ebc-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
-    /* Dynamic Firebase event cards (same big style) */
+    /* Dynamic Firebase event cards — compact horizontal layout */
     .event-card-dynamic {
-      position: relative;
-      border-radius: 24px;
+      display: flex;
+      align-items: stretch;
+      border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 28px;
+      margin-bottom: 14px;
       border: 1px solid rgba(255,255,255,0.08);
       background: linear-gradient(135deg, #141428 0%, #1c0e14 100%);
-      transition: transform 0.3s, box-shadow 0.3s;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      min-height: 90px;
     }
 
     .event-card-dynamic:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 60px rgba(230,57,70,0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(230,57,70,0.15);
     }
 
     .event-img {
-      height: 260px;
+      width: 110px;
+      min-width: 110px;
       background-size: cover;
       background-position: center;
       position: relative;
+      flex-shrink: 0;
     }
 
     .event-img::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.7) 100%);
+      background: linear-gradient(90deg, transparent 60%, rgba(20,20,40,0.5) 100%);
     }
 
     .event-info-dynamic {
-      padding: 24px 28px;
-      display: block;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 0;
     }
 
     .date-badge {
-      display: inline-flex;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
       background: #e63946;
       border-radius: 10px;
-      padding: 6px 14px;
+      padding: 6px 10px;
       color: white;
       font-weight: 800;
-      font-size: 13px;
-      margin-bottom: 14px;
+      font-size: 12px;
+      min-width: 44px;
+      flex-shrink: 0;
+      line-height: 1.3;
+      text-align: center;
     }
 
     .date-badge p { margin: 0; }
 
+    .event-details-dynamic {
+      min-width: 0;
+      flex: 1;
+    }
+
     .event-details-dynamic h3 {
-      font-size: 20px;
+      font-size: 15px;
       color: white;
-      font-weight: 900;
-      margin-bottom: 8px;
-      letter-spacing: -0.3px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      letter-spacing: -0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .event-details-dynamic p {
-      font-size: 13px;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.7;
-      margin-bottom: 6px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* ── UPCOMING ── */
