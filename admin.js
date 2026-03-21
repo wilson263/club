@@ -36,24 +36,9 @@ if (isConfigured) {
 
   auth.onAuthStateChanged(async (user) => {
     if (user) {
-      currentUser = user;
-      const cachedRole = localStorage.getItem("nn_role_" + user.uid);
-      if (cachedRole !== null) {
-        isPermanentAdmin = cachedRole === "true";
-        updateSidebarForRole(user);
-        showDashboard();
-        logActivity("login", "Admin signed in");
-        loadCurrentUser(user);
-      } else if (user.email === PERMANENT_ADMIN_EMAIL) {
-        isPermanentAdmin = true;
-        localStorage.setItem("nn_role_" + user.uid, "true");
-        updateSidebarForRole(user);
-        showDashboard();
-        loadCurrentUser(user);
-      } else {
-        await loadCurrentUser(user);
-        showDashboard();
-      }
+      // Only auto-restore session if the dashboard isn't already showing
+      if (document.getElementById("dashboard").style.display === "block") return;
+      await handleUserSignIn(user, false);
     } else {
       currentUser = null;
       showLogin();
@@ -62,6 +47,36 @@ if (isConfigured) {
 } else {
   showLogin();
   document.getElementById("config-banner").style.display = "flex";
+}
+
+// ─── HANDLE USER AFTER SIGN-IN ────────────────────
+// Called both from doLogin (direct) and onAuthStateChanged (session restore)
+async function handleUserSignIn(user, logLogin) {
+  currentUser = user;
+  const cachedRole = localStorage.getItem("nn_role_" + user.uid);
+  if (cachedRole !== null) {
+    isPermanentAdmin = cachedRole === "true";
+  } else if (user.email === PERMANENT_ADMIN_EMAIL) {
+    isPermanentAdmin = true;
+    localStorage.setItem("nn_role_" + user.uid, "true");
+  } else {
+    // Temp admin — fetch role from Firestore
+    try {
+      const doc = await db.collection("admins").doc(user.uid).get();
+      isPermanentAdmin = doc.exists ? doc.data().isPermanent === true : false;
+      localStorage.setItem("nn_role_" + user.uid, isPermanentAdmin ? "true" : "false");
+    } catch(e) { isPermanentAdmin = false; }
+  }
+  updateSidebarForRole(user);
+  showDashboard();
+  if (logLogin) logActivity("login", "Admin signed in");
+  // Ensure admin doc exists in Firestore (non-blocking)
+  if (user.email === PERMANENT_ADMIN_EMAIL) {
+    db.collection("admins").doc(user.uid).set({
+      email: user.email, name: "Super Admin", isPermanent: true,
+      addedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(() => {});
+  }
 }
 
 // ─── AUTH ─────────────────────────────────────────
@@ -83,8 +98,9 @@ async function doLogin() {
   const resetBtn = () => { btn.innerHTML = '🔐 Sign In'; btn.disabled = false; };
 
   try {
-    await auth.signInWithEmailAndPassword(email, password);
-    // Success — onAuthStateChanged will call showDashboard(); button stays hidden with login screen
+    const cred = await auth.signInWithEmailAndPassword(email, password);
+    // Directly set up dashboard — do not wait for onAuthStateChanged
+    await handleUserSignIn(cred.user, true);
     return;
   } catch (err) {
     // Handle the case where the permanent admin account doesn't exist yet in Firebase Auth
@@ -94,11 +110,10 @@ async function doLogin() {
     if (isInvalidCred && email === PERMANENT_ADMIN_EMAIL && password === PERMANENT_ADMIN_PASSWORD) {
       try {
         btn.innerHTML = '<span class="spin">⟳</span> Setting up account...';
-        await auth.createUserWithEmailAndPassword(email, password);
-        // Success — onAuthStateChanged will handle the rest
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        await handleUserSignIn(cred.user, true);
         return;
       } catch (createErr) {
-        // If account already exists, the original password may be wrong — just show error
         if (createErr.code === "auth/email-already-in-use") {
           showLoginError("Incorrect password for this admin account.");
         } else {
@@ -112,6 +127,7 @@ async function doLogin() {
     if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential" || err.code === "auth/invalid-login-credentials") msg = "No admin account found with this email.";
     if (err.code === "auth/wrong-password")    msg = "Incorrect password.";
     if (err.code === "auth/too-many-requests") msg = "Too many attempts. Try again later.";
+    if (err.code === "auth/unauthorized-domain") msg = "This domain is not authorized. Contact the developer.";
     showLoginError(msg);
     resetBtn();
   }
