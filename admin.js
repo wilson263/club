@@ -33,8 +33,28 @@ if (isConfigured) {
   auth.onAuthStateChanged(async (user) => {
     if (user) {
       currentUser = user;
-      await loadCurrentUser(user);
-      showDashboard();
+
+      // Check localStorage cache first — instant, no network needed
+      const cachedRole = localStorage.getItem("nn_role_" + user.uid);
+      if (cachedRole !== null) {
+        isPermanentAdmin = cachedRole === "true";
+        updateSidebarForRole(user);
+        showDashboard();
+        // Refresh role silently in background
+        loadCurrentUser(user);
+      } else if (user.email === PERMANENT_ADMIN_EMAIL) {
+        // Permanent admin — no need to wait for Firestore
+        isPermanentAdmin = true;
+        localStorage.setItem("nn_role_" + user.uid, "true");
+        updateSidebarForRole(user);
+        showDashboard();
+        // Sync Firestore in background
+        loadCurrentUser(user);
+      } else {
+        // Temp admin — must load role before showing dashboard
+        await loadCurrentUser(user);
+        showDashboard();
+      }
     } else {
       currentUser = null;
       showLogin();
@@ -85,6 +105,8 @@ async function doLogin() {
 }
 
 async function doLogout() {
+  // Clear cached role on logout
+  if (currentUser) localStorage.removeItem("nn_role_" + currentUser.uid);
   await auth.signOut();
   showToast("Logged out successfully", "info");
 }
@@ -109,6 +131,22 @@ function showDashboard() {
   loadDashboardData();
 }
 
+// ─── SIDEBAR FOR ROLE ──────────────────────────────
+function updateSidebarForRole(user) {
+  const initial = (user.email || "A")[0].toUpperCase();
+  document.getElementById("sidebar-avatar").textContent = initial;
+  document.getElementById("sidebar-name").textContent   = user.email || "Admin";
+  document.getElementById("sidebar-role").textContent   = isPermanentAdmin ? "Permanent Admin" : "Temp Admin";
+  if (isPermanentAdmin) {
+    document.getElementById("admin-mgmt-label").style.display = "block";
+    document.getElementById("admin-mgmt-btn").style.display   = "flex";
+    document.getElementById("guide-admin").style.display      = "flex";
+  } else {
+    document.getElementById("admin-mgmt-label").style.display = "none";
+    document.getElementById("admin-mgmt-btn").style.display   = "none";
+  }
+}
+
 // ─── LOAD USER ─────────────────────────────────────
 async function loadCurrentUser(user) {
   try {
@@ -117,20 +155,15 @@ async function loadCurrentUser(user) {
       isPermanentAdmin = doc.data().isPermanent === true;
     } else if (user.email === PERMANENT_ADMIN_EMAIL) {
       isPermanentAdmin = true;
-      await db.collection("admins").doc(user.uid).set({
+      // Create the admin document without blocking the UI
+      db.collection("admins").doc(user.uid).set({
         email: user.email, name: "Super Admin", isPermanent: true,
         addedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      }).catch(e => console.error("Error creating admin doc:", e));
     }
-    const initial = (user.email || "A")[0].toUpperCase();
-    document.getElementById("sidebar-avatar").textContent = initial;
-    document.getElementById("sidebar-name").textContent   = user.email || "Admin";
-    document.getElementById("sidebar-role").textContent   = isPermanentAdmin ? "Permanent Admin" : "Temp Admin";
-    if (isPermanentAdmin) {
-      document.getElementById("admin-mgmt-label").style.display = "block";
-      document.getElementById("admin-mgmt-btn").style.display   = "flex";
-      document.getElementById("guide-admin").style.display      = "flex";
-    }
+    // Cache role so next login is instant
+    localStorage.setItem("nn_role_" + user.uid, isPermanentAdmin ? "true" : "false");
+    updateSidebarForRole(user);
   } catch(e) { console.error("Error loading user:", e); }
 }
 
@@ -168,24 +201,23 @@ function showPanel(name) {
 
 // ─── STATS ────────────────────────────────────────
 async function loadStats() {
-  try {
-    const [homeSnap, eventsSnap, gallerySnap, achSnap, adminsSnap, membersSnap, facultySnap] = await Promise.all([
-      db.collection("home_images").get(),
-      db.collection("events").get(),
-      db.collection("gallery_images").get(),
-      db.collection("achievements").get(),
-      db.collection("admins").get(),
-      db.collection("club_members").get(),
-      db.collection("faculty_members").get()
-    ]);
-    document.getElementById("stat-home-images").textContent  = homeSnap.size;
-    document.getElementById("stat-events").textContent       = eventsSnap.size;
-    document.getElementById("stat-gallery").textContent      = gallerySnap.size;
-    document.getElementById("stat-achievements").textContent = achSnap.size;
-    document.getElementById("stat-admins").textContent       = adminsSnap.size;
-    document.getElementById("stat-members").textContent      = membersSnap.size;
-    document.getElementById("stat-faculty-count").textContent = facultySnap.size;
-  } catch(e) { console.error(e); }
+  const results = await Promise.allSettled([
+    db.collection("home_images").get(),
+    db.collection("events").get(),
+    db.collection("gallery_images").get(),
+    db.collection("achievements").get(),
+    db.collection("admins").get(),
+    db.collection("club_members").get(),
+    db.collection("faculty_members").get()
+  ]);
+  const val = (r) => r.status === "fulfilled" ? r.value.size : "—";
+  document.getElementById("stat-home-images").textContent   = val(results[0]);
+  document.getElementById("stat-events").textContent        = val(results[1]);
+  document.getElementById("stat-gallery").textContent       = val(results[2]);
+  document.getElementById("stat-achievements").textContent  = val(results[3]);
+  document.getElementById("stat-admins").textContent        = val(results[4]);
+  document.getElementById("stat-members").textContent       = val(results[5]);
+  document.getElementById("stat-faculty-count").textContent = val(results[6]);
 }
 function loadDashboardData() { loadStats(); }
 
@@ -388,7 +420,14 @@ async function deleteGalleryImage(docId, url) {
 
 // ─── ADMIN MANAGEMENT ─────────────────────────────
 async function loadAdmins() {
-  if (!isPermanentAdmin) return;
+  // If role not yet resolved and user looks like perm admin, wait briefly
+  if (!isPermanentAdmin && currentUser && currentUser.email === PERMANENT_ADMIN_EMAIL) {
+    await new Promise(r => setTimeout(r, 800));
+  }
+  if (!isPermanentAdmin) {
+    document.getElementById("admin-list").innerHTML = '<div style="text-align:center;padding:28px;color:var(--muted)">⛔ Only the permanent admin can view this section.</div>';
+    return;
+  }
   const list     = document.getElementById("admin-list");
   const limitMsg = document.getElementById("admin-limit-msg");
   list.innerHTML = "";
