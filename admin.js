@@ -266,6 +266,7 @@ const panelTitles = {
 };
 
 function showPanel(name) {
+  document.querySelectorAll(".modal-overlay.open").forEach(m => m.classList.remove("open"));
   document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
   document.getElementById("panel-" + name).classList.add("active");
